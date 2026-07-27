@@ -153,7 +153,7 @@ export async function middleware(req: NextRequest) {
       return withCsp(Response.json({ success: false, error: "انتهت الجلسة" }, { status: 401 }), false);
     }
     const res = redirectNoStore(new URL("/login", req.url));
-    res.cookies.delete(AUTH_COOKIE_NAME);
+    res.cookies.delete({ name: AUTH_COOKIE_NAME, path: "/" });
     return withCsp(res, false);
   }
 
