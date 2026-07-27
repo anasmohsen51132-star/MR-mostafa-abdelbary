@@ -31,9 +31,9 @@ export const systemLogSource: ErrorMetricsSource & AuthMetricsSource & SecurityM
         by: ["message", "category"],
         where,
         _count: { _all: true },
-        orderBy: { _count: { _all: "desc" } },
-        take: 8,
-      }),
+      }).then((rows) =>
+        rows.sort((a, b) => b._count._all - a._count._all).slice(0, 8)
+      ),
     ]);
 
     const byCategoryRaw = await prisma.systemLog.groupBy({
@@ -82,9 +82,9 @@ export const systemLogSource: ErrorMetricsSource & AuthMetricsSource & SecurityM
         by: ["message"],
         where,
         _count: { _all: true },
-        orderBy: { _count: { _all: "desc" } },
-        take: 5,
-      }),
+      }).then((rows) =>
+        rows.sort((a, b) => b._count._all - a._count._all).slice(0, 5)
+      ),
     ]);
 
     return {
