@@ -92,7 +92,21 @@ export async function setAuthCookie(token: string) {
 // ---- Clear auth cookie ----
 export async function clearAuthCookie() {
   const cookieStore = await cookies();
-  cookieStore.delete({ name: AUTH_COOKIE_NAME, path: "/" });
+  // BUGFIX (logout not sticking in production): .delete() never sends a
+  // `Secure` attribute. The __Host- prefix used on AUTH_COOKIE_NAME in
+  // production REQUIRES `Secure` to be present on every Set-Cookie for
+  // that name, including the deletion one — without it the browser
+  // silently discards the whole instruction and the old cookie survives
+  // logout. Using .set() with an expired date lets us mirror the exact
+  // attributes setAuthCookie() used (secure/path), which is what actually
+  // makes the deletion valid.
+  cookieStore.set(AUTH_COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    expires: new Date(0),
+    path: "/",
+  });
 }
 
 // ---- AUTH-002: generate a fresh single-device session id ----
