@@ -92,7 +92,7 @@ export async function setAuthCookie(token: string) {
 // ---- Clear auth cookie ----
 export async function clearAuthCookie() {
   const cookieStore = await cookies();
-  cookieStore.delete(AUTH_COOKIE_NAME);
+  cookieStore.delete({ name: AUTH_COOKIE_NAME, path: "/" });
 }
 
 // ---- AUTH-002: generate a fresh single-device session id ----
