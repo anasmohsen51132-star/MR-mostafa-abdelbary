@@ -123,7 +123,7 @@
      (#C9A84C / #1A6B47 / #F5F1E8 / #1A1208 / #8B6914). Because
      ThemeStyle renders after this stylesheet, those DB-sourced
      values can win the cascade for any component that reads
-     --color-* instead of --ds-*/--cyan/--navy/etc. Fixing this
+     --color-* instead of --ds-* / --cyan / --navy / etc. Fixing this
      requires a Prisma schema + data change, which this task is
      explicitly not permitted to touch — flagged for a dedicated,
      separately-approved follow-up task.
