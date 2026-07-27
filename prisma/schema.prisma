@@ -1,0 +1,781 @@
+// ============================================================
+// MUSTAFA ACADEMY — Prisma Schema v3
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── ENUMS ──────────────────────────────────────────────────
+
+enum Role {
+  OWNER
+  ADMIN
+  STUDENT
+  // DEVELOPER: added as the foundation for the new internal Developer
+  // Dashboard (/developer). Highest permission level — has access to
+  // everything OWNER has, plus future developer-only tooling (AI
+  // monitoring, security, diagnostics, deployments). Existing OWNER/
+  // ADMIN/STUDENT roles and behavior are completely unaffected by this
+  // addition. No user is assigned this role automatically; it must be
+  // granted manually (e.g. via Prisma Studio or a direct DB update) since
+  // this task intentionally does not add any UI for assigning it.
+  DEVELOPER
+}
+
+enum AcademicLevel {
+  FIRST_SECONDARY
+  SECOND_SECONDARY
+  THIRD_SECONDARY
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+}
+
+// NEW: per-lecture quiz access requirement
+enum QuizRequirement {
+  NONE          // no quiz, open access
+  OPTIONAL      // quiz exists, lecture accessible without passing
+  MUST_PASS     // student must pass quiz to access lecture content
+}
+
+// ── USERS ──────────────────────────────────────────────────
+
+model User {
+  id             String         @id @default(cuid())
+  name           String
+  phone          String         @unique
+  passwordHash   String
+  role           Role           @default(STUDENT)
+  academicLevel  AcademicLevel?
+  avatar         String?
+  isActive       Boolean        @default(true)
+  joinedAt       DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // AUTH-002: single-device login enforcement. Every successful login
+  // generates a fresh random id here AND embeds it in the issued JWT's
+  // `sid` claim. Since this column only ever holds the *latest* session's
+  // id, any older token (from a different device/browser) still verifies
+  // cryptographically fine but carries a now-stale `sid` — /api/auth/me
+  // checks this on every session-verification call and rejects the
+  // mismatch, effectively logging the older device out. Nullable because
+  // existing users have no session yet until their next login.
+  currentSessionId String?
+
+  // Task 3 (Platform Metrics — "active users"/"online admins"/"online
+  // owners"): updated by /api/auth/me's success path, at most once every 5
+  // minutes per user (see that route for the exact throttle), never on
+  // every request — this is a coarse "seen in roughly the last few
+  // minutes" signal, not a precise online/offline flag.
+  lastSeenAt DateTime?
+
+  redeemedCodes      AccessCode[]       @relation("CodeRedeemer")
+  createdCodes       AccessCode[]       @relation("CodeCreator")
+  progress           Progress[]
+  quizSubmissions    QuizSubmission[]
+  homeworkSubmissions HomeworkSubmission[]
+  // Task 2 (Developer Dashboard monitoring): reverse relation only — this
+  // model never queries systemLogs off of a User, but Prisma requires the
+  // back-relation to exist for SystemLog.user above to compile.
+  systemLogs         SystemLog[]
+
+  @@index([phone])
+  @@index([role])
+  @@index([lastSeenAt])
+  @@index([academicLevel])
+}
+
+// ── COURSES ────────────────────────────────────────────────
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  icon        String   @default("📚")
+  color       String   @default("#1A6B47")
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lectures CourseLecture[]
+  codes    CourseOnCode[]
+  levels   CourseOnLevel[]
+
+  @@index([isPublished])
+}
+
+// ── COURSE-LEVEL JOIN ──────────────────────────────────────
+
+model CourseOnLevel {
+  courseId      String
+  academicLevel AcademicLevel
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, academicLevel])
+  @@index([academicLevel])
+}
+
+// ── LECTURES ───────────────────────────────────────────────
+
+model Lecture {
+  id               String          @id @default(cuid())
+  title            String
+  description      String?
+  order            Int             @default(0)
+  // API-004 FIX: there was no way to keep a lecture in draft while building
+  // it — every lecture was visible to any student who owned its course the
+  // moment it was created. Defaults to true so existing lectures keep their
+  // current (visible) behavior; new lectures can be created as drafts.
+  isPublished      Boolean         @default(true)
+  // Quiz gate: how strictly is the quiz enforced?
+  quizRequirement  QuizRequirement @default(NONE)
+  quizPassScore    Int             @default(60) // % needed to pass when MUST_PASS
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  courses  CourseLecture[]
+  videos   Video[]
+  pdfs     PDF[]
+  quizzes  Quiz[]
+  homework Homework[]
+  progress Progress[]
+
+  @@index([isPublished])
+}
+
+// ── COURSE-LECTURE JOIN ────────────────────────────────────
+
+model CourseLecture {
+  id        String   @id @default(cuid())
+  courseId  String
+  lectureId String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, lectureId])
+  @@index([courseId])
+  @@index([lectureId])
+}
+
+// ── VIDEOS ─────────────────────────────────────────────────
+
+model Video {
+  id        String   @id @default(cuid())
+  lectureId String
+  title     String
+  youtubeId String
+  order     Int      @default(0)
+  duration  String?
+  createdAt DateTime @default(now())
+
+  lecture  Lecture    @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  progress Progress[]
+
+  @@index([lectureId])
+}
+
+// ── PDFs ───────────────────────────────────────────────────
+
+model PDF {
+  id        String   @id @default(cuid())
+  lectureId String
+  title     String
+  fileUrl   String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+
+  @@index([lectureId])
+}
+
+// ── QUIZZES ────────────────────────────────────────────────
+
+model Quiz {
+  id        String   @id @default(cuid())
+  lectureId String
+  title     String
+  timeLimit Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lecture     Lecture          @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  questions   Question[]
+  submissions QuizSubmission[]
+
+  @@index([lectureId])
+}
+
+// ── HOMEWORK ───────────────────────────────────────────────
+
+model Homework {
+  id        String   @id @default(cuid())
+  lectureId String
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lecture     Lecture              @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  questions   Question[]
+  submissions HomeworkSubmission[]
+
+  @@index([lectureId])
+}
+
+// ── QUESTIONS ──────────────────────────────────────────────
+
+model Question {
+  id         String       @id @default(cuid())
+  quizId     String?
+  homeworkId String?
+  text       String?
+  imageUrl   String?
+  type       QuestionType @default(MULTIPLE_CHOICE)
+  order      Int          @default(0)
+  createdAt  DateTime     @default(now())
+
+  quiz     Quiz?     @relation(fields: [quizId],     references: [id], onDelete: Cascade)
+  homework Homework? @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  choices  Choice[]
+
+  @@index([quizId])
+  @@index([homeworkId])
+}
+
+// ── CHOICES ────────────────────────────────────────────────
+
+model Choice {
+  id         String  @id @default(cuid())
+  questionId String
+  text       String?
+  imageUrl   String?
+  isCorrect  Boolean @default(false)
+  order      Int     @default(0)
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+}
+
+// ── ACCESS CODES ───────────────────────────────────────────
+
+model AccessCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  note        String?
+  createdAt   DateTime  @default(now())
+
+  createdById String
+  createdBy   User   @relation("CodeCreator",  fields: [createdById], references: [id])
+
+  usedById    String?
+  usedAt      DateTime?
+  usedBy      User?   @relation("CodeRedeemer", fields: [usedById], references: [id])
+
+  courses     CourseOnCode[]
+
+  @@index([code])
+  @@index([isActive])
+  @@index([usedById])
+  @@index([createdAt])
+  @@index([expiresAt])
+}
+
+// ── CODE-COURSE JOIN ───────────────────────────────────────
+
+model CourseOnCode {
+  codeId   String
+  courseId String
+
+  code   AccessCode @relation(fields: [codeId],   references: [id], onDelete: Cascade)
+  course Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([codeId, courseId])
+  @@index([courseId])
+}
+
+// ── PROGRESS ───────────────────────────────────────────────
+
+model Progress {
+  id        String    @id @default(cuid())
+  userId    String
+  lectureId String
+  videoId   String?
+  completed Boolean   @default(false)
+  watchedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // FEATURE-001 (continue watching): the actual last-known playback
+  // position, in seconds. Previously this only ever lived in the
+  // student's browser localStorage (per-device, never synced) — this is
+  // what makes "continue where I left off" work across devices, and what
+  // powers the dashboard's continue-watching card.
+  positionSeconds Int?
+
+  user    User    @relation(fields: [userId],    references: [id], onDelete: Cascade)
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  video   Video?  @relation(fields: [videoId],   references: [id], onDelete: SetNull)
+
+  @@unique([userId, lectureId, videoId])
+  @@index([userId])
+  @@index([lectureId])
+  @@index([videoId])
+}
+
+// ── QUIZ SUBMISSIONS (multi-attempt) ───────────────────────
+// Removed @@unique so multiple attempts are allowed (max 3 enforced in API)
+
+model QuizSubmission {
+  id           String   @id @default(cuid())
+  userId       String
+  quizId       String
+  attemptNumber Int     @default(1)  // 1, 2, or 3
+  score        Int
+  total        Int
+  percentage   Float
+  passed       Boolean
+  answers      Json     // student-selected choice IDs per question
+  // DB-001: Prisma's Json type has no DB-level size ceiling — only the
+  // 50KB app-layer cap in quizAnswersSchema (src/lib/validations.ts)
+  // actually enforces a limit, which a direct DB write (e.g. psql, a
+  // future internal script) would bypass entirely. A real CHECK constraint
+  // can't be expressed in schema.prisma (Prisma has no CHECK-constraint
+  // support compatible with `prisma db push`), so one is provided as an
+  // optional manual script instead: see prisma/optional-db-constraints.sql.
+  submittedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  // INFRA-002: the unique constraint below already provides a composite
+  // btree index with userId as its leading column, so WHERE userId=? AND
+  // quizId=? (the attempt-count lookup in the submit transaction) already
+  // uses an index scan — no separate @@index([userId, quizId]) needed.
+  @@unique([userId, quizId, attemptNumber])
+  @@index([userId])
+  @@index([quizId])
+}
+
+// ── HOMEWORK SUBMISSIONS (multi-attempt) ───────────────────
+// Mirrors QuizSubmission exactly — homework is now auto-graded the same way
+// quizzes are (same scoring logic, same 3-attempt limit). The manual
+// grade/feedback/gradedAt fields that used to live here are gone; there's
+// nothing left for an admin to manually grade.
+
+model HomeworkSubmission {
+  id            String   @id @default(cuid())
+  userId        String
+  homeworkId    String
+  attemptNumber Int      @default(1)
+  score         Int
+  total         Int
+  percentage    Float
+  passed        Boolean
+  answers       Json     // student-selected choice IDs per question
+  // DB-001: same DB-level size-cap gap as QuizSubmission.answers above — see
+  // prisma/optional-db-constraints.sql for the optional enforcement script.
+  submittedAt   DateTime @default(now())
+
+  user     User     @relation(fields: [userId],     references: [id], onDelete: Cascade)
+  homework Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+
+  // INFRA-002: same as QuizSubmission — the unique constraint's leading
+  // (userId, homeworkId) prefix already serves this lookup pattern.
+  @@unique([userId, homeworkId, attemptNumber])
+  @@index([userId])
+  @@index([homeworkId])
+}
+
+// ── SITE SETTINGS ──────────────────────────────────────────
+
+model SiteSettings {
+  id               String   @id @default("singleton")
+  heroTitle        String   @default("اتقن اللغة العربية")
+  heroSubtitle     String   @default("مع نخبة من أفضل الأساتذة")
+  heroDesc         String   @default("انضم إلى آلاف الطلاب في رحلة تعليمية استثنائية تجمع بين الأصالة والحداثة")
+  teacherName      String   @default("مستر مصطفى")
+  teacherTitle     String   @default("خبير تدريس اللغة العربية")
+  teacherBio       String   @default("معلم متميز بخبرة تزيد عن خمس عشرة عاماً في تدريس اللغة العربية لجميع المراحل الدراسية")
+  teacherStats     Json     @default("[{\"value\":\"١٥+\",\"label\":\"سنة خبرة\"},{\"value\":\"٥٠٠٠+\",\"label\":\"طالب مستفيد\"},{\"value\":\"٩٨٪\",\"label\":\"نسبة نجاح\"}]")
+  features         Json     @default("[{\"icon\":\"📖\",\"title\":\"محتوى شامل\",\"desc\":\"دروس متكاملة تغطي جميع جوانب اللغة العربية\"},{\"icon\":\"🎯\",\"title\":\"تعلم هادف\",\"desc\":\"منهج مدروس يضمن التقدم المستمر\"},{\"icon\":\"💡\",\"title\":\"أسلوب مبتكر\",\"desc\":\"طرق تدريس حديثة تجعل التعلم ممتعاً\"}]")
+  statsBar         Json     @default("[{\"value\":\"٥٠٠٠+\",\"label\":\"طالب مسجل\"},{\"value\":\"٢٠\",\"label\":\"دورة متاحة\"},{\"value\":\"١٥+\",\"label\":\"سنة خبرة\"},{\"value\":\"٩٨٪\",\"label\":\"نسبة الرضا\"}]")
+  platformName     String   @default("اكاديمية مستر مصطفى")
+  platformTagline  String   @default("لتدريس اللغة العربية")
+
+  // ── COLORS (CUSTOM-001): full palette, was just primary+accent ──
+  // Defaults below match the colors already hardcoded across the app today,
+  // so turning this feature on doesn't visually change anything until the
+  // OWNER actually edits a value.
+  primaryColor     String   @default("#C9A84C")
+  secondaryColor   String   @default("#1A6B47")
+  accentColor      String   @default("#1A6B47")
+  backgroundColor  String   @default("#F5F1E8")
+  surfaceColor     String   @default("#FFFFFF")
+  textColor        String   @default("#1A1208")
+  buttonColor      String   @default("#C9A84C")
+  hoverColor       String   @default("#8B6914")
+  successColor     String   @default("#16A34A")
+  warningColor     String   @default("#D97706")
+  errorColor       String   @default("#DC2626")
+  loginBgGradient  String   @default("135deg, #0D3D27 0%, #1A6B47 100%")
+
+  // ── IMAGES (CUSTOM-002): all optional — null = fall back to the
+  // current static/default asset, so nothing breaks for existing sites
+  // until the OWNER uploads something. URLs are Vercel Blob URLs, same
+  // storage already used by /api/upload for everything else. ──
+  heroBackgroundImage    String?
+  heroIllustration       String?
+  heroBanner             String?
+  dashboardBanner        String?
+  welcomeSectionImage    String?
+  dashboardDecorImage    String?
+  headerLogo             String?
+  loginLogo              String?
+  faviconImage           String?
+
+  dashboardWelcome String   @default("أهلاً وسهلاً بك في منصتك التعليمية")
+  footerText       String   @default("© ٢٠٢٤ اكاديمية مستر مصطفى — جميع الحقوق محفوظة")
+
+  // ── CTA BUTTONS (CUSTOM-003): ordered + toggleable, same JSON-array
+  // convention already used above for teacherStats/features/statsBar. ──
+  ctaButtons       Json     @default("[{\"id\":\"primary\",\"label\":\"ابدأ الآن\",\"href\":\"/register\",\"visible\":true,\"order\":0},{\"id\":\"secondary\",\"label\":\"تعرف أكثر\",\"href\":\"/#about\",\"visible\":true,\"order\":1}]")
+
+  // ── SEO (CUSTOM-004) ──
+  metaTitle        String?
+  metaDescription  String?
+  metaKeywords     String?
+  ogImage          String?
+
+  // ── ANNOUNCEMENT BAR (CUSTOM-010): site-wide dismissible banner,
+  // editable by ADMIN or OWNER (unlike the rest of this model, which is
+  // OWNER-only — see /api/admin/announcement for the separate, more
+  // permissive RBAC this specific feature needs). ──
+  announcementEnabled     Boolean @default(false)
+  announcementTitle       String?
+  announcementText        String?
+  announcementLink        String?
+  announcementDismissible Boolean @default(true)
+
+  updatedAt        DateTime @updatedAt
+}
+
+// ── DISTRIBUTED RATE LIMITING (ARCH-003) ───────────────────
+// Backs src/lib/rate-limit.ts. Replaces the old in-memory Map (which reset
+// on every cold start and wasn't shared across Vercel's concurrent lambda
+// instances — meaning limits were trivially bypassable by an attacker whose
+// requests happened to land on different warm instances). Every rate-limit
+// check now reads/writes a row here instead, so the limit is enforced
+// consistently regardless of which serverless instance handles the request.
+model RateLimitBucket {
+  key     String   @id
+  count   Int      @default(1)
+  resetAt DateTime
+
+  @@index([resetAt])
+}
+
+// ── OWNERSHIP CHECK CACHE (ARCH-002) ────────────────────────
+// Backs src/lib/access.ts. userOwnsLecture() used to run a multi-table join
+// (AccessCode → CourseOnCode → CourseLecture) on every single student
+// request that touches lecture-scoped content — including high-frequency
+// ones like video-progress pings every few seconds. Caching the boolean
+// result here for a short TTL means most requests hit one indexed row
+// lookup instead of that join, while still re-verifying periodically (so a
+// revoked/expired access code is reflected within the TTL window, not
+// permanently stale).
+model AccessCheckCache {
+  key       String   @id // `${userId}:${lectureId}`
+  owns      Boolean
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
+
+// ── MONITORING & LOGGING (Developer Dashboard — Task 2) ─────
+// Single, normalized event/log table backing src/lib/logger.ts and the
+// Developer Dashboard's Error Center + System Events pages. Deliberately
+// ONE table rather than a separate table per category (errors, auth
+// events, upload failures, etc.) — the fields needed to describe any of
+// these event types are identical (when/how severe/what/where/who), so a
+// `category` enum column keeps this normalized without duplicating the
+// same shape ten times. This also means the Error Center and System
+// Events pages can share the exact same query/pagination/filter code,
+// just with different default filters.
+
+enum LogSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum LogCategory {
+  ERROR           // generic caught application error
+  EXCEPTION       // unhandled/unexpected exception (see instrumentation.ts)
+  API_FAILURE     // a specific API endpoint failed to complete its request
+  AUTH            // login/logout/register/session events
+  SECURITY        // rate limits, forbidden access attempts, suspicious activity
+  PERFORMANCE     // slow queries/requests, resource warnings
+  UPLOAD          // file/image upload failures
+  VIDEO           // video processing/playback related failures
+  DATABASE        // Prisma/DB-level exceptions
+  BACKGROUND_JOB  // reserved for future background/cron tasks
+  SYSTEM          // general platform events (deploy detected, server started, etc.)
+}
+
+model SystemLog {
+  id       String      @id @default(cuid())
+
+  // When the event actually happened. Defaults to "now" for events logged
+  // as they occur (the overwhelming majority), but kept separate from
+  // createdAt so a future batched/replayed import could set it accurately
+  // without pretending the row was inserted at that historical time.
+  timestamp DateTime   @default(now())
+
+  severity LogSeverity
+  category LogCategory
+
+  route  String? // e.g. "/api/progress"
+  method String? // e.g. "POST"
+
+  // Who triggered it, if known. Nullable + SetNull (not a hard requirement
+  // relation) since logs are an audit trail that must survive the
+  // referenced user being deleted later, and plenty of events (e.g. a
+  // failed login with a wrong phone number) have no matching user at all.
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  role   String? // snapshot of the role at the time, independent of the user relation
+
+  ip        String?
+  userAgent String? // raw device/browser string from the request
+
+  message String
+  stack   String? @db.Text
+  metadata Json?  // category-specific extra detail (e.g. { field, value } for a validation failure)
+
+  resolved   Boolean   @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?   // developer user id who marked it resolved
+
+  createdAt DateTime @default(now())
+
+  @@index([severity])
+  @@index([category])
+  @@index([resolved])
+  @@index([createdAt])
+  @@index([userId])
+}
+
+// ── REQUEST METRICS (Task 3 — Live Monitoring) ─────────────
+//
+// Deliberately a separate, lightweight table from SystemLog above, not a
+// new SystemLog category: this row gets written on every request handled
+// by an instrumented route (see src/lib/monitoring/recordMetric.ts),
+// including ordinary successful ones — mixing that routine, high-volume
+// traffic data into SystemLog (an error/audit log meant to stay small and
+// fast to query) would bloat it and slow down error-center queries over
+// time. This table is expected to grow quickly and is meant to be
+// periodically pruned (see the note in src/lib/monitoring/recordMetric.ts).
+//
+// Populated ONLY by routes that opt into withApiMonitoring() — per Task 3's
+// "do not modify existing LMS functionality" constraint, no existing route
+// has been changed to write here; today that's the new /api/developer/
+// monitoring endpoint itself. Existing routes can adopt it later exactly
+// the same way withApiLogging (Task 2) is opt-in.
+model RequestMetric {
+  id         String   @id @default(cuid())
+  route      String
+  method     String
+  statusCode Int
+  durationMs Int
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([route])
+  @@index([statusCode])
+}
+
+// ── AI GUARDIAN (Developer Dashboard — Task 4) ─────────────────
+//
+// One row per generated report. Generation is ALWAYS human-triggered (a
+// developer clicking "Generate Report" — see
+// POST /api/developer/ai-guardian/reports) — there is no cron job or
+// automatic schedule producing these, both to respect the "no automatic
+// actions" rule and to keep AI provider spend under explicit human
+// control. `inputSnapshot` stores the exact sanitized data that was sent
+// to the provider, for audit/debugging — never raw DB rows.
+model AiGuardianReport {
+  id            String   @id @default(cuid())
+  provider      String   // "claude" | "openai" | "gemini"
+  model         String
+  windowHours   Int
+  platformScore Int
+  status        String   // "HEALTHY" | "WARNING" | "CRITICAL"
+  summary       String   @db.Text
+  reportJson    Json     // full GuardianReport (see reportSchema.ts)
+  inputSnapshot Json     // the sanitized PlatformSnapshot sent to the provider
+  tokensUsed    Int?
+  generatedBy   String?  // developer User.id who triggered generation
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([status])
+}
+
+// ── DEVELOPER OPERATIONS SUITE (Task 5) ──────────────────────
+//
+// Incident: a deduplicated, trackable problem — distinct from SystemLog
+// (one row per raw event) and AiGuardianReport (one row per platform-wide
+// analysis snapshot). Many SystemLog rows with the same `fingerprint` map
+// to ONE Incident, whose firstDetectedAt/lastDetectedAt/occurrenceCount
+// track its whole lifetime. Incidents are kept in sync from SystemLog
+// opportunistically — every time GET /api/developer/incidents is called
+// (see src/lib/incidents/syncIncidents.ts) — not via a cron job: this is
+// the same "sync on read" pattern already used elsewhere in this project
+// (e.g. RateLimitBucket's opportunistic cleanup in src/lib/rate-limit.ts).
+// Developers can also open an incident manually.
+//
+// No relation to User for assignedTo/createdBy (deliberately plain
+// string ids) — this keeps the model self-contained and avoids adding
+// more back-relation fields to the User model than necessary; the few
+// DEVELOPER accounts this ever needs to reference are looked up
+// separately when rendering.
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  CLOSED
+}
+
+model Incident {
+  id       String @id @default(cuid())
+  title    String
+  severity IncidentSeverity
+  status   IncidentStatus   @default(OPEN)
+  category String // mirrors LogCategory values where the incident originated from a log
+
+  // Dedup key (category + normalized title) — see fingerprint.ts. Unique so
+  // syncIncidents.ts can upsert instead of creating duplicates for the same
+  // recurring problem.
+  fingerprint String @unique
+
+  firstDetectedAt DateTime @default(now())
+  lastDetectedAt  DateTime @default(now())
+  occurrenceCount Int      @default(1)
+
+  // Populated by POST /api/developer/incidents/[id]/analyze — always
+  // human-triggered, never automatic. `aiAnalysis` stores the full
+  // structured result; rootCause/suggestedFix are denormalized copies of
+  // two of its fields purely so list views and exports don't need to
+  // unpack JSON.
+  rootCause    String? @db.Text
+  suggestedFix String? @db.Text
+  aiAnalysis   Json?
+
+  assignedTo      String? // User.id of a DEVELOPER, looked up separately
+  resolutionNotes String? @db.Text
+  createdBy       String? // User.id if opened manually, null if auto-detected
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([severity])
+  @@index([lastDetectedAt])
+  @@index([category])
+}
+
+// PatchPreview: Section 3. AI-generated suggestion, TEXT ONLY — never
+// written to disk, never committed, never deployed. `approvalStatus` is
+// purely a workflow label a developer sets manually; setting it to
+// APPROVED does not trigger any file write, commit, or deployment
+// anywhere in this codebase. Optionally linked to an Incident.
+model PatchPreview {
+  id         String  @id @default(cuid())
+  incidentId String?
+
+  problemSummary   String   @db.Text
+  likelyFiles      String[]
+  suggestedChanges Json // array of { file, description, codeSnippet } — illustrative text only
+  expectedBenefits String[]
+  possibleRisks    String[]
+
+  approvalStatus String    @default("PENDING") // PENDING | APPROVED | REJECTED — a label only
+  approvedBy     String?
+  approvedAt     DateTime?
+
+  provider  String
+  model     String
+  createdBy String?
+  createdAt DateTime @default(now())
+
+  @@index([incidentId])
+  @@index([approvalStatus])
+}
+
+// DeveloperSettings: one row per DEVELOPER user (Section 10). Every field
+// here is a *preference the UI reads*, not something that reaches into
+// and reconfigures another module's code — e.g. `aiProvider` overrides the
+// AI_GUARDIAN_PROVIDER env default (see providers/registry.ts), and
+// `monitoringIntervalSec` is read by useMonitoring()/polling hooks as the
+// interval to request, rather than any file being rewritten.
+model DeveloperSettings {
+  userId String @id // one row per developer, User.id as the key
+
+  theme                 String  @default("system") // "light" | "dark" | "system"
+  monitoringIntervalSec Int     @default(15)
+  aiProvider            String? // null = fall back to AI_GUARDIAN_PROVIDER env var
+  incidentRetentionDays Int     @default(90)
+  dashboardDensity      String  @default("comfortable") // "comfortable" | "compact"
+
+  updatedAt DateTime @updatedAt
+}
+
+// NotificationChannel: Section 8 — architecture + settings UI only, per
+// the task's explicit "do not send notifications yet" instruction. Rows
+// are stored and can be enabled/disabled, but nothing in this codebase
+// reads `config` to actually dispatch anything.
+enum NotificationChannelType {
+  EMAIL
+  TELEGRAM
+  DISCORD
+  SLACK
+  WEBHOOK
+}
+
+model NotificationChannel {
+  id        String                  @id @default(cuid())
+  type      NotificationChannelType
+  label     String
+  enabled   Boolean                 @default(false)
+  config    Json // shape depends on `type` — e.g. { webhookUrl } for WEBHOOK; never sent anywhere yet
+  createdBy String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+}
