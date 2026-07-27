@@ -1,11 +1,11 @@
 "use client";
 
-// src/components/landing/HeroSection.tsx — Chemistry Academy Edition
-import { m as motion } from "framer-motion";
+// src/components/landing/HeroSection.tsx — Premium Chemistry Academy Edition
+import { m as motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import type { SiteSettings } from "@/types";
-import { FloatingArabicBackground } from "@/components/effects/FloatingArabicBackground";
-import { TwinklingStars } from "@/components/effects/TwinklingStars";
+import { useState, useEffect } from "react";
+import { ChemistryBackground } from "@/components/effects/ChemistryBackground";
 import { HeroChemicalReaction } from "@/components/landing/HeroChemicalReaction";
 
 interface Props {
@@ -28,20 +28,281 @@ const fadeUp = {
   }),
 };
 
-// Atom SVG decorative component
-function AtomDecor({ size = 120, opacity = 0.12, color = "#00D4FF" }: { size?: number; opacity?: number; color?: string }) {
+// Premium SVG Logo - Chemistry Academy
+function AcademyLogo({ size = 40, className = "" }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 120 120" fill="none" style={{ opacity }}>
-      <ellipse cx="60" cy="60" rx="50" ry="18" stroke={color} strokeWidth="1.5" />
-      <ellipse cx="60" cy="60" rx="50" ry="18" stroke={color} strokeWidth="1.5" transform="rotate(60 60 60)" />
-      <ellipse cx="60" cy="60" rx="50" ry="18" stroke={color} strokeWidth="1.5" transform="rotate(120 60 60)" />
-      <circle cx="60" cy="60" r="7" fill={color} />
-      <circle cx="110" cy="60" r="4" fill={color} />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 120 120"
+      fill="none"
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Outer hexagon structure */}
+      <motion.path
+        d="M60 6L114 33V87L60 114L6 87V33L60 6Z"
+        stroke="url(#logoGrad)"
+        strokeWidth="2.5"
+        fill="rgba(0,212,255,0.05)"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1.5, ease: "easeInOut" }}
+      />
+      
+      {/* Hexagonal grid overlay */}
+      <motion.path
+        d="M60 18L96 36V72L60 90L24 72V36L60 18Z"
+        stroke="url(#logoGrad)"
+        strokeWidth="1.2"
+        fill="rgba(0,212,255,0.03)"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
+      />
+      
+      {/* Atom structure */}
+      <motion.ellipse
+        cx="60"
+        cy="60"
+        rx="32"
+        ry="12"
+        stroke="#00D4FF"
+        strokeWidth="2"
+        opacity="0.8"
+        initial={{ rotate: 0 }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.ellipse
+        cx="60"
+        cy="60"
+        rx="32"
+        ry="12"
+        stroke="#00FF88"
+        strokeWidth="2"
+        opacity="0.8"
+        initial={{ rotate: 60 }}
+        animate={{ rotate: 420 }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.ellipse
+        cx="60"
+        cy="60"
+        rx="32"
+        ry="12"
+        stroke="#00D4FF"
+        strokeWidth="2"
+        opacity="0.8"
+        initial={{ rotate: 120 }}
+        animate={{ rotate: 480 }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      />
+      
+      {/* Nucleus */}
+      <motion.circle
+        cx="60"
+        cy="60"
+        r="8"
+        fill="url(#logoGrad)"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 260, 
+          damping: 20, 
+          delay: 0.5 
+        }}
+      />
+      <motion.circle
+        cx="60"
+        cy="60"
+        r="4"
+        fill="white"
+        opacity="0.5"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.7 }}
+      />
+      
+      {/* Orbital electrons */}
+      <motion.circle
+        cx="92"
+        cy="60"
+        r="3.5"
+        fill="#00D4FF"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.9 }}
+      />
+      <motion.circle
+        cx="28"
+        cy="60"
+        r="3.5"
+        fill="#00FF88"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 1.0 }}
+      />
+      
+      {/* Chemical bond lines */}
+      <motion.line
+        x1="60"
+        y1="28"
+        x2="60"
+        y2="52"
+        stroke="rgba(0,212,255,0.3)"
+        strokeWidth="1.5"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ delay: 0.3 }}
+      />
+      <motion.line
+        x1="60"
+        y1="68"
+        x2="60"
+        y2="92"
+        stroke="rgba(0,212,255,0.3)"
+        strokeWidth="1.5"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ delay: 0.4 }}
+      />
+      
+      {/* Gradients */}
+      <defs>
+        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#00D4FF" />
+          <stop offset="100%" stopColor="#00FF88" />
+        </linearGradient>
+        <radialGradient id="glow">
+          <stop offset="0%" stopColor="#00D4FF" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#00D4FF" stopOpacity="0" />
+        </radialGradient>
+      </defs>
     </svg>
   );
 }
 
+// Premium Navbar with improved design
+function Navbar({ settings, btnGradient }: { settings: Partial<SiteSettings> | null, btnGradient: string }) {
+  const [scrolled, setScrolled] = useState(false);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <motion.nav
+      className="fixed top-0 inset-x-0 h-20 flex items-center z-50 transition-all duration-300"
+      style={{
+        background: scrolled 
+          ? "rgba(10,15,30,0.85)" 
+          : "rgba(10,15,30,0.4)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderBottom: scrolled 
+          ? "1px solid rgba(0,212,255,0.08)" 
+          : "1px solid rgba(0,212,255,0.05)",
+        padding: "0 clamp(16px,4vw,48px)",
+      }}
+    >
+      {/* Logo + name */}
+      <Link href="/" className="flex items-center gap-3 flex-1 min-w-0 group">
+        <motion.div
+          whileHover={{ scale: 1.05, rotate: -5 }}
+          transition={{ type: "spring", stiffness: 400 }}
+          className="relative"
+        >
+          <AcademyLogo size={44} />
+          <motion.div
+            className="absolute -inset-4 rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(0,212,255,0.15), transparent 70%)" }}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          />
+        </motion.div>
+        <div className="min-w-0">
+          <motion.span
+            className="font-bold leading-tight block truncate tracking-tight"
+            style={{
+              color: "#FFFFFF",
+              fontSize: "clamp(14px,3vw,18px)",
+              fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {settings?.platformName ?? "أكاديمية مستر مصطفى عبد الباري"}
+          </motion.span>
+          <motion.span
+            style={{
+              color: "rgba(0,212,255,0.5)",
+              fontSize: "clamp(10px,2vw,12px)",
+              fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
+            }}
+          >
+            {settings?.platformTagline ?? "Chemistry Academy"}
+          </motion.span>
+        </div>
+      </Link>
+
+      {/* Nav actions */}
+      <div className="flex items-center gap-3 flex-shrink-0">
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Link
+            href="/login"
+            className="transition-all duration-200 whitespace-nowrap rounded-xl px-4 py-2 hover:bg-white/5"
+            style={{
+              color: "rgba(255,255,255,0.7)",
+              fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+              fontSize: "clamp(13px,3vw,15px)",
+              fontWeight: 500,
+            }}
+          >
+            دخول
+          </Link>
+        </motion.div>
+        <motion.div
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 15 }}
+        >
+          <Link
+            href="/register"
+            className="rounded-xl font-semibold transition-all duration-200 whitespace-nowrap px-5 py-2.5 relative overflow-hidden group"
+            style={{
+              background: btnGradient,
+              boxShadow: "0 2px 20px rgba(0,212,255,0.2)",
+              color: "#0A0F1E",
+              fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+              fontWeight: 600,
+              fontSize: "clamp(13px,3vw,15px)",
+            }}
+          >
+            <span className="relative z-10">إنشاء حساب</span>
+            <motion.div
+              className="absolute inset-0 bg-white/20"
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "100%" }}
+              transition={{ duration: 0.6 }}
+            />
+          </Link>
+        </motion.div>
+      </div>
+    </motion.nav>
+  );
+}
+
 export function HeroSection({ settings }: Props) {
+  const [animationComplete, setAnimationComplete] = useState(false);
+
   let statsBar = STATS_DEFAULT;
   try {
     if (settings?.statsBar && Array.isArray(settings.statsBar)) {
@@ -59,126 +320,45 @@ export function HeroSection({ settings }: Props) {
       style={
         settings?.heroBackgroundImage
           ? {
-              backgroundImage: `linear-gradient(135deg,rgba(10,15,30,0.92) 0%,rgba(13,21,40,0.92) 100%), url(${settings.heroBackgroundImage})`,
+              backgroundImage: `linear-gradient(135deg,rgba(10,15,30,0.97) 0%,rgba(13,21,40,0.95) 60%,rgba(17,30,56,0.95) 100%), url(${settings.heroBackgroundImage})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }
-          : { background: "linear-gradient(135deg,#0A0F1E 0%,#0D1528 60%,#111E38 100%)" }
+          : { 
+              background: "linear-gradient(135deg, #0A0F1E 0%, #0D1528 40%, #0A1A2E 70%, #111E38 100%)" 
+            }
       }
     >
-      {/* ── Molecule dot grid pattern ── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `radial-gradient(circle, rgba(0,212,255,0.06) 1px, transparent 1px)`,
-          backgroundSize: "36px 36px",
+      {/* ── Premium Chemistry Background ── */}
+      <ChemistryBackground />
+
+      {/* ── Sophisticated ambient glow orbs ── */}
+      <motion.div
+        className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full pointer-events-none opacity-30"
+        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.08), transparent 70%)" }}
+        animate={{ 
+          x: [0, 30, 0],
+          y: [0, -20, 0],
         }}
-      />
-
-      {/* ── Floating chemistry symbols ── */}
-      <FloatingArabicBackground />
-      <TwinklingStars />
-
-      {/* ── Glow orbs ── */}
-      <motion.div
-        className="absolute top-16 right-8 sm:right-24 w-48 h-48 sm:w-80 sm:h-80 rounded-full pointer-events-none"
-        style={{ background: "radial-gradient(circle,rgba(0,212,255,0.13),transparent 70%)" }}
-        animate={{ scale: [1, 1.15, 1] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-24 left-4 sm:left-16 w-36 h-36 sm:w-56 sm:h-56 rounded-full pointer-events-none"
-        style={{ background: "radial-gradient(circle,rgba(0,255,136,0.10),transparent 70%)" }}
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        className="absolute bottom-1/3 left-1/4 w-80 h-80 rounded-full pointer-events-none opacity-20"
+        style={{ background: "radial-gradient(circle, rgba(0,255,136,0.06), transparent 70%)" }}
+        animate={{ 
+          x: [0, -25, 0],
+          y: [0, 25, 0],
+        }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
       />
-
-      {/* ── Decorative atoms — hidden on small mobile ── */}
-      <motion.div
-        className="absolute pointer-events-none select-none hidden sm:block"
-        style={{ top: "-2%", right: "-2%", zIndex: 1 }}
-        animate={{ rotate: [0, 360] }}
-        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-      >
-        <AtomDecor size={180} opacity={0.15} />
-      </motion.div>
-      <motion.div
-        className="absolute pointer-events-none select-none hidden md:block"
-        style={{ bottom: "-3%", left: "-2%", zIndex: 1 }}
-        animate={{ rotate: [360, 0] }}
-        transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-      >
-        <AtomDecor size={160} opacity={0.12} color="#00FF88" />
-      </motion.div>
 
       {/* ── Navbar ── */}
-      <nav
-        className="absolute top-0 inset-x-0 h-16 flex items-center z-20"
-        style={{
-          background: "rgba(10,15,30,0.8)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(0,212,255,0.12)",
-          padding: "0 clamp(12px,4vw,32px)",
-        }}
-      >
-        {/* Logo + name */}
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-base"
-            style={{ background: "linear-gradient(135deg,#00D4FF,#00FF88)" }}
-          >
-            ⚛
-          </div>
-          <div className="min-w-0">
-            <span
-              className="font-bold leading-tight block truncate"
-              style={{ color: "#7AE8FF", fontSize: "clamp(11px,3vw,15px)", fontFamily: "Cairo,sans-serif" }}
-            >
-              {settings?.platformName ?? "أكاديمية مستر مصطفى عبد الباري"}
-            </span>
-            <span style={{ color: "rgba(0,212,255,0.45)", fontSize: 10, fontFamily: "Cairo,sans-serif" }}>
-              {settings?.platformTagline ?? "لتدريس الكيمياء"}
-            </span>
-          </div>
-        </div>
-
-        {/* Nav actions */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <Link
-            href="/login"
-            className="transition-colors whitespace-nowrap"
-            style={{
-              color: "rgba(122,232,255,0.75)",
-              fontFamily: "Cairo,sans-serif",
-              fontSize: "clamp(12px,3vw,14px)",
-              padding: "8px 12px",
-            }}
-          >
-            دخول
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-xl font-semibold transition-all whitespace-nowrap hover:-translate-y-0.5"
-            style={{
-              background: btnGradient,
-              boxShadow: "0 4px 16px rgba(0,212,255,0.3)",
-              color: "#0A0F1E",
-              fontFamily: "Cairo,sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(12px,3vw,14px)",
-              padding: "8px clamp(12px,3vw,20px)",
-            }}
-          >
-            إنشاء حساب
-          </Link>
-        </div>
-      </nav>
+      <Navbar settings={settings} btnGradient={btnGradient} />
 
       {/* ── Hero Content ── */}
       <div
         className="relative z-10 text-center w-full"
-        style={{ padding: "88px clamp(16px,5vw,40px) 64px" }}
+        style={{ padding: "100px clamp(20px,5vw,60px) 40px" }}
       >
         {/* Platform badge */}
         <motion.div
@@ -186,24 +366,30 @@ export function HeroSection({ settings }: Props) {
           animate="show"
           custom={0}
           variants={fadeUp}
-          className="inline-flex items-center gap-2 rounded-full mb-4"
+          className="inline-flex items-center gap-2 rounded-full mb-6"
           style={{
-            background: "rgba(0,212,255,0.08)",
-            border: "1px solid rgba(0,212,255,0.22)",
-            padding: "6px 16px",
+            background: "rgba(0,212,255,0.06)",
+            border: "1px solid rgba(0,212,255,0.1)",
+            padding: "8px 20px",
           }}
         >
-          <span style={{ fontSize: 14 }}>⚗️</span>
-          <span style={{ color: "#7AE8FF", fontFamily: "Cairo,sans-serif", fontSize: "clamp(11px,3vw,13px)" }}>
+          <span style={{ fontSize: 16 }}>⚗️</span>
+          <span style={{ 
+            color: "rgba(255,255,255,0.6)", 
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", 
+            fontSize: "clamp(11px,3vw,13px)",
+            letterSpacing: "0.02em",
+          }}>
             المنصة الأولى لتدريس الكيمياء في مصر
           </span>
         </motion.div>
 
-        {/* ── Feature Hero Chemical Reaction Animation ── */}
-        <div className="my-2">
+        {/* ── Signature Hero Chemical Reaction ── */}
+        <div className="my-4">
           <HeroChemicalReaction
             teacherName={settings?.platformName ?? "مستر مصطفى عبد الباري"}
-            tagline={settings?.platformTagline ?? "أكاديمية تدريس الكيمياء"}
+            tagline={settings?.platformTagline ?? "لتدريس الكيمياء"}
+            onComplete={() => setAnimationComplete(true)}
           />
         </div>
 
@@ -214,23 +400,24 @@ export function HeroSection({ settings }: Props) {
           custom={0.15}
           variants={fadeUp}
           style={{
-            fontFamily: "Cairo,sans-serif",
-            fontWeight: 900,
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+            fontWeight: 700,
             color: "#FFFFFF",
-            fontSize: "clamp(28px,6vw,60px)",
-            lineHeight: 1.15,
-            marginBottom: 8,
-            textShadow: "0 0 40px rgba(0,212,255,0.25)",
+            fontSize: "clamp(32px,7vw,72px)",
+            lineHeight: 1.08,
+            marginBottom: 12,
+            letterSpacing: "-0.03em",
           }}
         >
           {settings?.heroTitle ?? "افهم الكيمياء"}
           <br />
           <span
             style={{
-              background: "linear-gradient(135deg,#00D4FF,#00FF88)",
+              background: "linear-gradient(135deg, #00D4FF 0%, #00FF88 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
+              backgroundSize: "200% 200%",
             }}
           >
             بطريقة مختلفة
@@ -238,42 +425,54 @@ export function HeroSection({ settings }: Props) {
         </motion.h1>
 
         {/* Sub heading */}
-        <motion.h2
+        <motion.p
           initial="hidden"
           animate="show"
           custom={0.3}
           variants={fadeUp}
           style={{
-            fontFamily: "Cairo,sans-serif",
-            color: "rgba(122,232,255,0.6)",
-            fontSize: "clamp(14px,3vw,20px)",
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+            color: "rgba(255,255,255,0.5)",
+            fontSize: "clamp(16px,3vw,22px)",
             fontWeight: 400,
-            marginBottom: 20,
+            marginBottom: 24,
+            maxWidth: 600,
+            marginLeft: "auto",
+            marginRight: "auto",
+            letterSpacing: "-0.01em",
           }}
         >
           {settings?.heroSubtitle ?? "مع مستر مصطفى عبد الباري"}
-        </motion.h2>
+        </motion.p>
 
-        {/* Divider — molecule bonds style */}
+        {/* Minimal divider */}
         <motion.div
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="flex items-center justify-center gap-3 mb-6"
+          className="flex items-center justify-center gap-4 mb-8"
         >
-          <div style={{ height: 1, width: 60, background: "linear-gradient(to right,transparent,rgba(0,212,255,0.5))" }} />
+          <div style={{ 
+            height: 1, 
+            width: 80, 
+            background: "linear-gradient(to right, transparent, rgba(0,212,255,0.3))" 
+          }} />
           <motion.div
             style={{
-              width: 10,
-              height: 10,
+              width: 6,
+              height: 6,
               borderRadius: "50%",
-              background: "linear-gradient(135deg,#00D4FF,#00FF88)",
-              boxShadow: "0 0 12px rgba(0,212,255,0.6)",
+              background: "linear-gradient(135deg, #00D4FF, #00FF88)",
+              boxShadow: "0 0 20px rgba(0,212,255,0.3)",
             }}
             animate={{ scale: [1, 1.5, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            transition={{ duration: 3, repeat: Infinity }}
           />
-          <div style={{ height: 1, width: 60, background: "linear-gradient(to left,transparent,rgba(0,212,255,0.5))" }} />
+          <div style={{ 
+            height: 1, 
+            width: 80, 
+            background: "linear-gradient(to left, transparent, rgba(0,212,255,0.3))" 
+          }} />
         </motion.div>
 
         {/* Description */}
@@ -283,69 +482,68 @@ export function HeroSection({ settings }: Props) {
           custom={0.48}
           variants={fadeUp}
           style={{
-            color: "rgba(255,255,255,0.55)",
-            fontFamily: "Cairo,sans-serif",
-            fontSize: "clamp(14px,3vw,16px)",
-            lineHeight: 1.9,
-            maxWidth: 540,
-            margin: "0 auto 32px",
+            color: "rgba(255,255,255,0.4)",
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+            fontSize: "clamp(15px,3vw,17px)",
+            lineHeight: 1.8,
+            maxWidth: 520,
+            margin: "0 auto 36px",
+            fontWeight: 400,
           }}
         >
           {settings?.heroDesc ?? "انضم إلى آلاف الطلاب وافهم الكيمياء العضوية والتحليلية والفيزيائية بأسلوب مبسط واحترافي"}
         </motion.p>
 
-        {/* CTA Buttons — stack on mobile, row on tablet+ */}
+        {/* CTA Buttons */}
         <motion.div
           initial="hidden"
           animate="show"
           custom={0.58}
           variants={fadeUp}
-          className="flex flex-col sm:flex-row justify-center"
-          style={{ gap: "clamp(10px,2vw,16px)" }}
+          className="flex flex-col sm:flex-row justify-center gap-4"
         >
           <motion.div
-            whileHover={{ y: -5, scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+            whileHover={{ y: -3, scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 15 }}
           >
             <Link
               href="/register"
+              className="relative overflow-hidden group px-8 py-4 rounded-2xl font-semibold inline-block transition-all duration-300"
               style={{
-                display: "block",
-                padding: "clamp(12px,2vw,16px) clamp(24px,4vw,44px)",
-                borderRadius: 16,
                 background: btnGradient,
-                boxShadow: "0 6px 28px rgba(0,212,255,0.4)",
+                boxShadow: "0 4px 30px rgba(0,212,255,0.25)",
                 color: "#0A0F1E",
-                fontFamily: "Cairo,sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(14px,3.5vw,17px)",
-                textDecoration: "none",
-                textAlign: "center",
+                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                fontWeight: 600,
+                fontSize: "clamp(15px,3.5vw,18px)",
+                letterSpacing: "-0.01em",
               }}
             >
-              ابدأ رحلتك الآن 🚀
+              <span className="relative z-10">ابدأ رحلتك الآن 🚀</span>
+              <motion.div
+                className="absolute inset-0 bg-white/20"
+                initial={{ x: "-100%" }}
+                whileHover={{ x: "100%" }}
+                transition={{ duration: 0.6 }}
+              />
             </Link>
           </motion.div>
           <motion.div
-            whileHover={{ y: -5, scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+            whileHover={{ y: -3, scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 15 }}
           >
             <Link
               href="/login"
+              className="px-8 py-4 rounded-2xl font-medium inline-block transition-all duration-300 hover:bg-white/5"
               style={{
-                display: "block",
-                padding: "clamp(12px,2vw,16px) clamp(24px,4vw,44px)",
-                borderRadius: 16,
-                border: "1.5px solid rgba(0,212,255,0.35)",
-                background: "rgba(0,212,255,0.06)",
-                color: "#7AE8FF",
-                fontFamily: "Cairo,sans-serif",
-                fontWeight: 600,
-                fontSize: "clamp(14px,3.5vw,17px)",
-                textDecoration: "none",
-                textAlign: "center",
+                border: "1px solid rgba(0,212,255,0.15)",
+                background: "rgba(0,212,255,0.03)",
+                color: "rgba(255,255,255,0.7)",
+                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                fontWeight: 500,
+                fontSize: "clamp(15px,3.5vw,18px)",
               }}
             >
               تسجيل الدخول
@@ -353,45 +551,51 @@ export function HeroSection({ settings }: Props) {
           </motion.div>
         </motion.div>
 
-        {/* Stats bar — 2×2 on mobile, row on sm+ */}
+        {/* Stats bar */}
         <motion.div
           initial="hidden"
           animate="show"
           custom={0.72}
           variants={fadeUp}
-          className="grid grid-cols-2 sm:grid-cols-4 mt-12 mx-auto"
-          style={{ maxWidth: 560, gap: "clamp(12px,3vw,24px)" }}
+          className="grid grid-cols-2 md:grid-cols-4 mt-14 mx-auto gap-4"
+          style={{ maxWidth: 560 }}
         >
           {statsBar.map((s, i) => (
             <motion.div
               key={i}
-              className="text-center rounded-2xl py-3 px-2"
+              className="text-center rounded-2xl py-4 px-3 backdrop-blur-sm"
               style={{
-                background: "rgba(0,212,255,0.06)",
-                border: "1px solid rgba(0,212,255,0.12)",
+                background: "rgba(255,255,255,0.02)",
+                border: "1px solid rgba(255,255,255,0.04)",
               }}
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 260, damping: 14, delay: 0.85 + i * 0.1 }}
-              whileHover={{ scale: 1.08, y: -4 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 260, damping: 14, delay: 0.85 + i * 0.08 }}
+              whileHover={{ 
+                y: -4,
+                background: "rgba(255,255,255,0.04)",
+                borderColor: "rgba(0,212,255,0.1)",
+              }}
             >
               <div
                 style={{
-                  fontFamily: "Cairo,sans-serif",
-                  color: "#00D4FF",
-                  fontSize: "clamp(22px,5vw,36px)",
-                  fontWeight: 900,
-                  lineHeight: 1.2,
+                  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                  color: "#FFFFFF",
+                  fontSize: "clamp(24px,5vw,38px)",
+                  fontWeight: 700,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.02em",
                 }}
               >
                 {s.value}
               </div>
               <div
                 style={{
-                  fontFamily: "Cairo,sans-serif",
-                  color: "rgba(122,232,255,0.5)",
-                  fontSize: "clamp(10px,2.5vw,12px)",
+                  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                  color: "rgba(255,255,255,0.3)",
+                  fontSize: "clamp(11px,2.5vw,13px)",
                   marginTop: 4,
+                  fontWeight: 400,
                 }}
               >
                 {s.label}
@@ -403,12 +607,24 @@ export function HeroSection({ settings }: Props) {
 
       {/* Scroll hint */}
       <motion.div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none"
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none opacity-50"
+        animate={{ y: [0, 10, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       >
-        <span style={{ color: "rgba(0,212,255,0.3)", fontFamily: "Cairo,sans-serif", fontSize: 11 }}>اكتشف المزيد</span>
-        <div style={{ width: 1, height: 28, background: "linear-gradient(to bottom,rgba(0,212,255,0.4),transparent)" }} />
+        <span style={{ 
+          color: "rgba(255,255,255,0.2)", 
+          fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", 
+          fontSize: 10,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+        }}>
+          Scroll
+        </span>
+        <div style={{ 
+          width: 1, 
+          height: 30, 
+          background: "linear-gradient(to bottom, rgba(255,255,255,0.2), transparent)" 
+        }} />
       </motion.div>
     </section>
   );
