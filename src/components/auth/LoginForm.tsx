@@ -5,6 +5,16 @@ import { useState } from "react";
 import { m as motion } from "framer-motion";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  authFieldStyle,
+  authLabelStyle,
+  authAccentGradient,
+  authColors,
+  focusAuthField,
+  blurAuthField,
+  invalidAuthField,
+} from "./authTheme";
+import { PhoneIcon, LockIcon, EyeIcon, EyeOffIcon, AlertIcon, SpinnerIcon } from "./AuthIcons";
 
 export function LoginForm() {
   const { login, isLoginLoading } = useAuth();
@@ -31,39 +41,8 @@ export function LoginForm() {
     login({ phone: phone.trim(), password });
   };
 
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    minHeight: 52,
-    boxSizing: "border-box",
-    padding: "14px 46px 14px 16px",
-    borderRadius: 12,
-    border: "1.5px solid rgba(201,168,76,0.25)",
-    background: "rgba(250,247,240,0.06)",
-    color: "#FAF7F0",
-    fontFamily: "Cairo, sans-serif",
-    fontSize: "clamp(14px, 3.8vw, 15px)",
-    outline: "none",
-    direction: "rtl",
-    transition: "border-color 0.2s, box-shadow 0.2s",
-  };
-
-  const labelStyle: React.CSSProperties = {
-    fontFamily: "Cairo, sans-serif",
-    color: "rgba(250,247,240,0.75)",
-    fontSize: "clamp(12px, 3.5vw, 13px)",
-    marginBottom: 7,
-    display: "block",
-  };
-
-  const focusInput = (element: HTMLInputElement) => {
-    element.style.borderColor = "rgba(201,168,76,0.7)";
-    element.style.boxShadow = "0 0 0 3px rgba(201,168,76,0.1)";
-  };
-
-  const blurInput = (element: HTMLInputElement) => {
-    element.style.borderColor = "rgba(201,168,76,0.25)";
-    element.style.boxShadow = "none";
-  };
+  const phoneInvalid = Boolean(localError && !phone.trim());
+  const passwordInvalid = Boolean(localError && !password);
 
   return (
     <motion.div
@@ -71,25 +50,14 @@ export function LoginForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="w-full"
-      style={{
-        width: "100%",
-        maxWidth: 460,
-        margin: "0 auto",
-      }}
+      style={{ width: "100%", maxWidth: 460, margin: "0 auto" }}
     >
-      <form
-        onSubmit={handleSubmit}
-        noValidate
-        dir="rtl"
-        style={{
-          width: "100%",
-          direction: "rtl",
-        }}
-      >
+      <form onSubmit={handleSubmit} noValidate dir="rtl" style={{ width: "100%", direction: "rtl" }}>
         {/* Phone field */}
         <div style={{ marginBottom: 18 }}>
-          <label htmlFor="phone" style={labelStyle}>
-            📱 رقم الهاتف
+          <label htmlFor="phone" style={authLabelStyle}>
+            <PhoneIcon size={15} color={authColors.cyanLight} />
+            رقم الهاتف
           </label>
 
           <div style={{ position: "relative", width: "100%" }}>
@@ -101,31 +69,33 @@ export function LoginForm() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="01xxxxxxxxx"
-              aria-invalid={Boolean(localError && !phone.trim())}
-              style={inputStyle}
-              onFocus={(e) => focusInput(e.target)}
-              onBlur={(e) => blurInput(e.target)}
+              aria-invalid={phoneInvalid}
+              aria-describedby={localError ? "login-error" : undefined}
+              style={authFieldStyle}
+              onFocus={(e) => (phoneInvalid ? invalidAuthField(e.target) : focusAuthField(e.target))}
+              onBlur={(e) => blurAuthField(e.target)}
             />
-
             <span
               style={{
                 position: "absolute",
                 right: 14,
                 top: "50%",
                 transform: "translateY(-50%)",
-                fontSize: 18,
                 pointerEvents: "none",
+                color: "rgba(0,212,255,0.55)",
+                display: "flex",
               }}
             >
-              📱
+              <PhoneIcon size={17} />
             </span>
           </div>
         </div>
 
         {/* Password field */}
-        <div style={{ marginBottom: 24 }}>
-          <label htmlFor="password" style={labelStyle}>
-            🔑 كلمة المرور
+        <div style={{ marginBottom: 22 }}>
+          <label htmlFor="password" style={authLabelStyle}>
+            <LockIcon size={15} color={authColors.cyanLight} />
+            كلمة المرور
           </label>
 
           <div style={{ position: "relative", width: "100%" }}>
@@ -136,14 +106,11 @@ export function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              aria-invalid={Boolean(localError && !password)}
-              style={{
-                ...inputStyle,
-                paddingRight: 46,
-                paddingLeft: 62,
-              }}
-              onFocus={(e) => focusInput(e.target)}
-              onBlur={(e) => blurInput(e.target)}
+              aria-invalid={passwordInvalid}
+              aria-describedby={localError ? "login-error" : undefined}
+              style={{ ...authFieldStyle, paddingRight: 46, paddingLeft: 62 }}
+              onFocus={(e) => (passwordInvalid ? invalidAuthField(e.target) : focusAuthField(e.target))}
+              onBlur={(e) => blurAuthField(e.target)}
             />
 
             <span
@@ -152,11 +119,12 @@ export function LoginForm() {
                 right: 14,
                 top: "50%",
                 transform: "translateY(-50%)",
-                fontSize: 18,
                 pointerEvents: "none",
+                color: "rgba(0,212,255,0.55)",
+                display: "flex",
               }}
             >
-              🔑
+              <LockIcon size={17} />
             </span>
 
             <button
@@ -165,22 +133,22 @@ export function LoginForm() {
               aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
               style={{
                 position: "absolute",
-                left: 8,
+                left: 6,
                 top: "50%",
                 transform: "translateY(-50%)",
-                minWidth: 48,
-                minHeight: 36,
-                padding: "4px 7px",
+                minWidth: 40,
+                minHeight: 40,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 background: "transparent",
                 border: "none",
                 borderRadius: 8,
                 cursor: "pointer",
-                color: "rgba(250,247,240,0.65)",
-                fontSize: "clamp(11px, 3vw, 13px)",
-                fontFamily: "Cairo, sans-serif",
+                color: "rgba(248,250,255,0.6)",
               }}
             >
-              {showPassword ? "إخفاء" : "إظهار"}
+              {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
             </button>
           </div>
         </div>
@@ -188,12 +156,9 @@ export function LoginForm() {
         {/* Error message */}
         {localError && (
           <motion.div
+            id="login-error"
             initial={{ opacity: 0, y: -8 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              x: [0, -6, 6, -4, 4, 0],
-            }}
+            animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
             transition={{ x: { duration: 0.4 } }}
             role="alert"
             style={{
@@ -202,15 +167,19 @@ export function LoginForm() {
               marginBottom: 16,
               padding: "11px 14px",
               borderRadius: 12,
-              textAlign: "center",
-              background: "rgba(239,68,68,0.15)",
-              border: "1px solid rgba(239,68,68,0.3)",
-              color: "#FCA5A5",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              background: "rgba(255,107,107,0.12)",
+              border: "1px solid rgba(255,107,107,0.32)",
+              color: "#FFB3B3",
               fontFamily: "Cairo, sans-serif",
               fontSize: "clamp(12px, 3.5vw, 14px)",
             }}
           >
-            ❌ {localError}
+            <AlertIcon size={16} />
+            {localError}
           </motion.div>
         )}
 
@@ -226,22 +195,29 @@ export function LoginForm() {
             boxSizing: "border-box",
             padding: "14px 16px",
             borderRadius: 14,
-            background: isLoginLoading
-              ? "rgba(201,168,76,0.4)"
-              : "linear-gradient(135deg,#C9A84C,#8B6914)",
-            boxShadow: isLoginLoading
-              ? "none"
-              : "0 6px 20px rgba(201,168,76,0.4)",
-            color: "#1A1208",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            background: isLoginLoading ? "rgba(0,212,255,0.35)" : authAccentGradient,
+            boxShadow: isLoginLoading ? "none" : "0 6px 22px rgba(0,212,255,0.35)",
+            color: authColors.navyDeep,
             fontFamily: "Cairo, sans-serif",
             fontWeight: 700,
             fontSize: "clamp(14px, 4vw, 16px)",
             border: "none",
             cursor: isLoginLoading ? "not-allowed" : "pointer",
-            transition: "all 0.2s",
+            transition: "all 0.2s ease",
           }}
         >
-          {isLoginLoading ? "⏳ جارٍ تسجيل الدخول..." : "🚀 دخول"}
+          {isLoginLoading ? (
+            <>
+              <SpinnerIcon size={17} />
+              جارٍ تسجيل الدخول...
+            </>
+          ) : (
+            "تسجيل الدخول"
+          )}
         </motion.button>
 
         {/* Footer link */}
@@ -251,7 +227,7 @@ export function LoginForm() {
             marginTop: 20,
             paddingInline: 8,
             fontFamily: "Cairo, sans-serif",
-            color: "rgba(250,247,240,0.55)",
+            color: authColors.textMuted,
             fontSize: "clamp(12px, 3.5vw, 13px)",
             lineHeight: 1.8,
           }}
@@ -260,7 +236,7 @@ export function LoginForm() {
           <Link
             href="/register"
             style={{
-              color: "#E8C97A",
+              color: authColors.cyanLight,
               fontWeight: 600,
               textDecoration: "none",
               whiteSpace: "nowrap",
