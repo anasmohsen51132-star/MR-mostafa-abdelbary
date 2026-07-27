@@ -17,7 +17,7 @@ async function createUserAtomically(data: {
   name: string; phone: string; passwordHash: string; academicLevel: AcademicLevel;
 }) {
   return prisma.$transaction(
-    async (tx) => {
+    async (tx: Prisma.TransactionClient) => {
       const ownerCount = await tx.user.count({ where: { role: "OWNER" } });
       const role: Role = ownerCount === 0 ? "OWNER" : "STUDENT";
 
