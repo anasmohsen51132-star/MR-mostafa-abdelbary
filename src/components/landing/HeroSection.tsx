@@ -1,26 +1,29 @@
 "use client";
+
 // src/components/landing/HeroSection.tsx — Chemistry Academy Edition
 import { m as motion } from "framer-motion";
 import Link from "next/link";
 import type { SiteSettings } from "@/types";
 import { FloatingArabicBackground } from "@/components/effects/FloatingArabicBackground";
 import { TwinklingStars } from "@/components/effects/TwinklingStars";
+import { HeroChemicalReaction } from "@/components/landing/HeroChemicalReaction";
 
 interface Props {
   settings: Partial<SiteSettings> | null;
 }
 
 const STATS_DEFAULT = [
-  { value: "٥٠٠٠+", label: "طالب مسجل"   },
-  { value: "٢٠",    label: "كورس متاح"    },
-  { value: "١٥+",   label: "سنة خبرة"     },
-  { value: "٩٨٪",  label: "نسبة النجاح"  },
+  { value: "٥٠٠٠+", label: "طالب مسجل" },
+  { value: "٢٠", label: "كورس متاح" },
+  { value: "١٥+", label: "سنة خبرة" },
+  { value: "٩٨٪", label: "نسبة النجاح" },
 ];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 44 },
   show: (delay = 0) => ({
-    opacity: 1, y: 0,
+    opacity: 1,
+    y: 0,
     transition: { type: "spring", stiffness: 220, damping: 20, delay },
   }),
 };
@@ -44,7 +47,9 @@ export function HeroSection({ settings }: Props) {
     if (settings?.statsBar && Array.isArray(settings.statsBar)) {
       statsBar = settings.statsBar;
     }
-  } catch { statsBar = STATS_DEFAULT; }
+  } catch {
+    statsBar = STATS_DEFAULT;
+  }
 
   const btnGradient = `linear-gradient(135deg,${settings?.buttonColor || "#00D4FF"},${settings?.hoverColor || "#00FF88"})`;
 
@@ -62,10 +67,13 @@ export function HeroSection({ settings }: Props) {
       }
     >
       {/* ── Molecule dot grid pattern ── */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: `radial-gradient(circle, rgba(0,212,255,0.06) 1px, transparent 1px)`,
-        backgroundSize: "36px 36px",
-      }} />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle, rgba(0,212,255,0.06) 1px, transparent 1px)`,
+          backgroundSize: "36px 36px",
+        }}
+      />
 
       {/* ── Floating chemistry symbols ── */}
       <FloatingArabicBackground />
@@ -170,12 +178,15 @@ export function HeroSection({ settings }: Props) {
       {/* ── Hero Content ── */}
       <div
         className="relative z-10 text-center w-full"
-        style={{ padding: "96px clamp(16px,5vw,40px) 96px" }}
+        style={{ padding: "88px clamp(16px,5vw,40px) 64px" }}
       >
         {/* Platform badge */}
         <motion.div
-          initial="hidden" animate="show" custom={0} variants={fadeUp}
-          className="inline-flex items-center gap-2 rounded-full mb-6"
+          initial="hidden"
+          animate="show"
+          custom={0}
+          variants={fadeUp}
+          className="inline-flex items-center gap-2 rounded-full mb-4"
           style={{
             background: "rgba(0,212,255,0.08)",
             border: "1px solid rgba(0,212,255,0.22)",
@@ -188,14 +199,25 @@ export function HeroSection({ settings }: Props) {
           </span>
         </motion.div>
 
+        {/* ── Feature Hero Chemical Reaction Animation ── */}
+        <div className="my-2">
+          <HeroChemicalReaction
+            teacherName={settings?.platformName ?? "مستر مصطفى عبد الباري"}
+            tagline={settings?.platformTagline ?? "أكاديمية تدريس الكيمياء"}
+          />
+        </div>
+
         {/* Main heading */}
         <motion.h1
-          initial="hidden" animate="show" custom={0.15} variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          custom={0.15}
+          variants={fadeUp}
           style={{
             fontFamily: "Cairo,sans-serif",
             fontWeight: 900,
             color: "#FFFFFF",
-            fontSize: "clamp(32px,8vw,76px)",
+            fontSize: "clamp(28px,6vw,60px)",
             lineHeight: 1.15,
             marginBottom: 8,
             textShadow: "0 0 40px rgba(0,212,255,0.25)",
@@ -203,25 +225,30 @@ export function HeroSection({ settings }: Props) {
         >
           {settings?.heroTitle ?? "افهم الكيمياء"}
           <br />
-          <span style={{
-            background: "linear-gradient(135deg,#00D4FF,#00FF88)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}>
+          <span
+            style={{
+              background: "linear-gradient(135deg,#00D4FF,#00FF88)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
             بطريقة مختلفة
           </span>
         </motion.h1>
 
         {/* Sub heading */}
         <motion.h2
-          initial="hidden" animate="show" custom={0.3} variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          custom={0.3}
+          variants={fadeUp}
           style={{
             fontFamily: "Cairo,sans-serif",
             color: "rgba(122,232,255,0.6)",
-            fontSize: "clamp(14px,3.5vw,22px)",
+            fontSize: "clamp(14px,3vw,20px)",
             fontWeight: 400,
-            marginBottom: 28,
+            marginBottom: 20,
           }}
         >
           {settings?.heroSubtitle ?? "مع مستر مصطفى عبد الباري"}
@@ -232,12 +259,14 @@ export function HeroSection({ settings }: Props) {
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="flex items-center justify-center gap-3 mb-8"
+          className="flex items-center justify-center gap-3 mb-6"
         >
           <div style={{ height: 1, width: 60, background: "linear-gradient(to right,transparent,rgba(0,212,255,0.5))" }} />
           <motion.div
             style={{
-              width: 10, height: 10, borderRadius: "50%",
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
               background: "linear-gradient(135deg,#00D4FF,#00FF88)",
               boxShadow: "0 0 12px rgba(0,212,255,0.6)",
             }}
@@ -249,14 +278,17 @@ export function HeroSection({ settings }: Props) {
 
         {/* Description */}
         <motion.p
-          initial="hidden" animate="show" custom={0.48} variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          custom={0.48}
+          variants={fadeUp}
           style={{
             color: "rgba(255,255,255,0.55)",
             fontFamily: "Cairo,sans-serif",
-            fontSize: "clamp(14px,3.5vw,17px)",
-            lineHeight: 2,
+            fontSize: "clamp(14px,3vw,16px)",
+            lineHeight: 1.9,
             maxWidth: 540,
-            margin: "0 auto 40px",
+            margin: "0 auto 32px",
           }}
         >
           {settings?.heroDesc ?? "انضم إلى آلاف الطلاب وافهم الكيمياء العضوية والتحليلية والفيزيائية بأسلوب مبسط واحترافي"}
@@ -264,7 +296,10 @@ export function HeroSection({ settings }: Props) {
 
         {/* CTA Buttons — stack on mobile, row on tablet+ */}
         <motion.div
-          initial="hidden" animate="show" custom={0.58} variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          custom={0.58}
+          variants={fadeUp}
           className="flex flex-col sm:flex-row justify-center"
           style={{ gap: "clamp(10px,2vw,16px)" }}
         >
@@ -320,8 +355,11 @@ export function HeroSection({ settings }: Props) {
 
         {/* Stats bar — 2×2 on mobile, row on sm+ */}
         <motion.div
-          initial="hidden" animate="show" custom={0.72} variants={fadeUp}
-          className="grid grid-cols-2 sm:grid-cols-4 mt-14 mx-auto"
+          initial="hidden"
+          animate="show"
+          custom={0.72}
+          variants={fadeUp}
+          className="grid grid-cols-2 sm:grid-cols-4 mt-12 mx-auto"
           style={{ maxWidth: 560, gap: "clamp(12px,3vw,24px)" }}
         >
           {statsBar.map((s, i) => (
@@ -337,21 +375,25 @@ export function HeroSection({ settings }: Props) {
               transition={{ type: "spring", stiffness: 260, damping: 14, delay: 0.85 + i * 0.1 }}
               whileHover={{ scale: 1.08, y: -4 }}
             >
-              <div style={{
-                fontFamily: "Cairo,sans-serif",
-                color: "#00D4FF",
-                fontSize: "clamp(22px,5vw,36px)",
-                fontWeight: 900,
-                lineHeight: 1.2,
-              }}>
+              <div
+                style={{
+                  fontFamily: "Cairo,sans-serif",
+                  color: "#00D4FF",
+                  fontSize: "clamp(22px,5vw,36px)",
+                  fontWeight: 900,
+                  lineHeight: 1.2,
+                }}
+              >
                 {s.value}
               </div>
-              <div style={{
-                fontFamily: "Cairo,sans-serif",
-                color: "rgba(122,232,255,0.5)",
-                fontSize: "clamp(10px,2.5vw,12px)",
-                marginTop: 4,
-              }}>
+              <div
+                style={{
+                  fontFamily: "Cairo,sans-serif",
+                  color: "rgba(122,232,255,0.5)",
+                  fontSize: "clamp(10px,2.5vw,12px)",
+                  marginTop: 4,
+                }}
+              >
                 {s.label}
               </div>
             </motion.div>
