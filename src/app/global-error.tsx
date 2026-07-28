@@ -22,21 +22,21 @@ export default function GlobalError({
         <div
           style={{
             minHeight: "100vh", display: "flex", alignItems: "center",
-            justifyContent: "center", background: "#FAF7F0", padding: 24,
+            justifyContent: "center", background: "#F8FAFF", padding: 24,
           }}
         >
           <div style={{ textAlign: "center", maxWidth: 420 }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
-            <h1 style={{ color: "#1A6B47", fontSize: 22, fontWeight: 700, marginBottom: 8 }}>
+            <h1 style={{ color: "#111E38", fontSize: 22, fontWeight: 700, marginBottom: 8 }}>
               تعذر تحميل المنصة
             </h1>
-            <p style={{ color: "#6b6256", marginBottom: 24 }}>
+            <p style={{ color: "#52607A", marginBottom: 24 }}>
               حدث خطأ غير متوقع. حاول إعادة تحميل الصفحة.
             </p>
             <button
               onClick={reset}
               style={{
-                background: "#1A6B47", color: "#fff", border: "none",
+                background: "#111E38", color: "#fff", border: "none",
                 borderRadius: 10, padding: "10px 28px", fontWeight: 600, cursor: "pointer",
               }}
             >
