@@ -4,6 +4,7 @@ import { m as motion } from "framer-motion";
 import Link from "next/link";
 import type { SiteSettings } from "@/types";
 import { MixingSolutionsAnimation } from "@/components/effects/MixingSolutionsAnimation";
+import { FloatingChemistryBackground } from "@/components/effects/FloatingChemistryBackground";
 import { TwinklingStars } from "@/components/effects/TwinklingStars";
 
 interface Props {
@@ -68,6 +69,7 @@ export function HeroSection({ settings }: Props) {
       }} />
 
       {/* ── Ambient effects ── */}
+      <FloatingChemistryBackground />
       <TwinklingStars />
 
       {/* ── Glow orbs ── */}
@@ -129,7 +131,7 @@ export function HeroSection({ settings }: Props) {
               {settings?.platformName ?? "أكاديمية مستر مصطفى عبد الباري"}
             </span>
             <span style={{ color: "rgba(0,212,255,0.45)", fontSize: 10, fontFamily: "Cairo,sans-serif" }}>
-              {settings?.platformTagline ?? "لتدريس الكيمياء"}
+              لتدريس الكيمياء
             </span>
           </div>
         </div>
@@ -171,19 +173,21 @@ export function HeroSection({ settings }: Props) {
         className="relative z-10 text-center w-full"
         style={{ padding: "96px clamp(16px,5vw,40px) 96px" }}
       >
-        {/* Signature visual — two solutions mixing */}
+        {/* Signature visual — two solutions react. The headline below only
+            reveals itself once this reaction fires, so the page opens on
+            the reaction rather than static text. */}
         <motion.div
           initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.05 }}
-          className="mb-4"
+          className="mb-2"
         >
-          <MixingSolutionsAnimation maxWidth={220} />
+          <MixingSolutionsAnimation maxWidth={300} />
         </motion.div>
 
         {/* Platform badge */}
         <motion.div
-          initial="hidden" animate="show" custom={0} variants={fadeUp}
+          initial="hidden" animate="show" custom={1.7} variants={fadeUp}
           className="inline-flex items-center gap-2 rounded-full mb-6"
           style={{
             background: "rgba(0,212,255,0.08)",
@@ -197,9 +201,11 @@ export function HeroSection({ settings }: Props) {
           </span>
         </motion.div>
 
-        {/* Main heading */}
+        {/* Main heading — fixed to the chemistry phrase on purpose: this no
+            longer reads from settings.heroTitle, so a stale "اتقن اللغة
+            العربية" value saved in the CMS can never show up here again. */}
         <motion.h1
-          initial="hidden" animate="show" custom={0.15} variants={fadeUp}
+          initial="hidden" animate="show" custom={1.85} variants={fadeUp}
           style={{
             fontFamily: "Cairo,sans-serif",
             fontWeight: 900,
@@ -210,21 +216,20 @@ export function HeroSection({ settings }: Props) {
             textShadow: "0 0 40px rgba(0,212,255,0.25)",
           }}
         >
-          {settings?.heroTitle ?? "افهم الكيمياء"}
-          <br />
+          اتقن{" "}
           <span style={{
             background: "linear-gradient(135deg,#00D4FF,#00FF88)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
           }}>
-            بطريقة مختلفة
+            الكيمياء
           </span>
         </motion.h1>
 
-        {/* Sub heading */}
+        {/* Sub heading — also fixed, same reason as above */}
         <motion.h2
-          initial="hidden" animate="show" custom={0.3} variants={fadeUp}
+          initial="hidden" animate="show" custom={2} variants={fadeUp}
           style={{
             fontFamily: "Cairo,sans-serif",
             color: "rgba(122,232,255,0.6)",
@@ -233,14 +238,14 @@ export function HeroSection({ settings }: Props) {
             marginBottom: 28,
           }}
         >
-          {settings?.heroSubtitle ?? "مع مستر مصطفى عبد الباري"}
+          مع مستر مصطفى عبد الباري
         </motion.h2>
 
         {/* Divider — molecule bonds style */}
         <motion.div
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
+          transition={{ duration: 0.7, delay: 2.15 }}
           className="flex items-center justify-center gap-3 mb-8"
         >
           <div style={{ height: 1, width: 60, background: "linear-gradient(to right,transparent,rgba(0,212,255,0.5))" }} />
@@ -258,7 +263,7 @@ export function HeroSection({ settings }: Props) {
 
         {/* Description */}
         <motion.p
-          initial="hidden" animate="show" custom={0.48} variants={fadeUp}
+          initial="hidden" animate="show" custom={2.3} variants={fadeUp}
           style={{
             color: "rgba(255,255,255,0.55)",
             fontFamily: "Cairo,sans-serif",
@@ -273,7 +278,7 @@ export function HeroSection({ settings }: Props) {
 
         {/* CTA Buttons — stack on mobile, row on tablet+ */}
         <motion.div
-          initial="hidden" animate="show" custom={0.58} variants={fadeUp}
+          initial="hidden" animate="show" custom={2.45} variants={fadeUp}
           className="flex flex-col sm:flex-row justify-center"
           style={{ gap: "clamp(10px,2vw,16px)" }}
         >
@@ -329,7 +334,7 @@ export function HeroSection({ settings }: Props) {
 
         {/* Stats bar — 2×2 on mobile, row on sm+ */}
         <motion.div
-          initial="hidden" animate="show" custom={0.72} variants={fadeUp}
+          initial="hidden" animate="show" custom={2.6} variants={fadeUp}
           className="grid grid-cols-2 sm:grid-cols-4 mt-14 mx-auto"
           style={{ maxWidth: 560, gap: "clamp(12px,3vw,24px)" }}
         >
@@ -343,7 +348,7 @@ export function HeroSection({ settings }: Props) {
               }}
               initial={{ opacity: 0, scale: 0.6 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 260, damping: 14, delay: 0.85 + i * 0.1 }}
+              transition={{ type: "spring", stiffness: 260, damping: 14, delay: 2.75 + i * 0.1 }}
               whileHover={{ scale: 1.08, y: -4 }}
             >
               <div style={{
