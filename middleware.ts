@@ -11,29 +11,9 @@ const PUBLIC_PATHS = [
   "/api/auth/login",
   "/api/auth/register",
   "/api/customize",
-  // SEO FIX: Next.js's dynamic OG-image file convention (opengraph-image.tsx)
-  // serves it at a clean, extension-less path — so the extension-based
-  // static-file bypass further down (pathname.includes(".")) never catches
-  // it. Without this, every anonymous visitor and every crawler (Google,
-  // Facebook/WhatsApp link previews, etc.) would get redirected to /login
-  // instead of receiving the actual image, silently breaking social share
-  // previews for all of them.
-  //
-  // NOTE: /icon, /apple-icon, /icon-192, /icon-512 used to need the same
-  // explicit entry here too, back when they were also dynamic generators.
-  // They're now static .png files (src/app/icon.png, apple-icon.png, and
-  // public/icon-192.png, icon-512.png) which already have a "." in their
-  // served path, so the generic extension check below covers them — no
-  // explicit entry needed anymore.
-  "/opengraph-image",
   "/opengraph-image",
 ];
 
-// SEC-007 FIX: next.config.mjs sets CORS response headers on /api/:path*, but
-// Next.js App Router does NOT auto-answer the OPTIONS preflight Vercel
-// receives before any real cross-origin request — without this, every
-// cross-origin call (mobile app, partner integration) gets a 405 on its
-// preflight and never even reaches the real handler.
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 function corsPreflightResponse() {
   return new NextResponse(null, {
@@ -47,28 +27,12 @@ function corsPreflightResponse() {
   });
 }
 
-// NEXT-003 FIX: the static CSP in next.config.mjs had `'unsafe-inline'` in
-// script-src, which negates CSP's main XSS protection — any injected
-// <script> tag runs just as freely as Next.js's own hydration scripts. A
-// nonce is generated fresh per request here (Edge-safe, no Node crypto
-// needed) and only script tags carrying it are allowed to execute. Next.js
-// automatically applies the nonce from the `x-nonce` request header to its
-// own inline scripts when read via headers() in a Server Component (see
-// src/app/layout.tsx) — this is their documented pattern, not a workaround.
-// `'strict-dynamic'` lets those nonced scripts load further scripts they
-// trust, while plain injected <script> tags (no nonce) are blocked outright.
 function buildCsp(nonce: string) {
   const isDev = process.env.NODE_ENV !== "production";
   return [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
-    // style-src still needs unsafe-inline: Next.js/Tailwind inject style
-    // attributes and <style> tags with no nonce support today. This is a
-    // far smaller XSS surface than script-src (CSS can't run arbitrary JS).
     "style-src 'self' 'unsafe-inline'",
-    // Cloudinary added: the owner uses Cloudinary URLs for images like the
-    // dashboard banner (siteSettings.dashboardBanner) — without this, CSP
-    // silently blocks the image from loading in the browser.
     "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://*.public.blob.vercel-storage.com https://res.cloudinary.com",
     "font-src 'self' data:",
     "frame-src https://www.youtube-nocookie.com",
@@ -80,7 +44,6 @@ function buildCsp(nonce: string) {
 }
 
 function generateNonce(): string {
-  // Edge runtime has Web Crypto globally — no Node 'crypto' import needed.
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
   return btoa(String.fromCharCode(...bytes));
@@ -88,12 +51,15 @@ function generateNonce(): string {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // GOOGLE VERIFICATION FIX: تمرير ملف التحقق من جوجل مباشرة بدون أي توجيه أو معالجة
+  if (pathname.startsWith("/google") && pathname.endsWith(".html")) {
+    return NextResponse.next();
+  }
+
   const nonce = generateNonce();
   const csp   = buildCsp(nonce);
 
-  // Attach nonce + CSP to every response this middleware returns, on every
-  // exit path — pages need the CSP header to enforce it, and the nonce
-  // header so the root layout can read it via headers().
   function withCsp<T extends Response>(res: T, includeNonceForRequest = true): T {
     res.headers.set("Content-Security-Policy", csp);
     if (includeNonceForRequest) res.headers.set("x-nonce", nonce);
@@ -106,15 +72,6 @@ export async function middleware(req: NextRequest) {
     return withCsp(NextResponse.next({ request: { headers: requestHeaders } }));
   }
 
-  // BUGFIX (mobile "stuck on /login"): auth-gate redirects (no token, invalid
-  // token, wrong role) were returned with no Cache-Control header. Browsers
-  // — mobile Safari/Chrome in particular — can cache a 307 redirect per-URL
-  // when no explicit no-store directive is present, which meant a device
-  // that ever received a redirect for "/" (e.g. from an older deployment)
-  // could keep silently replaying that cached redirect forever, never
-  // re-asking the server — so it never saw that "/" is public, and clicking
-  // back to the homepage hit the same cached redirect again. These auth
-  // decisions must always be re-evaluated per request, never cached.
   function redirectNoStore(url: URL) {
     const res = NextResponse.redirect(url);
     res.headers.set("Cache-Control", "no-store");
@@ -164,8 +121,6 @@ export async function middleware(req: NextRequest) {
   }
 
   // Role-based protection
-  // DEVELOPER is the highest permission level and can access everything
-  // OWNER/ADMIN can (see /developer block below for its own exclusive area).
   if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
     if (payload.role !== "ADMIN" && payload.role !== "OWNER" && payload.role !== "DEVELOPER") {
       if (pathname.startsWith("/api/")) {
@@ -184,9 +139,6 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // NEW: Developer Dashboard — exclusive to DEVELOPER. Unlike /owner and
-  // /admin above, OWNER does NOT get automatic access here: this area is
-  // reserved only for the platform developer.
   if (pathname.startsWith("/developer") || pathname.startsWith("/api/developer")) {
     if (payload.role !== "DEVELOPER") {
       if (pathname.startsWith("/api/")) {
@@ -207,5 +159,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // GOOGLE VERIFICATION FIX: استثناء ملفات HTML الخاصة بـ Google من الماتشر نهائياً
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|google.*\\.html$).*)"],
 };
