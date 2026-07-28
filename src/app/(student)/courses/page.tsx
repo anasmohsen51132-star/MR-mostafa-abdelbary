@@ -36,24 +36,24 @@ export default function CoursesPage() {
         transition={{ duration: 0.5 }}
         className="relative rounded-3xl p-8 mb-8 overflow-hidden"
         style={{
-          background: "linear-gradient(135deg,#0D3D27,#1A6B47)",
-          boxShadow: "0 8px 32px rgba(13,61,39,0.25)",
+          background: "linear-gradient(135deg,#0A0F1E,#111E38)",
+          boxShadow: "0 8px 32px rgba(10,15,30,0.25)",
         }}
       >
         {/* pattern */}
         <div className="absolute inset-0 pointer-events-none" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23C9A84C' fill-opacity='0.06'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2300D4FF' fill-opacity='0.06'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
         }} />
         {/* drifting orbs */}
         <motion.div className="absolute -top-10 -left-10 w-52 h-52 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle,rgba(201,168,76,0.15),transparent 70%)" }}
+          style={{ background: "radial-gradient(circle,rgba(0,212,255,0.15),transparent 70%)" }}
           animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }} />
         <motion.div className="absolute -bottom-8 -right-8 w-40 h-40 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle,rgba(45,158,107,0.15),transparent 70%)" }}
+          style={{ background: "radial-gradient(circle,rgba(0,255,136,0.15),transparent 70%)" }}
           animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
         {/* shimmer sweep */}
         <motion.div aria-hidden className="absolute inset-0 pointer-events-none"
-          style={{ background: "linear-gradient(115deg,transparent 30%,rgba(232,201,122,0.08) 50%,transparent 70%)" }}
+          style={{ background: "linear-gradient(115deg,transparent 30%,rgba(0,212,255,0.08) 50%,transparent 70%)" }}
           animate={{ x: ["-30%","30%"] }} transition={{ duration: 5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }} />
 
         <div className="relative z-10">
@@ -62,17 +62,17 @@ export default function CoursesPage() {
               animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
               📚
             </motion.span>
-            <h1 style={{ fontFamily: "Amiri,serif", color: "#E8C97A", fontSize: "clamp(22px,4vw,36px)", fontWeight: 700 }}>
+            <h1 style={{ fontFamily: "Cairo,sans-serif", color: "#7AE8FF", fontSize: "clamp(22px,4vw,36px)", fontWeight: 700 }}>
               الكورسات المتاحة
             </h1>
           </div>
-          <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(250,247,240,0.65)", fontSize: 14 }}>
+          <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(248,250,255,0.65)", fontSize: 14 }}>
             اكتشف جميع الكورسات — لديك{" "}
-            <span style={{ color: "#C9A84C", fontWeight: 700 }}>
+            <span style={{ color: "#00D4FF", fontWeight: 700 }}>
               {allCourses.filter(c => c.unlocked).length}
             </span>{" "}
             كورس مفتوح من أصل{" "}
-            <span style={{ color: "#C9A84C", fontWeight: 700 }}>{allCourses.filter(c => c.isPublished).length}</span>
+            <span style={{ color: "#00D4FF", fontWeight: 700 }}>{allCourses.filter(c => c.isPublished).length}</span>
           </p>
         </div>
       </motion.div>
@@ -94,23 +94,23 @@ export default function CoursesPage() {
               width: "100%",
               padding: "13px 48px 13px 44px",
               borderRadius: 16,
-              border: "1.5px solid rgba(201,168,76,0.25)",
+              border: "1.5px solid rgba(0,212,255,0.25)",
               background: "#fff",
               fontFamily: "Cairo,sans-serif",
               fontSize: 14,
-              color: "#1A1208",
+              color: "#0A0F1E",
               outline: "none",
               direction: "rtl",
-              boxShadow: "0 2px 12px rgba(26,18,8,0.05)",
+              boxShadow: "0 2px 12px rgba(10,15,30,0.05)",
               transition: "border-color 0.2s, box-shadow 0.2s",
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = "rgba(201,168,76,0.6)";
-              e.target.style.boxShadow = "0 2px 16px rgba(201,168,76,0.15)";
+              e.target.style.borderColor = "rgba(0,212,255,0.6)";
+              e.target.style.boxShadow = "0 2px 16px rgba(0,212,255,0.15)";
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = "rgba(201,168,76,0.25)";
-              e.target.style.boxShadow = "0 2px 12px rgba(26,18,8,0.05)";
+              e.target.style.borderColor = "rgba(0,212,255,0.25)";
+              e.target.style.boxShadow = "0 2px 12px rgba(10,15,30,0.05)";
             }}
           />
           <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 18, pointerEvents: "none" }}>
@@ -125,9 +125,9 @@ export default function CoursesPage() {
                 onClick={() => setSearch("")}
                 style={{
                   position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)",
-                  background: "rgba(201,168,76,0.15)", border: "none", borderRadius: "50%",
+                  background: "rgba(0,212,255,0.15)", border: "none", borderRadius: "50%",
                   width: 22, height: 22, cursor: "pointer", fontSize: 12,
-                  color: "#8B6914", display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "#0099CC", display: "flex", alignItems: "center", justifyContent: "center",
                 }}
               >
                 ✕
@@ -137,7 +137,7 @@ export default function CoursesPage() {
         </div>
         {search && (
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 13, marginTop: 8 }}>
+            style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 13, marginTop: 8 }}>
             {filtered.length} نتيجة للبحث عن "{search}"
           </motion.p>
         )}
@@ -147,7 +147,7 @@ export default function CoursesPage() {
       {isLoading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="rounded-2xl overflow-hidden" style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.1)" }}>
+            <div key={i} className="rounded-2xl overflow-hidden" style={{ background: "#fff", border: "1px solid rgba(0,212,255,0.1)" }}>
               <div className="skeleton h-32" />
               <div className="p-5 space-y-3">
                 <div className="skeleton h-4 rounded-full w-3/4" />
@@ -175,10 +175,10 @@ export default function CoursesPage() {
                 className="rounded-2xl overflow-hidden"
                 style={{
                   background: "#fff",
-                  border: `1px solid ${hoveredId === course.id ? course.color + "55" : "rgba(201,168,76,0.15)"}`,
+                  border: `1px solid ${hoveredId === course.id ? course.color + "55" : "rgba(0,212,255,0.15)"}`,
                   boxShadow: hoveredId === course.id
-                    ? `0 12px 32px ${course.color}22, 0 2px 8px rgba(26,18,8,0.06)`
-                    : "0 4px 20px rgba(26,18,8,0.06)",
+                    ? `0 12px 32px ${course.color}22, 0 2px 8px rgba(10,15,30,0.06)`
+                    : "0 4px 20px rgba(10,15,30,0.06)",
                   transition: "border-color 0.25s, box-shadow 0.25s",
                 }}
               >
@@ -220,7 +220,7 @@ export default function CoursesPage() {
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
-                      style={{ background: "rgba(13,61,39,0.85)", color: "#E8C97A", fontFamily: "Cairo,sans-serif", backdropFilter: "blur(4px)" }}
+                      style={{ background: "rgba(10,15,30,0.85)", color: "#7AE8FF", fontFamily: "Cairo,sans-serif", backdropFilter: "blur(4px)" }}
                     >
                       ✦ مفتوح
                     </motion.div>
@@ -235,12 +235,12 @@ export default function CoursesPage() {
 
                 {/* Card body */}
                 <div className="p-5">
-                  <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#1A1208", fontSize: 16, fontWeight: 700, marginBottom: 6, lineHeight: 1.5 }}>
+                  <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 16, fontWeight: 700, marginBottom: 6, lineHeight: 1.5 }}>
                     {course.title}
                   </h3>
                   {course.description && (
                     <p className="line-clamp-2"
-                      style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 13, lineHeight: 1.7, marginBottom: 16 }}>
+                      style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 13, lineHeight: 1.7, marginBottom: 16 }}>
                       {course.description}
                     </p>
                   )}
@@ -249,7 +249,7 @@ export default function CoursesPage() {
                   <div style={{ height: 1, background: `linear-gradient(90deg,${course.color}30,transparent)`, marginBottom: 14 }} />
 
                   <div className="flex items-center justify-between">
-                    <span style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 12 }}>
+                    <span style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 12 }}>
                       📖 {course._count?.lectures ?? 0} محاضرة
                     </span>
                     {course.unlocked ? (
@@ -257,7 +257,7 @@ export default function CoursesPage() {
                         style={{
                           padding: "8px 20px", borderRadius: 12,
                           background: `linear-gradient(135deg,${course.color},${course.color}cc)`,
-                          color: "#1A1208", fontFamily: "Cairo,sans-serif",
+                          color: "#0A0F1E", fontFamily: "Cairo,sans-serif",
                           fontWeight: 700, fontSize: 13, textDecoration: "none",
                           boxShadow: `0 4px 12px ${course.color}40`,
                           transition: "transform 0.15s, box-shadow 0.15s",
@@ -270,10 +270,10 @@ export default function CoursesPage() {
                       <Link href="/redeem"
                         style={{
                           padding: "8px 20px", borderRadius: 12,
-                          border: "1.5px solid rgba(201,168,76,0.35)",
-                          color: "#C9A84C", fontFamily: "Cairo,sans-serif",
+                          border: "1.5px solid rgba(0,212,255,0.35)",
+                          color: "#00D4FF", fontFamily: "Cairo,sans-serif",
                           fontWeight: 600, fontSize: 13, textDecoration: "none",
-                          background: "rgba(201,168,76,0.05)",
+                          background: "rgba(0,212,255,0.05)",
                           transition: "background 0.15s",
                         }}
                       >
@@ -292,15 +292,15 @@ export default function CoursesPage() {
       {!isLoading && filtered.length === 0 && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
           className="text-center py-20"
-          style={{ background: "#fff", borderRadius: 24, border: "1px solid rgba(201,168,76,0.12)" }}>
+          style={{ background: "#fff", borderRadius: 24, border: "1px solid rgba(0,212,255,0.12)" }}>
           <motion.div style={{ fontSize: 60, marginBottom: 16 }}
             animate={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
             {search ? "🔍" : "📭"}
           </motion.div>
-          <h3 style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 24, marginBottom: 8 }}>
+          <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 24, marginBottom: 8 }}>
             {search ? "لا توجد نتائج" : "لا توجد كورسات بعد"}
           </h3>
-          <p style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 14 }}>
+          <p style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 14 }}>
             {search ? "جرب البحث بكلمات مختلفة" : "سيتم إضافة الكورسات قريباً"}
           </p>
           {search && (
@@ -308,8 +308,8 @@ export default function CoursesPage() {
               whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
               style={{
                 marginTop: 20, padding: "10px 28px", borderRadius: 12, border: "none",
-                background: "linear-gradient(135deg,#C9A84C,#8B6914)",
-                color: "#1A1208", fontFamily: "Cairo,sans-serif", fontWeight: 700,
+                background: "linear-gradient(135deg,#00D4FF,#00FF88)",
+                color: "#0A0F1E", fontFamily: "Cairo,sans-serif", fontWeight: 700,
                 fontSize: 14, cursor: "pointer",
               }}>
               مسح البحث

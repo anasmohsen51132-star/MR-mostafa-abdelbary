@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ToastContainer } from "@/components/ui/Toast";
-import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
+import { StudentSpinner } from "@/components/dashboard/StudentSpinner";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { useAuth } from "@/hooks/useAuth";
 import type { SidebarItem } from "@/components/layout/Sidebar";
@@ -42,11 +42,11 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
   const handleClose = useCallback(() => setSidebarOpen(false), []);
 
-  if (!isHydrated || !isSessionVerified) return <FullScreenSpinner />;
+  if (!isHydrated || !isSessionVerified) return <StudentSpinner />;
   if (!isAuthenticated || !user) return null;
 
   return (
-    <div className="min-h-screen" style={{ background: "#FAF7F0", direction: "rtl" }}>
+    <div className="min-h-screen" style={{ background: "#F0F4FF", direction: "rtl" }}>
       <ToastContainer />
       <Sidebar
         items={STUDENT_NAV}
@@ -68,20 +68,20 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             <button
               onClick={() => setSidebarOpen(true)}
               className="flex items-center justify-center w-10 h-10 rounded-xl"
-              style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", cursor: "pointer" }}
+              style={{ background: "rgba(0,212,255,0.08)", border: "1px solid rgba(0,212,255,0.22)", cursor: "pointer" }}
               aria-label="فتح القائمة"
             >
               <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
-                <rect width="20" height="2.5" rx="1.25" fill="#C9A84C"/>
-                <rect y="6.75" width="14" height="2.5" rx="1.25" fill="#C9A84C"/>
-                <rect y="13.5" width="20" height="2.5" rx="1.25" fill="#C9A84C"/>
+                <rect width="20" height="2.5" rx="1.25" fill="#00D4FF"/>
+                <rect y="6.75" width="14" height="2.5" rx="1.25" fill="#00D4FF"/>
+                <rect y="13.5" width="20" height="2.5" rx="1.25" fill="#00D4FF"/>
               </svg>
             </button>
-            <span style={{ fontFamily: "Amiri,serif", color: "#1A6B47", fontSize: 16, fontWeight: 700 }}>
-              اكاديمية مستر مصطفى
+            <span style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 15, fontWeight: 700 }}>
+              أكاديمية مستر مصطفى
             </span>
             <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm"
-              style={{ background: "linear-gradient(135deg,#C9A84C,#2D9E6B)", color: "#1A1208" }}>
+              style={{ background: "linear-gradient(135deg,#00D4FF,#00FF88)", color: "#0A0F1E" }}>
               {user.avatar ?? user.name.charAt(0)}
             </div>
           </div>
