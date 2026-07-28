@@ -16,7 +16,7 @@ interface ReportRecord {
   reportJson: GuardianReport; tokensUsed: number | null; createdAt: string;
 }
 
-const sectionTitle: React.CSSProperties = { fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 22, marginBottom: 14 };
+const sectionTitle: React.CSSProperties = { fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 22, marginBottom: 14 };
 
 export default function ReportDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -36,13 +36,13 @@ export default function ReportDetailPage() {
       <div className="flex items-center justify-between mb-4 print:hidden">
         <button
           onClick={() => router.back()}
-          style={{ background: "none", border: "none", color: "#1A6B47", fontFamily: "Cairo,sans-serif", fontSize: 13, cursor: "pointer", padding: 0 }}
+          style={{ background: "none", border: "none", color: "#111E38", fontFamily: "Cairo,sans-serif", fontSize: 13, cursor: "pointer", padding: 0 }}
         >
           → رجوع
         </button>
         <button
           onClick={() => window.print()}
-          style={{ background: "#1A6B47", color: "#fff", border: "none", borderRadius: 10, padding: "8px 18px", fontWeight: 700, fontFamily: "Cairo,sans-serif", fontSize: 12.5, cursor: "pointer" }}
+          style={{ background: "#111E38", color: "#fff", border: "none", borderRadius: 10, padding: "8px 18px", fontWeight: 700, fontFamily: "Cairo,sans-serif", fontSize: 12.5, cursor: "pointer" }}
         >
           🖨️ تصدير PDF (طباعة)
         </button>
@@ -50,25 +50,25 @@ export default function ReportDetailPage() {
 
       {isLoading && <div className="skeleton rounded-3xl h-64" />}
       {notFound && (
-        <div className="rounded-2xl p-10 text-center" style={{ background: "#fff", border: "1px dashed rgba(201,168,76,0.3)" }}>
-          <p style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A" }}>التقرير غير موجود</p>
+        <div className="rounded-2xl p-10 text-center" style={{ background: "#fff", border: "1px dashed rgba(0,212,255,0.3)" }}>
+          <p style={{ fontFamily: "Cairo,sans-serif", color: "#52607A" }}>التقرير غير موجود</p>
         </div>
       )}
 
       {report && g && (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
           {/* Header */}
-          <div className="rounded-3xl p-8 flex flex-wrap items-center gap-8" style={{ background: "linear-gradient(135deg,#0D3D27,#1A6B47)", boxShadow: "0 8px 40px rgba(13,61,39,0.3)" }}>
+          <div className="rounded-3xl p-8 flex flex-wrap items-center gap-8" style={{ background: "linear-gradient(135deg,#0A0F1E,#111E38)", boxShadow: "0 8px 40px rgba(10,15,30,0.3)" }}>
             <ScoreGauge score={report.platformScore} status={report.status} />
             <div style={{ flex: 1, minWidth: 260 }}>
               <div className="flex items-center gap-2 mb-3 flex-wrap">
                 <StatusBadge status={report.status} />
-                <span style={{ fontFamily: "Cairo,sans-serif", color: "rgba(250,247,240,0.6)", fontSize: 12 }}>
+                <span style={{ fontFamily: "Cairo,sans-serif", color: "rgba(248,250,255,0.6)", fontSize: 12 }}>
                   {formatGuardianDateTime(report.createdAt)} · {report.provider} ({report.model}) · آخر {report.windowHours} ساعة
                   {report.tokensUsed ? ` · ${report.tokensUsed} token` : ""}
                 </span>
               </div>
-              <p style={{ fontFamily: "Cairo,sans-serif", color: "#F5F1E8", fontSize: 16, lineHeight: 1.9 }}>
+              <p style={{ fontFamily: "Cairo,sans-serif", color: "#F8FAFF", fontSize: 16, lineHeight: 1.9 }}>
                 {g.executiveSummary}
               </p>
             </div>
@@ -108,7 +108,7 @@ export default function ReportDetailPage() {
               <h2 style={sectionTitle}>✅ مشاكل تعافت</h2>
               <ul className="space-y-2">
                 {g.recoveredProblems.map((p, i) => (
-                  <li key={i} className="rounded-xl p-4" style={{ background: "rgba(26,107,71,0.06)", fontFamily: "Cairo,sans-serif", color: "#1A6B47", fontSize: 13.5 }}>
+                  <li key={i} className="rounded-xl p-4" style={{ background: "rgba(0,255,136,0.06)", fontFamily: "Cairo,sans-serif", color: "#111E38", fontSize: 13.5 }}>
                     {p}
                   </li>
                 ))}
@@ -150,8 +150,8 @@ export default function ReportDetailPage() {
           {g.technicalNotes && (
             <section>
               <h2 style={sectionTitle}>ملاحظات تقنية</h2>
-              <div className="rounded-2xl p-5" style={{ background: "#1A1208" }}>
-                <p style={{ fontFamily: "Cairo,sans-serif", color: "#F5F1E8", fontSize: 13, lineHeight: 1.9 }}>{g.technicalNotes}</p>
+              <div className="rounded-2xl p-5" style={{ background: "#0A0F1E" }}>
+                <p style={{ fontFamily: "Cairo,sans-serif", color: "#F8FAFF", fontSize: 13, lineHeight: 1.9 }}>{g.technicalNotes}</p>
               </div>
             </section>
           )}
