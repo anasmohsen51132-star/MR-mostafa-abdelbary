@@ -30,10 +30,17 @@ const ITEMS: Item[] = [
   { label: "Mg",       top: "91%", left: "30%", size: 18, duration: 20, delay: 1.2, color: "#7AE8FF" },
 ];
 
-export function FloatingChemistryBackground() {
+interface Props {
+  density?: number;
+  color?: string;
+}
+
+export function FloatingChemistryBackground({ density, color }: Props = {}) {
+  const set = density ? ITEMS.slice(0, density) : ITEMS;
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" style={{ zIndex: 1 }}>
-      {ITEMS.map((item, i) => (
+      {set.map((item, i) => (
         <motion.span
           key={i}
           className={item.hideOnMobile ? "hidden sm:inline-block absolute font-bold" : "absolute font-bold"}
@@ -41,7 +48,7 @@ export function FloatingChemistryBackground() {
             top: item.top,
             left: item.left,
             fontSize: `clamp(${Math.max(10, item.size - 6)}px, ${(item.size / 10).toFixed(1)}vw, ${item.size}px)`,
-            color: item.color,
+            color: color ?? item.color,
             fontFamily: "Cairo, sans-serif",
             letterSpacing: 1,
           }}
