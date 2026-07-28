@@ -10,13 +10,14 @@
 //  - Quiz and homework behave identically (auto-graded, multi-choice,
 //    3 attempts) — the only difference between them is the label shown.
 
-import { useState, useRef, useCallback, memo } from "react";
+import { useState, useCallback, memo } from "react";
 import { m as motion, AnimatePresence } from "framer-motion";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { fetchWithAuth } from "@/hooks/useAuth";
 import { useToast } from "@/store/uiStore";
+import { useFileUpload } from "@/hooks/useFileUpload";
 import type { QuestionForm, ChoiceForm } from "@/types";
 
 // PERF FIX: hoisted out of the component (used to be recreated as a new
@@ -50,48 +51,11 @@ const blankQ = (): QuestionForm => ({
   choices: [blank(), blank(), blank(), blank()],
 });
 
-// Upload a File object to /api/upload and return the data URL
-async function uploadImage(file: File): Promise<string> {
-  const fd = new FormData();
-  fd.append("file", file);
-  fd.append("type", "image");
-  const res  = await fetch("/api/upload", { method: "POST", body: fd });
-  const json = await res.json();
-  if (!json.success) throw new Error(json.error ?? "فشل الرفع");
-  return json.data.url as string;
-}
-
-// ── Tiny image-upload hook ───────────────────────────────────
-
-function useImageUpload(onUrl: (url: string) => void) {
-  const [loading, setLoading] = useState(false);
-  const ref = useRef<HTMLInputElement>(null);
-  const toast = useToast();
-
-  const trigger = () => ref.current?.click();
-
-  const handleChange = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      // Reset so same file can be picked again
-      e.target.value = "";
-      setLoading(true);
-      try {
-        const url = await uploadImage(file);
-        onUrl(url);
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "فشل رفع الصورة";
-        toast.error(msg);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [onUrl, toast]
-  );
-
-  return { ref, trigger, loading, handleChange };
-}
+// Image upload for question/choice images now goes entirely through the
+// shared useFileUpload() hook (src/hooks/useFileUpload.ts) — see UploadBtn
+// below. The local uploadImage()/useImageUpload() implementations that
+// used to live here were removed as part of Task 05's upload-system
+// unification; the /api/upload endpoint and request shape are unchanged.
 
 // ── Image preview component with remove button ───────────────
 
@@ -141,47 +105,61 @@ function ImagePreview({
 
 function UploadBtn({
   onUrl,
-  loading,
   label = "رفع صورة",
   small = false,
 }: {
   onUrl: (url: string) => void;
-  loading: boolean;
   label?: string;
   small?: boolean;
 }) {
-  const { ref, trigger, handleChange } = useImageUpload(onUrl);
+  // BUGFIX (Task 05): this button used to receive its disabled/loading
+  // state as a prop (`loading`) fed by a *separate*, parent-level state
+  // map (qImgLoading/cImgLoading) that was never actually updated by the
+  // real upload path — the functions that did update it (handleQImage/
+  // handleCImage) were dead code, never called. The button therefore
+  // never disabled itself during a real upload, which is exactly what let
+  // a fast double-click fire two concurrent uploads for the same field.
+  // It now drives its own disabled/progress state directly from its own
+  // upload, which can't drift out of sync with reality.
+  const { inputRef, accept, isUploading, progress, trigger, handleInputChange } = useFileUpload({
+    kind: "image",
+    onSuccess: (result) => onUrl(result.url),
+  });
   return (
     <>
       <input
-        ref={ref}
+        ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
-        onChange={handleChange}
+        accept={accept}
+        onChange={handleInputChange}
         style={{ display: "none" }}
+        aria-hidden="true"
+        tabIndex={-1}
       />
       <button
         type="button"
         onClick={trigger}
-        disabled={loading}
+        disabled={isUploading}
+        aria-label={label}
+        aria-busy={isUploading}
         style={{
           padding:      small ? "4px 10px" : "7px 16px",
           borderRadius: small ? 8 : 10,
-          border:       "1.5px solid rgba(201,168,76,0.35)",
-          background:   loading ? "rgba(201,168,76,0.08)" : "rgba(201,168,76,0.06)",
-          color:        "#8B6914",
+          border:       "1.5px solid rgba(0,212,255,0.35)",
+          background:   isUploading ? "rgba(0,212,255,0.1)" : "rgba(0,212,255,0.06)",
+          color:        "var(--cyan-dark)",
           fontFamily:   "Cairo,sans-serif",
           fontSize:     small ? 11 : 12,
           fontWeight:   600,
-          cursor:       loading ? "not-allowed" : "pointer",
+          cursor:       isUploading ? "not-allowed" : "pointer",
           whiteSpace:   "nowrap",
           display:      "inline-flex",
           alignItems:   "center",
           gap:          4,
-          transition:   "all 0.15s",
+          transition:   "background var(--duration-base) var(--ease-standard)",
         }}
       >
-        {loading ? "⏳..." : `🖼️ ${label}`}
+        {isUploading ? `⏳ ${progress > 0 ? `${progress}%` : "..."}` : `🖼️ ${label}`}
       </button>
     </>
   );
@@ -205,8 +183,6 @@ interface QuestionBlockProps {
   q: QuestionForm;
   qi: number;
   questionsLength: number;
-  qLoading: boolean;
-  cImgLoading: Record<string, boolean>;
   onUpdateQ: (qi: number, field: keyof QuestionForm, value: unknown) => void;
   onUpdateC: (qi: number, ci: number, field: keyof ChoiceForm, value: unknown) => void;
   onSetCorrect: (qi: number, ci: number) => void;
@@ -216,7 +192,7 @@ interface QuestionBlockProps {
 }
 
 const QuestionBlock = memo(function QuestionBlock({
-  q, qi, questionsLength, qLoading, cImgLoading,
+  q, qi, questionsLength,
   onUpdateQ, onUpdateC, onSetCorrect, onRemoveQuestion, onAddChoice, onRemoveChoice,
 }: QuestionBlockProps) {
   return (
@@ -263,7 +239,6 @@ const QuestionBlock = memo(function QuestionBlock({
           </label>
           <UploadBtn
             onUrl={(url) => onUpdateQ(qi, "imageUrl", url)}
-            loading={qLoading}
             label="رفع من الجهاز"
           />
         </div>
@@ -297,8 +272,6 @@ const QuestionBlock = memo(function QuestionBlock({
 
         <div className="space-y-4">
           {q.choices.map((c, ci) => {
-            const cKey    = `${qi}-${ci}`;
-            const cLoading = cImgLoading[cKey] ?? false;
             return (
               <div key={ci} className="rounded-xl p-3"
                 style={{ border: `1.5px solid ${c.isCorrect ? "rgba(45,158,107,0.4)" : "rgba(201,168,76,0.15)"}`,
@@ -333,7 +306,6 @@ const QuestionBlock = memo(function QuestionBlock({
                     <div className="flex items-center gap-2 flex-wrap">
                       <UploadBtn
                         onUrl={(url) => onUpdateC(qi, ci, "imageUrl", url)}
-                        loading={cLoading}
                         label="صورة للخيار"
                         small
                       />
@@ -384,10 +356,6 @@ export default function QuizBuilderPage() {
   const [quizTitle, setQuizTitle] = useState("");
   const [timeLimit, setTimeLimit] = useState<string>("");
   const [questions, setQuestions] = useState<QuestionForm[]>([blankQ()]);
-
-  // Per-field loading states for image uploads
-  const [qImgLoading,  setQImgLoading]  = useState<Record<number, boolean>>({});
-  const [cImgLoading,  setCImgLoading]  = useState<Record<string, boolean>>({});
 
   // ── Mutations ──────────────────────────────────────────────
 
@@ -485,35 +453,6 @@ export default function QuizBuilderPage() {
       )
     ), []);
 
-  // ── Image upload for question ──────────────────────────────
-
-  const handleQImage = async (qi: number, file: File) => {
-    setQImgLoading((p) => ({ ...p, [qi]: true }));
-    try {
-      const url = await uploadImage(file);
-      updateQ(qi, "imageUrl", url);
-    } catch (e: unknown) {
-      toast.error((e instanceof Error ? e.message : "فشل رفع الصورة"));
-    } finally {
-      setQImgLoading((p) => ({ ...p, [qi]: false }));
-    }
-  };
-
-  // ── Image upload for choice ────────────────────────────────
-
-  const handleCImage = async (qi: number, ci: number, file: File) => {
-    const key = `${qi}-${ci}`;
-    setCImgLoading((p) => ({ ...p, [key]: true }));
-    try {
-      const url = await uploadImage(file);
-      updateC(qi, ci, "imageUrl", url);
-    } catch (e: unknown) {
-      toast.error((e instanceof Error ? e.message : "فشل رفع الصورة"));
-    } finally {
-      setCImgLoading((p) => ({ ...p, [key]: false }));
-    }
-  };
-
   // ── Submit validation ──────────────────────────────────────
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -607,8 +546,6 @@ export default function QuizBuilderPage() {
               q={q}
               qi={qi}
               questionsLength={questions.length}
-              qLoading={qImgLoading[qi] ?? false}
-              cImgLoading={cImgLoading}
               onUpdateQ={updateQ}
               onUpdateC={updateC}
               onSetCorrect={setCorrect}
