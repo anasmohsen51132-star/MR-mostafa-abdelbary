@@ -9,8 +9,8 @@ import { SeverityBadge, CategoryBadge } from "@/components/developer/logs/LogBad
 import { formatLogDateTime } from "@/components/developer/logs/logMeta";
 import type { LogDetail } from "@/components/developer/logs/types";
 
-const fieldLabel: React.CSSProperties = { fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 12, marginBottom: 4 };
-const fieldValue: React.CSSProperties = { fontFamily: "Cairo,sans-serif", color: "#1A1208", fontSize: 14 };
+const fieldLabel: React.CSSProperties = { fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 12, marginBottom: 4 };
+const fieldValue: React.CSSProperties = { fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 14 };
 
 export default function LogDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -48,7 +48,7 @@ export default function LogDetailPage() {
     <div style={{ direction: "rtl" }}>
       <button
         onClick={() => router.back()}
-        style={{ background: "none", border: "none", color: "#1A6B47", fontFamily: "Cairo,sans-serif", fontSize: 13, cursor: "pointer", marginBottom: 16, padding: 0 }}
+        style={{ background: "none", border: "none", color: "#111E38", fontFamily: "Cairo,sans-serif", fontSize: 13, cursor: "pointer", marginBottom: 16, padding: 0 }}
       >
         → رجوع
       </button>
@@ -56,7 +56,7 @@ export default function LogDetailPage() {
       {isLoading && <div className="skeleton rounded-2xl h-64" />}
 
       {notFound && (
-        <div className="rounded-2xl p-10 text-center" style={{ background: "#fff", border: "1px dashed rgba(201,168,76,0.3)", fontFamily: "Cairo,sans-serif", color: "#7A6E5A" }}>
+        <div className="rounded-2xl p-10 text-center" style={{ background: "#fff", border: "1px dashed rgba(0,212,255,0.3)", fontFamily: "Cairo,sans-serif", color: "#52607A" }}>
           السجل غير موجود
         </div>
       )}
@@ -64,7 +64,7 @@ export default function LogDetailPage() {
       {log && (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
           {/* Header card */}
-          <div className="rounded-2xl p-6" style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.15)", boxShadow: "0 2px 12px rgba(26,18,8,0.04)" }}>
+          <div className="rounded-2xl p-6" style={{ background: "#fff", border: "1px solid rgba(0,212,255,0.15)", boxShadow: "0 2px 12px rgba(10,15,30,0.04)" }}>
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <SeverityBadge severity={log.severity} />
               <CategoryBadge category={log.category} />
@@ -73,14 +73,14 @@ export default function LogDetailPage() {
                 display: "inline-flex", alignItems: "center", gap: 4,
                 padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600,
                 fontFamily: "Cairo,sans-serif",
-                background: log.resolved ? "rgba(26,107,71,0.1)" : "rgba(179,38,30,0.08)",
-                color: log.resolved ? "#1A6B47" : "#B3261E",
+                background: log.resolved ? "rgba(0,255,136,0.1)" : "rgba(179,38,30,0.08)",
+                color: log.resolved ? "#111E38" : "#B3261E",
               }}>
                 {log.resolved ? "✓ محلولة" : "● مفتوحة"}
               </span>
             </div>
 
-            <p style={{ fontFamily: "Cairo,sans-serif", color: "#1A1208", fontSize: 17, fontWeight: 600, lineHeight: 1.7, marginBottom: 16 }}>
+            <p style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 17, fontWeight: 600, lineHeight: 1.7, marginBottom: 16 }}>
               {log.message}
             </p>
 
@@ -88,9 +88,9 @@ export default function LogDetailPage() {
               onClick={() => toggleResolved.mutate(!log.resolved)}
               disabled={toggleResolved.isPending}
               style={{
-                background: log.resolved ? "#fff" : "#1A6B47",
-                color: log.resolved ? "#1A6B47" : "#fff",
-                border: log.resolved ? "1.5px solid #1A6B47" : "none",
+                background: log.resolved ? "#fff" : "#111E38",
+                color: log.resolved ? "#111E38" : "#fff",
+                border: log.resolved ? "1.5px solid #111E38" : "none",
                 borderRadius: 10, padding: "9px 20px", fontWeight: 700,
                 fontFamily: "Cairo,sans-serif", fontSize: 13, cursor: "pointer",
                 opacity: toggleResolved.isPending ? 0.6 : 1,
@@ -101,7 +101,7 @@ export default function LogDetailPage() {
           </div>
 
           {/* Details grid */}
-          <div className="rounded-2xl p-6 grid grid-cols-2 sm:grid-cols-3 gap-5" style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.15)" }}>
+          <div className="rounded-2xl p-6 grid grid-cols-2 sm:grid-cols-3 gap-5" style={{ background: "#fff", border: "1px solid rgba(0,212,255,0.15)" }}>
             <div><p style={fieldLabel}>المسار</p><p style={{ ...fieldValue, fontFamily: "monospace" }}>{log.route ?? "—"}</p></div>
             <div><p style={fieldLabel}>الطريقة</p><p style={fieldValue}>{log.method ?? "—"}</p></div>
             <div><p style={fieldLabel}>IP</p><p style={{ ...fieldValue, fontFamily: "monospace" }}>{log.ip ?? "—"}</p></div>
@@ -121,9 +121,9 @@ export default function LogDetailPage() {
 
           {/* Stack trace */}
           {log.stack && (
-            <div className="rounded-2xl p-6" style={{ background: "#1A1208", border: "1px solid rgba(201,168,76,0.15)" }}>
-              <p style={{ ...fieldLabel, color: "rgba(250,247,240,0.6)", marginBottom: 8 }}>Stack Trace</p>
-              <pre style={{ color: "#F5F1E8", fontSize: 12, fontFamily: "monospace", whiteSpace: "pre-wrap", wordBreak: "break-all", direction: "ltr", textAlign: "left", margin: 0 }}>
+            <div className="rounded-2xl p-6" style={{ background: "#0A0F1E", border: "1px solid rgba(0,212,255,0.15)" }}>
+              <p style={{ ...fieldLabel, color: "rgba(248,250,255,0.6)", marginBottom: 8 }}>Stack Trace</p>
+              <pre style={{ color: "#F8FAFF", fontSize: 12, fontFamily: "monospace", whiteSpace: "pre-wrap", wordBreak: "break-all", direction: "ltr", textAlign: "left", margin: 0 }}>
                 {log.stack}
               </pre>
             </div>
@@ -131,9 +131,9 @@ export default function LogDetailPage() {
 
           {/* Metadata */}
           {log.metadata && Object.keys(log.metadata).length > 0 && (
-            <div className="rounded-2xl p-6" style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.15)" }}>
+            <div className="rounded-2xl p-6" style={{ background: "#fff", border: "1px solid rgba(0,212,255,0.15)" }}>
               <p style={{ ...fieldLabel, marginBottom: 8 }}>بيانات إضافية</p>
-              <pre style={{ color: "#4A3F2A", fontSize: 12, fontFamily: "monospace", whiteSpace: "pre-wrap", wordBreak: "break-all", direction: "ltr", textAlign: "left", margin: 0 }}>
+              <pre style={{ color: "#52607A", fontSize: 12, fontFamily: "monospace", whiteSpace: "pre-wrap", wordBreak: "break-all", direction: "ltr", textAlign: "left", margin: 0 }}>
                 {JSON.stringify(log.metadata, null, 2)}
               </pre>
             </div>
