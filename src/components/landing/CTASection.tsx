@@ -3,7 +3,7 @@
 import { m as motion, useInView } from "framer-motion";
 import Link from "next/link";
 import { useRef } from "react";
-import { FloatingArabicBackground } from "@/components/effects/FloatingArabicBackground";
+import { FloatingChemistryBackground } from "@/components/effects/FloatingChemistryBackground";
 import { TwinklingStars } from "@/components/effects/TwinklingStars";
 import type { SiteSettings } from "@/types";
 
@@ -40,7 +40,7 @@ export function CTASection({ settings }: Props = {}) {
           }}
         >
           {/* Floating chemistry symbols */}
-          <FloatingArabicBackground density={4} color="rgba(0,212,255,0.08)" />
+          <FloatingChemistryBackground density={4} color="rgba(0,212,255,0.08)" />
           <TwinklingStars density={6} maxOpacity={0.4} color="0,212,255" />
 
           {/* Dot grid pattern */}
