@@ -93,21 +93,21 @@ export default function StudentDashboard() {
           <div
             className="rounded-3xl p-8 relative overflow-hidden"
             style={{
-              background: "linear-gradient(135deg,#0D3D27,#1A6B47)",
-              boxShadow: "0 8px 32px rgba(13,61,39,0.25)",
+              background: "linear-gradient(135deg,#0A0F1E,#111E38)",
+              boxShadow: "0 8px 32px rgba(10,15,30,0.25)",
             }}
           >
             {/* Pattern */}
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23C9A84C' fill-opacity='0.06'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2300D4FF' fill-opacity='0.06'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
               }}
             />
-            {/* Gold orb */}
+            {/* Cyan glow orb */}
             <motion.div
               className="absolute -top-8 -left-8 w-48 h-48 rounded-full pointer-events-none"
-              style={{ background: "radial-gradient(circle,rgba(201,168,76,0.15),transparent 70%)" }}
+              style={{ background: "radial-gradient(circle,rgba(0,212,255,0.15),transparent 70%)" }}
               animate={{ scale: [1, 1.15, 1] }}
               transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
             />
@@ -116,28 +116,28 @@ export default function StudentDashboard() {
               aria-hidden
               className="absolute inset-0 pointer-events-none"
               style={{
-                background: "linear-gradient(115deg, transparent 30%, rgba(232,201,122,0.10) 50%, transparent 70%)",
+                background: "linear-gradient(115deg, transparent 30%, rgba(0,212,255,0.10) 50%, transparent 70%)",
               }}
               animate={{ x: ["-30%", "30%"] }}
               transition={{ duration: 5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
             />
             <div className="relative z-10">
-              <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(201,168,76,0.7)", fontSize: 14, marginBottom: 4 }}>
+              <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(0,212,255,0.7)", fontSize: 14, marginBottom: 4 }}>
                 {greeting}، 👋
               </p>
-              <h1 style={{ fontFamily: "Amiri,serif", color: "#E8C97A", fontSize: "clamp(24px,4vw,40px)", marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
+              <h1 style={{ fontFamily: "Cairo,sans-serif", color: "#7AE8FF", fontSize: "clamp(24px,4vw,40px)", marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
                 {user?.name}
                 <motion.span
-                  style={{ fontSize: "0.5em", color: "rgba(201,168,76,0.6)" }}
+                  style={{ fontSize: "0.5em", color: "rgba(0,212,255,0.6)" }}
                   animate={{ opacity: [0.3, 1, 0.3], rotate: [0, 180, 360] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                 >
                   ✦
                 </motion.span>
               </h1>
-              <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(250,247,240,0.65)", fontSize: 14 }}>
+              <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(248,250,255,0.65)", fontSize: 14 }}>
                 لديك{" "}
-                <span style={{ color: "#C9A84C", fontWeight: 700 }}>{myCourses.length}</span>
+                <span style={{ color: "#00D4FF", fontWeight: 700 }}>{myCourses.length}</span>
                 {" "}كورس نشط
               </p>
             </div>
@@ -157,35 +157,35 @@ export default function StudentDashboard() {
               className="flex items-center gap-4 rounded-2xl p-5 no-underline transition-transform hover:-translate-y-0.5"
               style={{
                 background: "#fff",
-                border: "1.5px solid rgba(201,168,76,0.3)",
-                boxShadow: "0 4px 20px rgba(201,168,76,0.12)",
+                border: "1.5px solid rgba(0,212,255,0.3)",
+                boxShadow: "0 4px 20px rgba(0,212,255,0.12)",
               }}
             >
               <div
                 className="flex-shrink-0 flex items-center justify-center rounded-xl"
                 style={{
                   width: 56, height: 56,
-                  background: `linear-gradient(135deg,#C9A84C,#8B6914)`,
+                  background: `linear-gradient(135deg,#00D4FF,#00FF88)`,
                   fontSize: 24,
                 }}
               >
                 ▶️
               </div>
               <div className="flex-1 min-w-0">
-                <p style={{ fontFamily: "Cairo,sans-serif", color: "#8B6914", fontSize: 12, fontWeight: 700, marginBottom: 2 }}>
+                <p style={{ fontFamily: "Cairo,sans-serif", color: "#0099CC", fontSize: 12, fontWeight: 700, marginBottom: 2 }}>
                   أكمل من حيث توقفت
                 </p>
-                <h3 className="line-clamp-1" style={{ fontFamily: "Cairo,sans-serif", color: "#1A1208", fontSize: 15, fontWeight: 700, marginBottom: 2 }}>
+                <h3 className="line-clamp-1" style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 15, fontWeight: 700, marginBottom: 2 }}>
                   {continueWatching.video.title}
                 </h3>
-                <p className="line-clamp-1" style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 12.5 }}>
+                <p className="line-clamp-1" style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 12.5 }}>
                   {continueWatching.course && <>{continueWatching.course.icon} {continueWatching.course.title} · </>}
                   {continueWatching.lecture.title} · عند {formatResumeTime(continueWatching.positionSeconds)}
                 </p>
               </div>
               <div
                 className="flex-shrink-0 flex items-center justify-center rounded-full"
-                style={{ width: 36, height: 36, background: "rgba(201,168,76,0.12)", fontSize: 14, color: "#8B6914" }}
+                style={{ width: 36, height: 36, background: "rgba(0,212,255,0.12)", fontSize: 14, color: "#0099CC" }}
               >
                 ←
               </div>
@@ -200,19 +200,19 @@ export default function StudentDashboard() {
               <div
                 key={i}
                 className="rounded-2xl p-5 animate-pulse"
-                style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.15)" }}
+                style={{ background: "#fff", border: "1px solid rgba(0,212,255,0.15)" }}
               >
-                <div className="w-10 h-10 rounded-xl mb-3" style={{ background: "rgba(201,168,76,0.12)" }} />
-                <div className="w-10 h-7 rounded mb-2" style={{ background: "rgba(122,110,90,0.12)" }} />
-                <div className="w-20 h-3 rounded" style={{ background: "rgba(122,110,90,0.1)" }} />
+                <div className="w-10 h-10 rounded-xl mb-3" style={{ background: "rgba(0,212,255,0.12)" }} />
+                <div className="w-10 h-7 rounded mb-2" style={{ background: "rgba(45,58,90,0.12)" }} />
+                <div className="w-20 h-3 rounded" style={{ background: "rgba(45,58,90,0.1)" }} />
               </div>
             ))
           ) : (
             [
-              { icon: "📚", value: myCourses.length,      label: "كورساتي",      color: "#C9A84C" },
-              { icon: "🎯", value: availableCourses.length, label: "كورسات متاحة", color: "#2D9E6B" },
-              { icon: "🎟️", value: "—",                   label: "استخدم كوداً",  color: "#C9A84C", link: "/redeem" },
-              { icon: "👤", value: "ملفي",                 label: "الإعدادات",    color: "#2D9E6B", link: "/profile" },
+              { icon: "📚", value: myCourses.length,      label: "كورساتي",      color: "#00D4FF" },
+              { icon: "🎯", value: availableCourses.length, label: "كورسات متاحة", color: "#00FF88" },
+              { icon: "🎟️", value: "—",                   label: "استخدم كوداً",  color: "#00D4FF", link: "/redeem" },
+              { icon: "👤", value: "ملفي",                 label: "الإعدادات",    color: "#00FF88", link: "/profile" },
             ].map((s, i) => (
             <StaggerItem key={i}>
               <motion.div
@@ -220,8 +220,8 @@ export default function StudentDashboard() {
                 className="rounded-2xl p-5"
                 style={{
                   background: "#fff",
-                  border: "1px solid rgba(201,168,76,0.15)",
-                  boxShadow: "0 2px 12px rgba(26,18,8,0.06)",
+                  border: "1px solid rgba(0,212,255,0.15)",
+                  boxShadow: "0 2px 12px rgba(10,15,30,0.06)",
                   cursor: s.link ? "pointer" : "default",
                 }}
                 onClick={() => s.link && (window.location.href = s.link)}
@@ -232,10 +232,10 @@ export default function StudentDashboard() {
                 >
                   {s.icon}
                 </div>
-                <div style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 28, fontWeight: 700 }}>
+                <div style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 28, fontWeight: 700 }}>
                   {s.value}
                 </div>
-                <div style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 13, marginTop: 2 }}>
+                <div style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 13, marginTop: 2 }}>
                   {s.label}
                 </div>
               </motion.div>
@@ -272,8 +272,8 @@ export default function StudentDashboard() {
             className="mb-8"
           >
             <div className="flex items-center justify-between mb-5">
-              <h2 style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 22 }}>كورساتي</h2>
-              <Link href="/my-courses" style={{ fontFamily: "Cairo,sans-serif", color: "#C9A84C", fontSize: 13, textDecoration: "none" }}>
+              <h2 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 22 }}>كورساتي</h2>
+              <Link href="/my-courses" style={{ fontFamily: "Cairo,sans-serif", color: "#00D4FF", fontSize: 13, textDecoration: "none" }}>
                 عرض الكل ←
               </Link>
             </div>
@@ -293,8 +293,8 @@ export default function StudentDashboard() {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <div className="flex items-center justify-between mb-5">
-              <h2 style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 22 }}>كورسات متاحة</h2>
-              <Link href="/courses" style={{ fontFamily: "Cairo,sans-serif", color: "#C9A84C", fontSize: 13, textDecoration: "none" }}>
+              <h2 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 22 }}>كورسات متاحة</h2>
+              <Link href="/courses" style={{ fontFamily: "Cairo,sans-serif", color: "#00D4FF", fontSize: 13, textDecoration: "none" }}>
                 عرض الكل ←
               </Link>
             </div>
@@ -314,18 +314,18 @@ export default function StudentDashboard() {
             className="text-center py-20"
           >
             <div style={{ fontSize: 64, marginBottom: 16 }}>📚</div>
-            <h3 style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 24, marginBottom: 8 }}>
+            <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 24, marginBottom: 8 }}>
               لا توجد كورسات بعد
             </h3>
-            <p style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 15, marginBottom: 24 }}>
+            <p style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 15, marginBottom: 24 }}>
               استخدم كود الوصول لفتح أول كورس لك
             </p>
             <Link
               href="/redeem"
               style={{
                 padding: "12px 32px", borderRadius: 14,
-                background: "linear-gradient(135deg,#C9A84C,#8B6914)",
-                color: "#1A1208", fontFamily: "Cairo,sans-serif",
+                background: "linear-gradient(135deg,#00D4FF,#00FF88)",
+                color: "#0A0F1E", fontFamily: "Cairo,sans-serif",
                 fontWeight: 700, fontSize: 15, textDecoration: "none",
               }}
             >
@@ -346,8 +346,8 @@ function CourseCard({ course, unlocked }: { course: Course; unlocked: boolean })
       className="rounded-2xl overflow-hidden"
       style={{
         background: "#fff",
-        border: "1px solid rgba(201,168,76,0.15)",
-        boxShadow: "0 4px 16px rgba(26,18,8,0.06)",
+        border: "1px solid rgba(0,212,255,0.15)",
+        boxShadow: "0 4px 16px rgba(10,15,30,0.06)",
       }}
     >
       {/* Color header */}
@@ -364,24 +364,24 @@ function CourseCard({ course, unlocked }: { course: Course; unlocked: boolean })
         {!unlocked && (
           <div
             className="absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-semibold"
-            style={{ background: "rgba(0,0,0,0.5)", color: "#FAF7F0", fontFamily: "Cairo,sans-serif" }}
+            style={{ background: "rgba(0,0,0,0.5)", color: "#F8FAFF", fontFamily: "Cairo,sans-serif" }}
           >
             🔒 يحتاج كود
           </div>
         )}
       </div>
       <div className="p-4">
-        <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#1A1208", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>
+        <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>
           {course.title}
         </h3>
         {course.description && (
-          <p style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}
+          <p style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}
             className="line-clamp-2">
             {course.description}
           </p>
         )}
         <div className="flex items-center justify-between">
-          <span style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 12 }}>
+          <span style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 12 }}>
             📖 {course._count?.lectures ?? 0} محاضرة
           </span>
           {unlocked ? (
@@ -389,8 +389,8 @@ function CourseCard({ course, unlocked }: { course: Course; unlocked: boolean })
               href={`/courses/${course.id}`}
               style={{
                 padding: "6px 16px", borderRadius: 10,
-                background: "linear-gradient(135deg,#C9A84C,#8B6914)",
-                color: "#1A1208", fontFamily: "Cairo,sans-serif",
+                background: "linear-gradient(135deg,#00D4FF,#00FF88)",
+                color: "#0A0F1E", fontFamily: "Cairo,sans-serif",
                 fontWeight: 700, fontSize: 12, textDecoration: "none",
               }}
             >
@@ -401,8 +401,8 @@ function CourseCard({ course, unlocked }: { course: Course; unlocked: boolean })
               href="/redeem"
               style={{
                 padding: "6px 16px", borderRadius: 10,
-                border: "1px solid rgba(201,168,76,0.35)",
-                color: "#C9A84C", fontFamily: "Cairo,sans-serif",
+                border: "1px solid rgba(0,212,255,0.35)",
+                color: "#00D4FF", fontFamily: "Cairo,sans-serif",
                 fontWeight: 600, fontSize: 12, textDecoration: "none",
               }}
             >

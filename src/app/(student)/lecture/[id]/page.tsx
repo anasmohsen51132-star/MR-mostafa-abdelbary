@@ -149,7 +149,7 @@ export default function LecturePage() {
   if (!lecture) return (
     <div className="text-center py-20" style={{ direction:"rtl" }}>
       <div style={{ fontSize:56, marginBottom:16 }}>⚠️</div>
-      <h3 style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:24 }}>المحاضرة غير موجودة</h3>
+      <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:24 }}>المحاضرة غير موجودة</h3>
     </div>
   );
 
@@ -157,21 +157,21 @@ export default function LecturePage() {
     <div style={{ direction:"rtl" }}>
       {/* Header */}
       <motion.div initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} className="mb-6">
-        <h1 style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:"clamp(22px,4vw,30px)", marginBottom:6 }}>
+        <h1 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:"clamp(22px,4vw,30px)", marginBottom:6 }}>
           {lecture.title}
         </h1>
         {lecture.description && (
-          <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:15, lineHeight:1.75 }}>{lecture.description}</p>
+          <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:15, lineHeight:1.75 }}>{lecture.description}</p>
         )}
         {/* Quiz requirement notice */}
         {quizRequirement === "MUST_PASS" && (
           <div className="mt-3 flex items-center gap-2 px-4 py-2 rounded-xl"
-            style={{ background: hasPassed ? "rgba(45,158,107,0.08)" : "rgba(220,38,38,0.06)",
-              border: `1px solid ${hasPassed ? "rgba(45,158,107,0.3)" : "rgba(220,38,38,0.2)"}`,
+            style={{ background: hasPassed ? "rgba(0,255,136,0.08)" : "rgba(220,38,38,0.06)",
+              border: `1px solid ${hasPassed ? "rgba(0,255,136,0.3)" : "rgba(220,38,38,0.2)"}`,
               display:"inline-flex" }}>
             <span>{hasPassed ? "✅" : "🔒"}</span>
             <span style={{ fontFamily:"Cairo,sans-serif", fontSize:13,
-              color: hasPassed ? "#1A6B47" : "#DC2626", fontWeight:600 }}>
+              color: hasPassed ? "#111E38" : "#DC2626", fontWeight:600 }}>
               {hasPassed ? "لقد اجتزت الاختبار — المحتوى مفتوح" : "يجب اجتياز الاختبار لفتح محتوى هذا الدرس"}
             </span>
           </div>
@@ -191,9 +191,9 @@ export default function LecturePage() {
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
               style={{ padding:"8px 16px", borderRadius:12, border:"1.5px solid",
-                borderColor: activeTab===t.id ? "#C9A84C" : "rgba(201,168,76,0.25)",
-                background:  activeTab===t.id ? "rgba(201,168,76,0.12)" : "#fff",
-                color:       activeTab===t.id ? "#8B6914" : "#7A6E5A",
+                borderColor: activeTab===t.id ? "#00D4FF" : "rgba(0,212,255,0.25)",
+                background:  activeTab===t.id ? "rgba(0,212,255,0.12)" : "#fff",
+                color:       activeTab===t.id ? "#0099CC" : "#52607A",
                 fontFamily:"Cairo,sans-serif", fontSize:13,
                 fontWeight: activeTab===t.id ? 700 : 400, cursor:"pointer" }}>
               {t.icon} {t.label} ({t.count})
@@ -214,7 +214,7 @@ export default function LecturePage() {
               ) : lecture.videos?.length ? (
                 lecture.videos.map((video: Video) => (
                   <div key={video.id}>
-                    <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#1A1208", fontSize:15, fontWeight:700, marginBottom:10 }}>
+                    <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:15, fontWeight:700, marginBottom:10 }}>
                       🎥 {video.title}
                     </h3>
                     {/* RESPONSIVE FIX: bleeds past the page's own side padding
@@ -255,11 +255,11 @@ export default function LecturePage() {
                   <motion.a key={pdf.id} href={pdf.fileUrl} target="_blank" rel="noopener noreferrer"
                     whileHover={{ x:-4 }}
                     className="flex items-center gap-4 p-5 rounded-2xl"
-                    style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.2)", boxShadow:"0 2px 8px rgba(26,18,8,0.04)", textDecoration:"none", display:"flex" }}>
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background:"rgba(201,168,76,0.12)" }}>📄</div>
+                    style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.2)", boxShadow:"0 2px 8px rgba(10,15,30,0.04)", textDecoration:"none", display:"flex" }}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background:"rgba(0,212,255,0.12)" }}>📄</div>
                     <div>
-                      <p style={{ fontFamily:"Cairo,sans-serif", color:"#1A1208", fontSize:15, fontWeight:600 }}>{pdf.title}</p>
-                      <p style={{ fontFamily:"Cairo,sans-serif", color:"#C9A84C", fontSize:12, marginTop:2 }}>اضغط لفتح الملف ↗</p>
+                      <p style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:15, fontWeight:600 }}>{pdf.title}</p>
+                      <p style={{ fontFamily:"Cairo,sans-serif", color:"#00D4FF", fontSize:12, marginTop:2 }}>اضغط لفتح الملف ↗</p>
                     </div>
                   </motion.a>
                 ))
@@ -277,25 +277,25 @@ export default function LecturePage() {
                     return (
                       <motion.div key={quiz.id} whileHover={{ x:-4 }}
                         className="p-5 rounded-2xl cursor-pointer"
-                        style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.2)", boxShadow:"0 2px 8px rgba(26,18,8,0.04)" }}
+                        style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.2)", boxShadow:"0 2px 8px rgba(10,15,30,0.04)" }}
                         onClick={() => { setSelectedQuizId(quiz.id); setQuizAnswers({}); setQuizResult(null); }}>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ background:"rgba(201,168,76,0.12)" }}>📝</div>
+                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ background:"rgba(0,212,255,0.12)" }}>📝</div>
                             <div>
-                              <p style={{ fontFamily:"Cairo,sans-serif", color:"#1A1208", fontSize:15, fontWeight:600 }}>{quiz.title}</p>
-                              <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:12 }}>
+                              <p style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:15, fontWeight:600 }}>{quiz.title}</p>
+                              <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:12 }}>
                                 {quiz._count?.questions ?? quiz.questions?.length ?? 0} سؤال
                                 {quiz.timeLimit ? ` — ${quiz.timeLimit} دقيقة` : ""}
                               </p>
                             </div>
                           </div>
-                          <span style={{ color:"#C9A84C", fontSize:20 }}>←</span>
+                          <span style={{ color:"#00D4FF", fontSize:20 }}>←</span>
                         </div>
                         {myBest !== null && (
-                          <div className="mt-3 pt-3 flex items-center gap-3" style={{ borderTop:"1px solid rgba(201,168,76,0.12)" }}>
-                            <span style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:12 }}>
-                              أفضل نتيجة: <span style={{ color:"#C9A84C", fontWeight:700 }}>{myBest}٪</span>
+                          <div className="mt-3 pt-3 flex items-center gap-3" style={{ borderTop:"1px solid rgba(0,212,255,0.12)" }}>
+                            <span style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:12 }}>
+                              أفضل نتيجة: <span style={{ color:"#00D4FF", fontWeight:700 }}>{myBest}٪</span>
                             </span>
                           </div>
                         )}
@@ -307,7 +307,7 @@ export default function LecturePage() {
                 <div className="flex items-center justify-center py-16">
                   <div
                     className="w-8 h-8 rounded-full border-4 animate-spin"
-                    style={{ borderColor: "rgba(201,168,76,0.25)", borderTopColor: "#C9A84C" }}
+                    style={{ borderColor: "rgba(0,212,255,0.25)", borderTopColor: "#00D4FF" }}
                   />
                 </div>
               ) : (
@@ -339,24 +339,24 @@ export default function LecturePage() {
                     return (
                       <motion.div key={hw.id} whileHover={{ x:-4 }}
                         className="p-5 rounded-2xl cursor-pointer"
-                        style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.2)", boxShadow:"0 2px 8px rgba(26,18,8,0.04)" }}
+                        style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.2)", boxShadow:"0 2px 8px rgba(10,15,30,0.04)" }}
                         onClick={() => { setSelectedHomeworkId(hw.id); setHwAnswers({}); setHwResult(null); }}>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ background:"rgba(201,168,76,0.12)" }}>📋</div>
+                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ background:"rgba(0,212,255,0.12)" }}>📋</div>
                             <div>
-                              <p style={{ fontFamily:"Cairo,sans-serif", color:"#1A1208", fontSize:15, fontWeight:600 }}>{hw.title}</p>
-                              <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:12 }}>
+                              <p style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:15, fontWeight:600 }}>{hw.title}</p>
+                              <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:12 }}>
                                 {hw._count?.questions ?? hw.questions?.length ?? 0} سؤال
                               </p>
                             </div>
                           </div>
-                          <span style={{ color:"#C9A84C", fontSize:20 }}>←</span>
+                          <span style={{ color:"#00D4FF", fontSize:20 }}>←</span>
                         </div>
                         {myBest !== null && (
-                          <div className="mt-3 pt-3 flex items-center gap-3" style={{ borderTop:"1px solid rgba(201,168,76,0.12)" }}>
-                            <span style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:12 }}>
-                              أفضل نتيجة: <span style={{ color:"#C9A84C", fontWeight:700 }}>{myBest}٪</span>
+                          <div className="mt-3 pt-3 flex items-center gap-3" style={{ borderTop:"1px solid rgba(0,212,255,0.12)" }}>
+                            <span style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:12 }}>
+                              أفضل نتيجة: <span style={{ color:"#00D4FF", fontWeight:700 }}>{myBest}٪</span>
                             </span>
                           </div>
                         )}
@@ -368,7 +368,7 @@ export default function LecturePage() {
                 <div className="flex items-center justify-center py-16">
                   <div
                     className="w-8 h-8 rounded-full border-4 animate-spin"
-                    style={{ borderColor: "rgba(201,168,76,0.25)", borderTopColor: "#C9A84C" }}
+                    style={{ borderColor: "rgba(0,212,255,0.25)", borderTopColor: "#00D4FF" }}
                   />
                 </div>
               ) : isHwError || !activeHomework ? (
@@ -378,13 +378,13 @@ export default function LecturePage() {
                   <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#DC2626", fontSize:17, fontWeight:700, marginBottom:8 }}>
                     تعذّر تحميل الواجب
                   </h3>
-                  <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:13, marginBottom:16 }}>
+                  <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:13, marginBottom:16 }}>
                     تأكد من اتصالك بالإنترنت ثم حاول مرة أخرى
                   </p>
                   <button
                     onClick={() => { setSelectedHomeworkId(null); setHwResult(null); }}
-                    style={{ padding:"9px 24px", borderRadius:12, border:"1px solid rgba(201,168,76,0.3)",
-                      background:"none", color:"#8B6914", fontFamily:"Cairo,sans-serif", fontWeight:600, fontSize:14, cursor:"pointer" }}>
+                    style={{ padding:"9px 24px", borderRadius:12, border:"1px solid rgba(0,212,255,0.3)",
+                      background:"none", color:"#0099CC", fontFamily:"Cairo,sans-serif", fontWeight:600, fontSize:14, cursor:"pointer" }}>
                     ← عودة
                   </button>
                 </div>
@@ -418,17 +418,17 @@ function LockedContentWall({ onGoToQuiz }: { onGoToQuiz: () => void }) {
       className="text-center py-16 rounded-2xl"
       style={{ background:"rgba(220,38,38,0.04)", border:"1.5px solid rgba(220,38,38,0.18)" }}>
       <div style={{ fontSize:56, marginBottom:12 }}>🔒</div>
-      <h3 style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:24, marginBottom:10 }}>
+      <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:24, marginBottom:10 }}>
         المحتوى مقفل
       </h3>
-      <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:15, marginBottom:24 }}>
+      <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:15, marginBottom:24 }}>
         يجب اجتياز الاختبار أولاً لفتح هذا المحتوى
       </p>
       <button onClick={onGoToQuiz}
         style={{ padding:"12px 32px", borderRadius:14, border:"none",
-          background:"linear-gradient(135deg,#C9A84C,#8B6914)",
-          boxShadow:"0 6px 20px rgba(201,168,76,0.4)",
-          color:"#1A1208", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:15, cursor:"pointer" }}>
+          background:"linear-gradient(135deg,#00D4FF,#00FF88)",
+          boxShadow:"0 6px 20px rgba(0,212,255,0.4)",
+          color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:15, cursor:"pointer" }}>
         📝 اذهب إلى الاختبار
       </button>
     </motion.div>
@@ -460,7 +460,7 @@ function QuizPlayer({
     <motion.div initial={{ opacity:0, scale:0.85 }} animate={{ opacity:1, scale:1 }}
       transition={{ type: "spring", stiffness: 220, damping: 18 }}
       className="text-center py-12"
-      style={{ background:"#fff", borderRadius:24, border:"1px solid rgba(201,168,76,0.2)", padding:40 }}>
+      style={{ background:"#fff", borderRadius:24, border:"1px solid rgba(0,212,255,0.2)", padding:40 }}>
       <motion.div
         initial={{ scale: 0, rotate: -30 }}
         animate={{ scale: 1, rotate: 0 }}
@@ -472,26 +472,26 @@ function QuizPlayer({
       <motion.h2
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 20 }}
-        style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:32, marginBottom:8 }}
+        style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:32, marginBottom:8 }}
       >
         {result.passed ? "أحسنت! لقد نجحت!" : "لم تنجح هذه المرة"}
       </motion.h2>
       <motion.div
         initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.45, type: "spring", stiffness: 200, damping: 14 }}
-        style={{ fontFamily:"Amiri,serif", color:"#C9A84C", fontSize:56, fontWeight:700, marginBottom:4 }}
+        style={{ fontFamily:"Cairo,sans-serif", color:"#00D4FF", fontSize:56, fontWeight:700, marginBottom:4 }}
       >
         {result.percentage}٪
       </motion.div>
       <motion.p
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-        style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:15, marginBottom:8 }}
+        style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:15, marginBottom:8 }}
       >
         {result.score} / {result.total} إجابة صحيحة
       </motion.p>
       <motion.p
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-        style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:13, marginBottom:24 }}
+        style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:13, marginBottom:24 }}
       >
         المحاولة رقم {result.attemptNumber} •
         {result.attemptsRemaining > 0
@@ -502,8 +502,8 @@ function QuizPlayer({
         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
         whileHover={{ scale: 1.06, y: -3 }} whileTap={{ scale: 0.95 }}
         style={{ padding:"12px 32px", borderRadius:14, border:"none",
-          background:"linear-gradient(135deg,#C9A84C,#8B6914)",
-          color:"#1A1208", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:15, cursor:"pointer" }}>
+          background:"linear-gradient(135deg,#00D4FF,#00FF88)",
+          color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:15, cursor:"pointer" }}>
         العودة
       </motion.button>
     </motion.div>
@@ -512,12 +512,12 @@ function QuizPlayer({
   if (noAttemptsLeft) return (
     <motion.div initial={{ opacity:0, scale:0.95 }} animate={{ opacity:1, scale:1 }}
       className="text-center py-16 rounded-2xl"
-      style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.15)" }}>
+      style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.15)" }}>
       <div style={{ fontSize:56, marginBottom:16 }}>❌</div>
-      <h3 style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:24, marginBottom:10 }}>
+      <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:24, marginBottom:10 }}>
         استُنفدت جميع المحاولات
       </h3>
-      <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:15, marginBottom:16 }}>
+      <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:15, marginBottom:16 }}>
         لقد استخدمت الحد الأقصى من المحاولات المسموح بها (3 محاولات)
       </p>
       {/* Attempt history */}
@@ -525,16 +525,16 @@ function QuizPlayer({
         <div className="mt-4 text-right px-8 space-y-2">
           {attemptHistory.map((a) => (
             <div key={a.id} className="flex items-center justify-between p-3 rounded-xl"
-              style={{ background:"rgba(201,168,76,0.06)", border:"1px solid rgba(201,168,76,0.12)" }}>
-              <span style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:13 }}>المحاولة {a.attemptNumber}</span>
-              <span style={{ fontFamily:"Cairo,sans-serif", color: a.passed ? "#2D9E6B" : "#DC2626", fontSize:14, fontWeight:700 }}>
+              style={{ background:"rgba(0,212,255,0.06)", border:"1px solid rgba(0,212,255,0.12)" }}>
+              <span style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:13 }}>المحاولة {a.attemptNumber}</span>
+              <span style={{ fontFamily:"Cairo,sans-serif", color: a.passed ? "#00FF88" : "#DC2626", fontSize:14, fontWeight:700 }}>
                 {a.percentage}٪ {a.passed ? "✅" : "❌"}
               </span>
             </div>
           ))}
         </div>
       )}
-      <button onClick={onBack} style={{ marginTop:20, padding:"10px 24px", borderRadius:12, border:"1px solid rgba(201,168,76,0.3)", background:"none", color:"#8B6914", fontFamily:"Cairo,sans-serif", fontWeight:600, fontSize:14, cursor:"pointer" }}>
+      <button onClick={onBack} style={{ marginTop:20, padding:"10px 24px", borderRadius:12, border:"1px solid rgba(0,212,255,0.3)", background:"none", color:"#0099CC", fontFamily:"Cairo,sans-serif", fontWeight:600, fontSize:14, cursor:"pointer" }}>
         ← عودة
       </button>
     </motion.div>
@@ -544,7 +544,7 @@ function QuizPlayer({
     <div>
       {/* Attempt counter + history */}
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
-        <button onClick={onBack} style={{ fontFamily:"Cairo,sans-serif", color:"#C9A84C", fontSize:13, background:"none", border:"none", cursor:"pointer" }}>
+        <button onClick={onBack} style={{ fontFamily:"Cairo,sans-serif", color:"#00D4FF", fontSize:13, background:"none", border:"none", cursor:"pointer" }}>
           ← عودة
         </button>
         <div className="flex items-center gap-3">
@@ -553,8 +553,8 @@ function QuizPlayer({
               {attemptHistory.map((a) => (
                 <span key={a.id} style={{
                   padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700,
-                  background: a.passed ? "rgba(45,158,107,0.1)" : "rgba(220,38,38,0.08)",
-                  color: a.passed ? "#2D9E6B" : "#DC2626",
+                  background: a.passed ? "rgba(0,255,136,0.1)" : "rgba(220,38,38,0.08)",
+                  color: a.passed ? "#00FF88" : "#DC2626",
                   fontFamily:"Cairo,sans-serif",
                 }}>
                   {a.attemptNumber}: {a.percentage}٪
@@ -562,24 +562,24 @@ function QuizPlayer({
               ))}
             </div>
           )}
-          <span style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:13 }}>
+          <span style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:13 }}>
             محاولة {attemptHistory.length + 1} / 3
           </span>
         </div>
-        <span style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:13 }}>{answered} / {total} مجاب</span>
+        <span style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:13 }}>{answered} / {total} مجاب</span>
       </div>
 
       {/* Progress bar */}
-      <div className="h-2 rounded-full mb-8" style={{ background:"rgba(201,168,76,0.15)" }}>
-        <motion.div className="h-full rounded-full" style={{ background:"linear-gradient(90deg,#C9A84C,#8B6914)" }}
+      <div className="h-2 rounded-full mb-8" style={{ background:"rgba(0,212,255,0.15)" }}>
+        <motion.div className="h-full rounded-full" style={{ background:"linear-gradient(90deg,#00D4FF,#0099CC)" }}
           animate={{ width: `${total ? (answered/total)*100 : 0}%` }} transition={{ duration:0.3 }} />
       </div>
 
       <div className="space-y-6">
         {quiz.questions?.map((q: Question, qi: number) => (
           <div key={q.id} className="p-6 rounded-2xl"
-            style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.15)", boxShadow:"0 2px 12px rgba(26,18,8,0.04)" }}>
-            <p style={{ fontFamily:"Cairo,sans-serif", color:"#1A1208", fontSize:15, fontWeight:600, marginBottom:12 }}>
+            style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.15)", boxShadow:"0 2px 12px rgba(10,15,30,0.04)" }}>
+            <p style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:15, fontWeight:600, marginBottom:12 }}>
               {qi+1}. {q.text}
             </p>
             {q.imageUrl && (
@@ -593,11 +593,11 @@ function QuizPlayer({
                   src={q.imageUrl}
                   alt="سؤال"
                   className="rounded-xl w-full max-h-[420px] object-contain"
-                  style={{ background: "rgba(250,247,240,0.5)", border: "1px solid rgba(201,168,76,0.15)" }}
+                  style={{ background: "rgba(248,250,255,0.5)", border: "1px solid rgba(0,212,255,0.15)" }}
                   draggable={false}
                   onContextMenu={(e) => e.preventDefault()}
                 />
-                <span style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:12, display:"block", marginTop:6 }}>
+                <span style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:12, display:"block", marginTop:6 }}>
                   🔍 اضغط للتكبير
                 </span>
               </button>
@@ -614,9 +614,9 @@ function QuizPlayer({
                     animate={selected ? { scale: [1, 1.03, 1] } : {}}
                     transition={{ type: "spring", stiffness: 400, damping: 20 }}
                     style={{ width:"100%", padding:"12px 16px", borderRadius:12, border:"1.5px solid",
-                      borderColor: selected ? "#C9A84C" : "rgba(201,168,76,0.2)",
-                      background:  selected ? "rgba(201,168,76,0.12)" : "rgba(250,247,240,0.5)",
-                      color:"#1A1208", fontFamily:"Cairo,sans-serif", fontSize:14, textAlign:"right",
+                      borderColor: selected ? "#00D4FF" : "rgba(0,212,255,0.2)",
+                      background:  selected ? "rgba(0,212,255,0.12)" : "rgba(248,250,255,0.5)",
+                      color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontSize:14, textAlign:"right",
                       cursor:"pointer", display:"flex", alignItems:"center", gap:10 }}>
                     <motion.span
                       animate={{ scale: selected ? 1.1 : 1, rotate: selected ? 360 : 0 }}
@@ -624,9 +624,9 @@ function QuizPlayer({
                       style={{
                         width:26, height:26, borderRadius:"50%", flexShrink:0,
                         border:"2px solid",
-                        borderColor: selected ? "#C9A84C" : "rgba(201,168,76,0.35)",
-                        background:  selected ? "#C9A84C" : "transparent",
-                        color: selected ? "#1A1208" : "#8B6914",
+                        borderColor: selected ? "#00D4FF" : "rgba(0,212,255,0.35)",
+                        background:  selected ? "#00D4FF" : "transparent",
+                        color: selected ? "#0A0F1E" : "#0099CC",
                         fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:13,
                         display:"flex", alignItems:"center", justifyContent:"center",
                         flexDirection:"column",
@@ -650,10 +650,10 @@ function QuizPlayer({
           animate={answered>=total && !isSubmitting ? { scale: [1, 1.03, 1] } : {}}
           transition={{ scale: { duration: 1.4, repeat: answered>=total && !isSubmitting ? Infinity : 0, ease: "easeInOut" } }}
           style={{ padding:"14px 48px", borderRadius:16, border:"none",
-            background: answered<total ? "rgba(201,168,76,0.3)" : "linear-gradient(135deg,#C9A84C,#8B6914)",
-            color:"#1A1208", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:16,
+            background: answered<total ? "rgba(0,212,255,0.3)" : "linear-gradient(135deg,#00D4FF,#00FF88)",
+            color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:16,
             cursor: answered<total ? "not-allowed" : "pointer",
-            boxShadow: answered>=total ? "0 6px 20px rgba(201,168,76,0.4)" : "none" }}>
+            boxShadow: answered>=total ? "0 6px 20px rgba(0,212,255,0.4)" : "none" }}>
           {isSubmitting ? "⏳ جارٍ التسليم..." :
            answered<total ? `أجب على ${total-answered} سؤال متبقي` : `✅ تسليم ${label}`}
         </motion.button>
@@ -684,7 +684,7 @@ function QuizPlayer({
             <button
               onClick={() => setZoomedImage(null)}
               className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center"
-              style={{ background: "rgba(250,247,240,0.15)", color: "#FAF7F0", fontSize: 18, border: "none", cursor: "pointer" }}
+              style={{ background: "rgba(248,250,255,0.15)", color: "#F8FAFF", fontSize: 18, border: "none", cursor: "pointer" }}
             >
               ✕
             </button>
@@ -697,9 +697,9 @@ function QuizPlayer({
 
 function EmptyTab({ icon, label }: { icon: string; label: string }) {
   return (
-    <div className="text-center py-16" style={{ background:"#fff", borderRadius:20, border:"1px solid rgba(201,168,76,0.15)" }}>
+    <div className="text-center py-16" style={{ background:"#fff", borderRadius:20, border:"1px solid rgba(0,212,255,0.15)" }}>
       <div style={{ fontSize:48, marginBottom:12 }}>{icon}</div>
-      <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:15 }}>{label}</p>
+      <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:15 }}>{label}</p>
     </div>
   );
 }

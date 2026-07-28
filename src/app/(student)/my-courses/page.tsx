@@ -31,15 +31,15 @@ export default function MyCoursesPage() {
       >
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div>
-            <h1 style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 32, marginBottom: 4 }}>
+            <h1 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 32, marginBottom: 4 }}>
               كورساتي
             </h1>
-            <p style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 15 }}>
+            <p style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 15 }}>
               الكورسات التي حصلت عليها
               {user?.academicLevel && (
                 <span
                   className="mr-2 inline-block px-3 py-0.5 rounded-full text-xs font-semibold"
-                  style={{ background: "rgba(201,168,76,0.12)", color: "#8B6914", border: "1px solid rgba(201,168,76,0.25)" }}
+                  style={{ background: "rgba(0,212,255,0.12)", color: "#0099CC", border: "1px solid rgba(0,212,255,0.25)" }}
                 >
                   🎓 {ACADEMIC_LEVEL_LABELS[user.academicLevel]}
                 </span>
@@ -50,8 +50,8 @@ export default function MyCoursesPage() {
             href="/redeem"
             style={{
               padding: "10px 24px", borderRadius: 12,
-              background: "linear-gradient(135deg,#C9A84C,#8B6914)",
-              color: "#1A1208", fontFamily: "Cairo,sans-serif",
+              background: "linear-gradient(135deg,#00D4FF,#00FF88)",
+              color: "#0A0F1E", fontFamily: "Cairo,sans-serif",
               fontWeight: 700, fontSize: 14, textDecoration: "none",
             }}
           >
@@ -79,8 +79,8 @@ export default function MyCoursesPage() {
                 className="rounded-2xl overflow-hidden"
                 style={{
                   background: "#fff",
-                  border: "1px solid rgba(201,168,76,0.15)",
-                  boxShadow: "0 4px 20px rgba(26,18,8,0.06)",
+                  border: "1px solid rgba(0,212,255,0.15)",
+                  boxShadow: "0 4px 20px rgba(10,15,30,0.06)",
                 }}
               >
                 {/* Color header */}
@@ -91,20 +91,20 @@ export default function MyCoursesPage() {
                   {course.icon}
                   <div
                     className="absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-semibold"
-                    style={{ background: "rgba(45,158,107,0.85)", color: "#fff", fontFamily: "Cairo,sans-serif" }}
+                    style={{ background: "rgba(0,255,136,0.85)", color: "#fff", fontFamily: "Cairo,sans-serif" }}
                   >
                     ✅ مفتوح
                   </div>
                 </div>
 
                 <div className="p-5">
-                  <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#1A1208", fontSize: 16, fontWeight: 700, marginBottom: 6 }}>
+                  <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 16, fontWeight: 700, marginBottom: 6 }}>
                     {course.title}
                   </h3>
                   {course.description && (
                     <p
                       className="line-clamp-2"
-                      style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}
+                      style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}
                     >
                       {course.description}
                     </p>
@@ -118,8 +118,8 @@ export default function MyCoursesPage() {
                           key={l.academicLevel}
                           style={{
                             padding: "2px 8px", borderRadius: 6, fontSize: 10,
-                            background: "rgba(201,168,76,0.1)", color: "#8B6914",
-                            border: "1px solid rgba(201,168,76,0.2)",
+                            background: "rgba(0,212,255,0.1)", color: "#0099CC",
+                            border: "1px solid rgba(0,212,255,0.2)",
                             fontFamily: "Cairo,sans-serif",
                           }}
                         >
@@ -130,15 +130,15 @@ export default function MyCoursesPage() {
                   )}
 
                   <div className="flex items-center justify-between mt-3">
-                    <span style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 12 }}>
+                    <span style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 12 }}>
                       📖 {course._count?.lectures ?? 0} محاضرة
                     </span>
                     <Link
                       href={`/courses/${course.id}`}
                       style={{
                         padding: "7px 18px", borderRadius: 10,
-                        background: "linear-gradient(135deg,#C9A84C,#8B6914)",
-                        color: "#1A1208", fontFamily: "Cairo,sans-serif",
+                        background: "linear-gradient(135deg,#00D4FF,#00FF88)",
+                        color: "#0A0F1E", fontFamily: "Cairo,sans-serif",
                         fontWeight: 700, fontSize: 13, textDecoration: "none",
                       }}
                     >
@@ -158,22 +158,22 @@ export default function MyCoursesPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center py-20 rounded-3xl"
-          style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.15)" }}
+          style={{ background: "#fff", border: "1px solid rgba(0,212,255,0.15)" }}
         >
           <div style={{ fontSize: 64, marginBottom: 16 }}>🎒</div>
-          <h3 style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 26, marginBottom: 10 }}>
+          <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 26, marginBottom: 10 }}>
             لا توجد كورسات بعد
           </h3>
-          <p style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 15, marginBottom: 28 }}>
+          <p style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 15, marginBottom: 28 }}>
             استخدم كود الوصول لفتح أول كورس لك
           </p>
           <Link
             href="/redeem"
             style={{
               padding: "14px 40px", borderRadius: 16,
-              background: "linear-gradient(135deg,#C9A84C,#8B6914)",
-              boxShadow: "0 6px 20px rgba(201,168,76,0.35)",
-              color: "#1A1208", fontFamily: "Cairo,sans-serif",
+              background: "linear-gradient(135deg,#00D4FF,#00FF88)",
+              boxShadow: "0 6px 20px rgba(0,212,255,0.35)",
+              color: "#0A0F1E", fontFamily: "Cairo,sans-serif",
               fontWeight: 700, fontSize: 16, textDecoration: "none",
               display: "inline-block",
             }}
