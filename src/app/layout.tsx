@@ -8,20 +8,6 @@ import { ThemeStyle } from "@/components/theme/ThemeStyle";
 import { getSiteSettings } from "@/lib/site-settings";
 import { SITE_URL, SITE_NAME, SITE_NAME_SHORT, SITE_DESCRIPTION, SITE_KEYWORDS, DEFAULT_LOCALE } from "@/lib/seo";
 
-// SEO NOTE: `icons` and `manifest` are intentionally NOT set on this
-// metadata object. Next.js's file-based conventions — src/app/icon.tsx,
-// src/app/apple-icon.tsx, and src/app/manifest.ts — already generate and
-// auto-link the correct <link> tags for all of these. Explicitly setting
-// `metadata.icons` here would override and disable the file-based icons
-// entirely (this is documented Next.js behavior), so the two approaches
-// must not be mixed.
-//
-// CUSTOM-004 (Platform Settings / SEO): this used to be a static `export
-// const metadata`. It's now generateMetadata() so the OWNER's saved
-// meta title/description/keywords/OG image (if set) can override the
-// static SITE_* defaults from src/lib/seo.ts — falling back to those
-// defaults whenever a field is left empty, so an untouched install looks
-// exactly as it did before this feature existed.
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSiteSettings();
   const title = s.metaTitle?.trim() || SITE_NAME;
@@ -33,6 +19,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(SITE_URL),
+    // GOOGLE VERIFICATION FIX: إضافة كود التحقق الخاص بجوجل هنا
+    verification: {
+      google: "C55EKKdgIfuSHe_hXSkEBlS4CheFrCuUmUrr8Ni6Wgg",
+    },
     title: {
       default: title,
       template: `%s | ${SITE_NAME_SHORT}`,
@@ -78,17 +68,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#1A6B47", // brand emerald, matches manifest.ts theme_color
+  themeColor: "#1A6B47",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // NEXT-003 FIX: reading headers() here is what matters, not the value
-  // itself — it forces this layout to render dynamically per request
-  // (required, since the nonce/CSP differ on every request and must never
-  // be cached/shared across requests). Next.js automatically applies this
-  // same nonce to its own internally-generated inline hydration scripts;
-  // if a custom inline <script> is ever added directly in this app, pass
-  // nonce={(await headers()).get("x-nonce")} to it explicitly.
   await headers();
 
   return (
