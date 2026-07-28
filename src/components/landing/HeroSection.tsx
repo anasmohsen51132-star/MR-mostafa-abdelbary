@@ -3,7 +3,7 @@
 import { m as motion } from "framer-motion";
 import Link from "next/link";
 import type { SiteSettings } from "@/types";
-import { FloatingArabicBackground } from "@/components/effects/FloatingArabicBackground";
+import { MixingSolutionsAnimation } from "@/components/effects/MixingSolutionsAnimation";
 import { TwinklingStars } from "@/components/effects/TwinklingStars";
 
 interface Props {
@@ -67,8 +67,7 @@ export function HeroSection({ settings }: Props) {
         backgroundSize: "36px 36px",
       }} />
 
-      {/* ── Floating chemistry symbols ── */}
-      <FloatingArabicBackground />
+      {/* ── Ambient effects ── */}
       <TwinklingStars />
 
       {/* ── Glow orbs ── */}
@@ -172,6 +171,16 @@ export function HeroSection({ settings }: Props) {
         className="relative z-10 text-center w-full"
         style={{ padding: "96px clamp(16px,5vw,40px) 96px" }}
       >
+        {/* Signature visual — two solutions mixing */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.05 }}
+          className="mb-4"
+        >
+          <MixingSolutionsAnimation maxWidth={220} />
+        </motion.div>
+
         {/* Platform badge */}
         <motion.div
           initial="hidden" animate="show" custom={0} variants={fadeUp}
