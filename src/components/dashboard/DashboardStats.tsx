@@ -22,19 +22,19 @@ export function DashboardStats() {
   const stats = [
     {
       icon: "🎓", value: myCourses.length,
-      label: "كورساتي", color: "#C9A84C",
-      bg: "rgba(201,168,76,0.1)", delay: 0,
+      label: "كورساتي", color: "#00D4FF",
+      bg: "rgba(0,212,255,0.1)", delay: 0,
     },
     {
       icon: "📚", value: available.length,
-      label: "متاح للفتح", color: "#2D9E6B",
-      bg: "rgba(45,158,107,0.1)", delay: 0.08,
+      label: "متاح للفتح", color: "#00FF88",
+      bg: "rgba(0,255,136,0.1)", delay: 0.08,
     },
     {
       icon: "📖",
       value: myCourses.reduce((sum, c) => sum + (c._count?.lectures ?? 0), 0),
-      label: "محاضرة", color: "#C9A84C",
-      bg: "rgba(201,168,76,0.1)", delay: 0.16,
+      label: "محاضرة", color: "#00D4FF",
+      bg: "rgba(0,212,255,0.1)", delay: 0.16,
     },
   ];
 
@@ -51,8 +51,8 @@ export function DashboardStats() {
           className="rounded-2xl p-5 text-center"
           style={{
             background: "#fff",
-            border: "1px solid rgba(201,168,76,0.15)",
-            boxShadow: "0 2px 12px rgba(26,18,8,0.05)",
+            border: "1px solid rgba(0,212,255,0.15)",
+            boxShadow: "0 2px 12px rgba(10,15,30,0.05)",
           }}
         >
           <motion.div
@@ -67,11 +67,11 @@ export function DashboardStats() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: s.delay + 0.2 }}
-            style={{ fontFamily: "Amiri,serif", color: s.color, fontSize: 32, fontWeight: 700, lineHeight: 1 }}
+            style={{ fontFamily: "Cairo,sans-serif", color: s.color, fontSize: 32, fontWeight: 700, lineHeight: 1 }}
           >
             {s.value}
           </motion.div>
-          <p style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 12, marginTop: 4 }}>
+          <p style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 12, marginTop: 4 }}>
             {s.label}
           </p>
         </motion.div>
