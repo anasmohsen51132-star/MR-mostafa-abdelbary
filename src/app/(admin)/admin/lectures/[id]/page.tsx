@@ -1,12 +1,13 @@
 "use client";
 // src/app/(admin)/admin/lectures/[id]/page.tsx
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { m as motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { fetchWithAuth } from "@/hooks/useAuth";
 import { useToast } from "@/store/uiStore";
+import { useFileUpload } from "@/hooks/useFileUpload";
 import { extractYouTubeId } from "@/lib/utils";
 import { QUIZ_REQUIREMENT_LABELS } from "@/types";
 import type { Video, PDF, Quiz, Homework, Course, QuizRequirement } from "@/types";
@@ -28,32 +29,24 @@ export default function LectureEditPage() {
   const [videoUrl,   setVideoUrl]   = useState("");
   const [pdfTitle,   setPdfTitle]   = useState("");
   const [pdfUrl,     setPdfUrl]     = useState("");
-  const [pdfUploading, setPdfUploading] = useState(false);
-  const pdfFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Same /api/upload + FormData pattern already used for image uploads
-  // elsewhere in this app (quiz-builder, ImageUploadField). Fills pdfUrl
-  // with the resulting storage URL — the only kind of URL /api/pdfs will
-  // actually accept — so admins have a real way to add a PDF, instead of
-  // needing to already have a Vercel Blob link to paste in manually.
-  async function handlePdfFileSelect(file: File | undefined) {
-    if (!file) return;
-    setPdfUploading(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("type", "pdf");
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error ?? "فشل رفع الملف");
-      setPdfUrl(json.data.url as string);
+  // TASK 05: was a hand-rolled fetch+FormData+useState('pdfUploading')
+  // implementation with no client-side type/size validation (relied
+  // entirely on the server rejecting oversized/wrong-type files after a
+  // full round trip) and no drag & drop. Now shares the same
+  // useFileUpload() hook as the image uploaders, which also fixes the
+  // "reselect the exact same file" input bug and adds real progress.
+  const {
+    inputRef: pdfFileInputRef, accept: pdfAccept, maxLabel: pdfMaxLabel,
+    isUploading: pdfUploading, progress: pdfProgress, dragOver: pdfDragOver,
+    dragProps: pdfDragProps, trigger: triggerPdfPicker, handleInputChange: handlePdfInputChange,
+  } = useFileUpload({
+    kind: "pdf",
+    onSuccess: (result, file) => {
+      setPdfUrl(result.url);
       if (!pdfTitle.trim()) setPdfTitle(file.name.replace(/\.pdf$/i, ""));
-    } catch (e: any) {
-      toast.error(e?.message ?? "فشل رفع الملف");
-    } finally {
-      setPdfUploading(false);
-    }
-  }
+    },
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-lecture", id],
@@ -226,20 +219,34 @@ export default function LectureEditPage() {
                   <input
                     ref={pdfFileInputRef}
                     type="file"
-                    accept="application/pdf"
+                    accept={pdfAccept}
                     style={{ display: "none" }}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      e.target.value = "";
-                      handlePdfFileSelect(file);
-                    }}
+                    aria-hidden="true"
+                    tabIndex={-1}
+                    onChange={handlePdfInputChange}
                   />
+                  {/* Doubles as a drag & drop target — dropping a PDF anywhere
+                      on this button starts the same upload as clicking it. */}
                   <button
                     type="button"
-                    onClick={() => pdfFileInputRef.current?.click()}
+                    onClick={triggerPdfPicker}
                     disabled={pdfUploading}
-                    style={{ padding:"10px 18px", borderRadius:10, border:"1px solid rgba(201,168,76,0.35)", background:"transparent", color:"#7A6E5A", fontFamily:"Cairo,sans-serif", fontSize:13, cursor:"pointer", whiteSpace:"nowrap" }}>
-                    {pdfUploading ? "⏳ جارِ الرفع..." : "📤 رفع ملف PDF"}
+                    aria-label={`رفع ملف PDF — حتى ${pdfMaxLabel}`}
+                    aria-busy={pdfUploading}
+                    {...pdfDragProps}
+                    style={{
+                      padding:"10px 18px", borderRadius:10,
+                      border: `1.5px dashed ${pdfDragOver ? "var(--cyan)" : "rgba(201,168,76,0.35)"}`,
+                      background: pdfDragOver ? "rgba(0,212,255,0.08)" : "transparent",
+                      color: pdfDragOver ? "var(--cyan-dark)" : "#7A6E5A",
+                      fontFamily:"Cairo,sans-serif", fontSize:13,
+                      cursor: pdfUploading ? "not-allowed" : "pointer",
+                      whiteSpace:"nowrap",
+                      transition: "border-color var(--duration-base) var(--ease-standard), background var(--duration-base) var(--ease-standard)",
+                    }}>
+                    {pdfUploading
+                      ? `⏳ جارِ الرفع${pdfProgress > 0 ? ` ${pdfProgress}%` : "..."}`
+                      : `📤 رفع ملف PDF (أو اسحبه هنا) — حتى ${pdfMaxLabel}`}
                   </button>
                   <button onClick={() => { if (!pdfTitle.trim() || !pdfUrl.trim()) { toast.error("أدخل عنوان ورابط الملف"); return; } addPDF.mutate(); }}
                     disabled={addPDF.isPending}
@@ -247,6 +254,11 @@ export default function LectureEditPage() {
                     {addPDF.isPending ? "⏳..." : "＋ إضافة"}
                   </button>
                 </div>
+                {pdfUploading && pdfProgress > 0 && (
+                  <div style={{ width: "100%", maxWidth: 320, height: 4, borderRadius: 2, background: "rgba(0,212,255,0.15)", overflow: "hidden", marginTop: 10 }}>
+                    <div style={{ width: `${pdfProgress}%`, height: "100%", background: "var(--cyan)", transition: "width 0.15s linear" }} />
+                  </div>
+                )}
               </div>
               {(lecture.pdfs?.length ?? 0) === 0 ? <EmptyState icon="📄" label="لا توجد ملفات بعد" /> : (
                 <div className="space-y-3">
