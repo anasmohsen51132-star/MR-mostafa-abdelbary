@@ -80,12 +80,12 @@ export default function AnnouncementPage() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "11px 13px", borderRadius: 11,
-    border: "1.5px solid rgba(201,168,76,0.25)", background: "#FAFAF8",
-    color: "#1A1208", fontFamily: "Cairo,sans-serif", fontSize: 14,
+    border: "1.5px solid rgba(0,212,255,0.25)", background: "#FAFAF8",
+    color: "#0A0F1E", fontFamily: "Cairo,sans-serif", fontSize: 14,
     outline: "none", direction: "rtl",
   };
   const labelStyle: React.CSSProperties = {
-    fontFamily: "Cairo,sans-serif", color: "#4A3F2A", fontSize: 12, fontWeight: 600,
+    fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 12, fontWeight: 600,
     marginBottom: 5, display: "block",
   };
 
@@ -98,20 +98,20 @@ export default function AnnouncementPage() {
   return (
     <div style={{ direction: "rtl" }}>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-        <h1 style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 28, marginBottom: 4 }}>
+        <h1 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 28, marginBottom: 4 }}>
           📢 الإعلان الشريطي
         </h1>
-        <p style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 14 }}>
+        <p style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 14 }}>
           شريط إعلان بيظهر أعلى كل صفحات المنصة — للطلاب وللزوار كمان
         </p>
       </motion.div>
 
       <div className="flex gap-6 flex-col lg:flex-row">
         <div className="flex-1 rounded-2xl p-7"
-          style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.15)", boxShadow: "0 2px 16px rgba(26,18,8,0.05)" }}>
+          style={{ background: "#fff", border: "1px solid rgba(0,212,255,0.15)", boxShadow: "0 2px 16px rgba(10,15,30,0.05)" }}>
 
-          <div className="flex items-center justify-between mb-6 p-3 rounded-xl" style={{ background: "rgba(201,168,76,0.06)" }}>
-            <span style={{ fontFamily: "Cairo,sans-serif", color: "#1A1208", fontSize: 14, fontWeight: 700 }}>
+          <div className="flex items-center justify-between mb-6 p-3 rounded-xl" style={{ background: "rgba(0,212,255,0.06)" }}>
+            <span style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 14, fontWeight: 700 }}>
               تفعيل الإعلان
             </span>
             <label style={{ position: "relative", display: "inline-block", width: 46, height: 26, cursor: "pointer" }}>
@@ -119,7 +119,7 @@ export default function AnnouncementPage() {
                 style={{ opacity: 0, width: 0, height: 0 }} />
               <span style={{
                 position: "absolute", inset: 0, borderRadius: 999,
-                background: enabled ? "#1A6B47" : "rgba(122,110,90,0.3)", transition: "background 0.2s",
+                background: enabled ? "#111E38" : "rgba(45,58,90,0.3)", transition: "background 0.2s",
               }}>
                 <span style={{
                   position: "absolute", top: 3, left: enabled ? 3 : 23, width: 20, height: 20,
@@ -150,7 +150,7 @@ export default function AnnouncementPage() {
 
           <label className="flex items-center gap-2 cursor-pointer select-none mb-6">
             <input type="checkbox" checked={dismissible} onChange={(e) => mark(setDismissible)(e.target.checked)} />
-            <span style={{ fontFamily: "Cairo,sans-serif", color: "#4A3F2A", fontSize: 13 }}>
+            <span style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 13 }}>
               يقدر الطالب يقفل الإعلان (زرار ✕)
             </span>
           </label>
@@ -162,8 +162,8 @@ export default function AnnouncementPage() {
               whileHover={isDirty ? { y: -2 } : {}}
               style={{
                 padding: "11px 26px", borderRadius: 12, border: "none",
-                background: !isDirty ? "rgba(201,168,76,0.25)" : "linear-gradient(135deg,#C9A84C,#8B6914)",
-                color: "#1A1208", fontFamily: "Cairo,sans-serif", fontWeight: 700, fontSize: 14,
+                background: !isDirty ? "rgba(0,212,255,0.25)" : "linear-gradient(135deg,#00D4FF,#00FF88)",
+                color: "#0A0F1E", fontFamily: "Cairo,sans-serif", fontWeight: 700, fontSize: 14,
                 cursor: !isDirty ? "default" : "pointer",
               }}
             >
@@ -187,16 +187,16 @@ export default function AnnouncementPage() {
         {/* Live preview */}
         <div className="lg:w-80 flex-shrink-0">
           <p style={labelStyle}>معاينة</p>
-          <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(201,168,76,0.2)" }}>
+          <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(0,212,255,0.2)" }}>
             {enabled && hasContent ? (
-              <div style={{ background: "linear-gradient(90deg,#0D3D27,#1A6B47)" }} className="relative px-6 py-4 text-center">
+              <div style={{ background: "linear-gradient(90deg,#0A0F1E,#111E38)" }} className="relative px-6 py-4 text-center">
                 {dismissible && <span className="absolute" style={{ left: 10, top: 10, color: "rgba(255,255,255,0.6)", fontSize: 14 }}>✕</span>}
-                {title && <div style={{ fontFamily: "Cairo,sans-serif", color: "#E8C97A", fontWeight: 700, fontSize: 13, textDecoration: link ? "underline" : "none" }}>{title}</div>}
+                {title && <div style={{ fontFamily: "Cairo,sans-serif", color: "#7AE8FF", fontWeight: 700, fontSize: 13, textDecoration: link ? "underline" : "none" }}>{title}</div>}
                 {text && <div style={{ fontFamily: "Cairo,sans-serif", color: "rgba(255,255,255,0.85)", fontSize: 11.5, marginTop: 2 }}>{text}</div>}
               </div>
             ) : (
               <div className="p-6 text-center" style={{ background: "#FAFAF8" }}>
-                <span style={{ fontFamily: "Cairo,sans-serif", color: "#A89A7E", fontSize: 12 }}>
+                <span style={{ fontFamily: "Cairo,sans-serif", color: "rgba(82,96,122,0.65)", fontSize: 12 }}>
                   {enabled ? "اكتب عنوان أو نص عشان تشوف المعاينة" : "الإعلان متوقف حاليًا"}
                 </span>
               </div>
