@@ -391,7 +391,7 @@ export function VideoPlayer({ youtubeId, title, lectureId, videoId, initialResum
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.22 }}
             className="relative cursor-pointer overflow-hidden rounded-2xl"
-            style={{ aspectRatio: "16/9", background: "#0a1f14" }}
+            style={{ aspectRatio: "16/9", background: "#0A0F1E" }}
             onClick={() => setStarted(true)}
             onContextMenu={(e) => e.preventDefault()}
           >
@@ -410,27 +410,27 @@ export function VideoPlayer({ youtubeId, title, lectureId, videoId, initialResum
               className="absolute inset-0"
               style={{
                 background:
-                  "linear-gradient(to top,rgba(13,61,39,0.92) 0%,rgba(13,61,39,0.25) 60%,rgba(13,61,39,0.08) 100%)",
+                  "linear-gradient(to top,rgba(10,15,30,0.92) 0%,rgba(10,15,30,0.25) 60%,rgba(10,15,30,0.08) 100%)",
               }}
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <motion.div
                 className="flex items-center justify-center rounded-full"
-                style={{ width: 72, height: 72, background: "linear-gradient(135deg,#C9A84C,#8B6914)", boxShadow: "0 8px 32px rgba(201,168,76,0.55)" }}
+                style={{ width: 72, height: 72, background: "linear-gradient(135deg,#00D4FF,#00FF88)", boxShadow: "0 8px 32px rgba(0,212,255,0.55)" }}
                 whileHover={{ scale: 1.12 }}
                 whileTap={{ scale: 0.94 }}
               >
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="#1A1208">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="#0A0F1E">
                   <polygon points="6,3 20,12 6,21" />
                 </svg>
               </motion.div>
             </div>
             <div
               className="absolute inset-x-0 bottom-0 px-4 py-4"
-              style={{ background: "linear-gradient(to top,rgba(13,61,39,0.98),transparent)" }}
+              style={{ background: "linear-gradient(to top,rgba(10,15,30,0.98),transparent)" }}
             >
-              <p style={{ fontFamily: "Cairo,sans-serif", color: "#E8C97A", fontSize: 14, fontWeight: 600 }}>{title}</p>
-              <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(250,247,240,0.5)", fontSize: 11, marginTop: 2 }}>
+              <p style={{ fontFamily: "Cairo,sans-serif", color: "#7AE8FF", fontSize: 14, fontWeight: 600 }}>{title}</p>
+              <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(248,250,255,0.5)", fontSize: 11, marginTop: 2 }}>
                 اضغط للتشغيل
               </p>
             </div>
@@ -455,20 +455,20 @@ export function VideoPlayer({ youtubeId, title, lectureId, videoId, initialResum
                   initial={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3"
-                  style={{ background: "#0a1f14" }}
+                  style={{ background: "#0A0F1E" }}
                 >
                   <div className="flex gap-2">
                     {[0, 1, 2].map((i) => (
                       <motion.div
                         key={i}
                         className="h-2 w-2 rounded-full"
-                        style={{ background: "#C9A84C" }}
+                        style={{ background: "#00D4FF" }}
                         animate={{ scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] }}
                         transition={{ duration: 0.8, delay: i * 0.18, repeat: Infinity }}
                       />
                     ))}
                   </div>
-                  <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(201,168,76,0.7)", fontSize: 12 }}>جارٍ تحميل الفيديو...</p>
+                  <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(0,212,255,0.7)", fontSize: 12 }}>جارٍ تحميل الفيديو...</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -477,12 +477,12 @@ export function VideoPlayer({ youtubeId, title, lectureId, videoId, initialResum
             {state.status === "error" && (
               <div
                 className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-2 px-4 text-center"
-                style={{ background: "#0a1f14" }}
+                style={{ background: "#0A0F1E" }}
               >
-                <p style={{ fontFamily: "Cairo,sans-serif", color: "#E8967A", fontSize: 13, fontWeight: 600 }}>
+                <p style={{ fontFamily: "Cairo,sans-serif", color: "#FF8F60", fontSize: 13, fontWeight: 600 }}>
                   ⚠️ تعذّر تحميل الفيديو
                 </p>
-                <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(250,247,240,0.5)", fontSize: 11 }}>
+                <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(248,250,255,0.5)", fontSize: 11 }}>
                   تأكد من اتصال الإنترنت، أو أن أي أداة حجب إعلانات لا تمنع youtube.com
                 </p>
                 <button
@@ -493,7 +493,7 @@ export function VideoPlayer({ youtubeId, title, lectureId, videoId, initialResum
                     window.setTimeout(() => setStarted(true), 50);
                   }}
                   className="mt-2 rounded-lg px-3 py-1.5"
-                  style={{ fontFamily: "Cairo,sans-serif", fontSize: 12, color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}
+                  style={{ fontFamily: "Cairo,sans-serif", fontSize: 12, color: "#00D4FF", border: "1px solid rgba(0,212,255,0.3)" }}
                 >
                   إعادة المحاولة
                 </button>
@@ -570,7 +570,7 @@ export function VideoPlayer({ youtubeId, title, lectureId, videoId, initialResum
         )}
       </AnimatePresence>
 
-      <p className="mt-2" style={{ fontFamily: "Cairo,sans-serif", color: "rgba(122,110,90,0.4)", fontSize: 11, direction: "rtl" }}>
+      <p className="mt-2" style={{ fontFamily: "Cairo,sans-serif", color: "rgba(45,58,90,0.4)", fontSize: 11, direction: "rtl" }}>
         🔒 هذا المحتوى مسجَّل باسم المستخدم — أي تسجيل غير مصرح به يُعدّ انتهاكاً
       </p>
     </div>
