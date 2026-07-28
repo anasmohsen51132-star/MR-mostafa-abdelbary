@@ -3,8 +3,8 @@
 // App Router uses this file as an automatic Suspense boundary for page
 // navigations and slow data fetches within the group; without it, users
 // saw a blank page during that gap instead of a sensible loading state.
-import { StudentSpinner } from "@/components/dashboard/StudentSpinner";
+import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 
 export default function StudentLoading() {
-  return <StudentSpinner />;
+  return <FullScreenSpinner />;
 }

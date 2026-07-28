@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ToastContainer } from "@/components/ui/Toast";
-import { StudentSpinner } from "@/components/dashboard/StudentSpinner";
+import { FullScreenSpinner } from "@/components/ui/FullScreenSpinner";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { useAuth } from "@/hooks/useAuth";
 import type { SidebarItem } from "@/components/layout/Sidebar";
@@ -42,7 +42,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
   const handleClose = useCallback(() => setSidebarOpen(false), []);
 
-  if (!isHydrated || !isSessionVerified) return <StudentSpinner />;
+  if (!isHydrated || !isSessionVerified) return <FullScreenSpinner />;
   if (!isAuthenticated || !user) return null;
 
   return (
