@@ -28,14 +28,14 @@ const SECTIONS: { id: Section; label: string; icon: string }[] = [
 ];
 
 const COLOR_FIELDS: { label: string; field: keyof SiteSettings; fallback: string }[] = [
-  { label: "اللون الرئيسي",   field: "primaryColor",    fallback: "#C9A84C" },
-  { label: "اللون الثانوي",   field: "secondaryColor",  fallback: "#1A6B47" },
-  { label: "لون التمييز",     field: "accentColor",     fallback: "#1A6B47" },
-  { label: "لون الخلفية",     field: "backgroundColor", fallback: "#F5F1E8" },
+  { label: "اللون الرئيسي",   field: "primaryColor",    fallback: "#00D4FF" },
+  { label: "اللون الثانوي",   field: "secondaryColor",  fallback: "#111E38" },
+  { label: "لون التمييز",     field: "accentColor",     fallback: "#111E38" },
+  { label: "لون الخلفية",     field: "backgroundColor", fallback: "#F0F4FF" },
   { label: "لون البطاقات",    field: "surfaceColor",    fallback: "#FFFFFF" },
-  { label: "لون النص",        field: "textColor",       fallback: "#1A1208" },
-  { label: "لون الأزرار",     field: "buttonColor",     fallback: "#C9A84C" },
-  { label: "لون التحويم",     field: "hoverColor",      fallback: "#8B6914" },
+  { label: "لون النص",        field: "textColor",       fallback: "#0A0F1E" },
+  { label: "لون الأزرار",     field: "buttonColor",     fallback: "#00D4FF" },
+  { label: "لون التحويم",     field: "hoverColor",      fallback: "#0099CC" },
   { label: "لون النجاح",      field: "successColor",    fallback: "#16A34A" },
   { label: "لون التحذير",     field: "warningColor",    fallback: "#D97706" },
   { label: "لون الخطأ",       field: "errorColor",      fallback: "#DC2626" },
@@ -108,21 +108,21 @@ export default function CustomizePage() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "11px 13px", borderRadius: 11,
-    border: "1.5px solid rgba(201,168,76,0.25)", background: "#FAFAF8",
-    color: "#1A1208", fontFamily: "Cairo,sans-serif", fontSize: 14,
+    border: "1.5px solid rgba(0,212,255,0.25)", background: "#FAFAF8",
+    color: "#0A0F1E", fontFamily: "Cairo,sans-serif", fontSize: 14,
     outline: "none", direction: "rtl", transition: "border-color 0.2s",
   };
   const labelStyle: React.CSSProperties = {
-    fontFamily: "Cairo,sans-serif", color: "#4A3F2A",
+    fontFamily: "Cairo,sans-serif", color: "#52607A",
     fontSize: 12, fontWeight: 600, marginBottom: 5, display: "block",
   };
   const sectionTitleStyle: React.CSSProperties = {
-    fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 20, marginBottom: 20,
+    fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 20, marginBottom: 20,
   };
   const onFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    (e.target.style.borderColor = "rgba(201,168,76,0.65)");
+    (e.target.style.borderColor = "rgba(0,212,255,0.65)");
   const onBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    (e.target.style.borderColor = "rgba(201,168,76,0.25)");
+    (e.target.style.borderColor = "rgba(0,212,255,0.25)");
 
   const Field = ({
     label, field, multiline = false, placeholder = "",
@@ -162,10 +162,10 @@ export default function CustomizePage() {
         className="flex items-center justify-between mb-8 flex-wrap gap-4"
       >
         <div>
-          <h1 style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 32, marginBottom: 4 }}>
+          <h1 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 32, marginBottom: 4 }}>
             🎨 تخصيص المنصة
           </h1>
-          <p style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A", fontSize: 14 }}>
+          <p style={{ fontFamily: "Cairo,sans-serif", color: "#52607A", fontSize: 14 }}>
             عدّل كل نصوص وألوان وصور المنصة بدون كود
           </p>
         </div>
@@ -178,9 +178,9 @@ export default function CustomizePage() {
             disabled={saveMutation.isPending}
             style={{
               padding: "11px 28px", borderRadius: 14, border: "none",
-              background: "linear-gradient(135deg,#C9A84C,#8B6914)",
-              boxShadow: "0 4px 16px rgba(201,168,76,0.4)",
-              color: "#1A1208", fontFamily: "Cairo,sans-serif",
+              background: "linear-gradient(135deg,#00D4FF,#00FF88)",
+              boxShadow: "0 4px 16px rgba(0,212,255,0.4)",
+              color: "#0A0F1E", fontFamily: "Cairo,sans-serif",
               fontWeight: 700, fontSize: 14, cursor: "pointer",
             }}
           >
@@ -206,9 +206,9 @@ export default function CustomizePage() {
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition-all"
                   style={{
                     border: "none",
-                    background: activeSection === s.id ? "rgba(201,168,76,0.12)" : "transparent",
-                    borderRight: activeSection === s.id ? "3px solid #C9A84C" : "3px solid transparent",
-                    color: activeSection === s.id ? "#8B6914" : "#7A6E5A",
+                    background: activeSection === s.id ? "rgba(0,212,255,0.12)" : "transparent",
+                    borderRight: activeSection === s.id ? "3px solid #00D4FF" : "3px solid transparent",
+                    color: activeSection === s.id ? "#0099CC" : "#52607A",
                     fontFamily: "Cairo,sans-serif", fontSize: 14,
                     fontWeight: activeSection === s.id ? 700 : 400,
                     cursor: "pointer",
@@ -231,7 +231,7 @@ export default function CustomizePage() {
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.22 }}
                 className="rounded-2xl p-7"
-                style={{ background: "#fff", border: "1px solid rgba(201,168,76,0.15)", boxShadow: "0 2px 16px rgba(26,18,8,0.05)" }}
+                style={{ background: "#fff", border: "1px solid rgba(0,212,255,0.15)", boxShadow: "0 2px 16px rgba(10,15,30,0.05)" }}
               >
 
                 {/* ── HERO SECTION ── */}
@@ -267,10 +267,10 @@ export default function CustomizePage() {
                       />
                     </div>
 
-                    <h3 style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 16, marginBottom: 4 }}>
+                    <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 16, marginBottom: 4 }}>
                       أزرار الدعوة لاتخاذ إجراء (CTA)
                     </h3>
-                    <p style={{ fontFamily: "Cairo,sans-serif", color: "#A89A7E", fontSize: 12, marginBottom: 14 }}>
+                    <p style={{ fontFamily: "Cairo,sans-serif", color: "rgba(82,96,122,0.65)", fontSize: 12, marginBottom: 14 }}>
                       رتّب الأزرار بالأسهم، أو أخفِ زرار بدون حذفه من غير ما تفقد إعداداته.
                     </p>
                     <CtaButtonsEditor
@@ -315,8 +315,8 @@ export default function CustomizePage() {
                         hint="مربّعة، 512×512 مثاليًا"
                       />
                     </div>
-                    <div className="mt-3 p-3 rounded-xl" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}>
-                      <p style={{ fontFamily: "Cairo,sans-serif", color: "#8B6914", fontSize: 12 }}>
+                    <div className="mt-3 p-3 rounded-xl" style={{ background: "rgba(0,212,255,0.06)", border: "1px solid rgba(0,212,255,0.2)" }}>
+                      <p style={{ fontFamily: "Cairo,sans-serif", color: "#0099CC", fontSize: 12 }}>
                         💡 أيقونة المتصفح الفعلية بتتحدد حاليًا من ملف ثابت في المشروع. رفع صورة هنا بيخزّنها للاستخدام المستقبلي، وربطها الفعلي بأيقونة المتصفح محتاج خطوة تطوير إضافية (موضّحة في تقرير المراجعة).
                       </p>
                     </div>
@@ -364,7 +364,7 @@ export default function CustomizePage() {
                                 type="color"
                                 value={current}
                                 onChange={(e) => update(field, e.target.value)}
-                                style={{ width: 44, height: 44, borderRadius: 11, border: "2px solid rgba(201,168,76,0.3)", cursor: "pointer", padding: 2 }}
+                                style={{ width: 44, height: 44, borderRadius: 11, border: "2px solid rgba(0,212,255,0.3)", cursor: "pointer", padding: 2 }}
                               />
                               <input
                                 type="text"
@@ -383,8 +383,8 @@ export default function CustomizePage() {
                       })}
                     </div>
 
-                    <div className="mt-6 p-4 rounded-xl" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}>
-                      <p style={{ fontFamily: "Cairo,sans-serif", color: "#8B6914", fontSize: 13 }}>
+                    <div className="mt-6 p-4 rounded-xl" style={{ background: "rgba(0,212,255,0.06)", border: "1px solid rgba(0,212,255,0.2)" }}>
+                      <p style={{ fontFamily: "Cairo,sans-serif", color: "#0099CC", fontSize: 13 }}>
                         💡 هذه القيم متاحة فورًا كمتغيرات CSS (<code>--color-primary</code> إلخ) في كل الموقع بعد الحفظ.
                         استخدامها الفعلي داخل كل شاشة موجودة مسبقًا في المنصة محتاج نقل تدريجي — تفاصيل ده في تقرير المراجعة.
                       </p>
@@ -412,7 +412,7 @@ export default function CustomizePage() {
                 )}
 
                 {/* Save button inside card */}
-                <div className="mt-6 pt-5" style={{ borderTop: "1px solid rgba(201,168,76,0.12)" }}>
+                <div className="mt-6 pt-5" style={{ borderTop: "1px solid rgba(0,212,255,0.12)" }}>
                   <motion.button
                     onClick={() => saveMutation.mutate()}
                     disabled={saveMutation.isPending || !isDirty}
@@ -420,9 +420,9 @@ export default function CustomizePage() {
                     whileTap={!saveMutation.isPending && isDirty ? { scale: 0.98 } : {}}
                     style={{
                       padding: "12px 32px", borderRadius: 12, border: "none",
-                      background: !isDirty ? "rgba(201,168,76,0.25)" : "linear-gradient(135deg,#C9A84C,#8B6914)",
-                      boxShadow: isDirty ? "0 4px 16px rgba(201,168,76,0.35)" : "none",
-                      color: "#1A1208", fontFamily: "Cairo,sans-serif",
+                      background: !isDirty ? "rgba(0,212,255,0.25)" : "linear-gradient(135deg,#00D4FF,#00FF88)",
+                      boxShadow: isDirty ? "0 4px 16px rgba(0,212,255,0.35)" : "none",
+                      color: "#0A0F1E", fontFamily: "Cairo,sans-serif",
                       fontWeight: 700, fontSize: 14,
                       cursor: !isDirty ? "default" : "pointer",
                       transition: "all 0.2s",
