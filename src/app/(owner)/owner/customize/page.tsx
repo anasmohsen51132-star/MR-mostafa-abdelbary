@@ -332,7 +332,8 @@ export default function CustomizePage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-2">
                       <ImageUploadField
                         label="بانر لوحة الطالب" fieldKey="dashboardBanner"
-                        value={form.dashboardBanner} aspect="21/9"
+                        hint="المقاس الموصى به: 1280×511 بكسل (أو أي مقاس بنفس النسبة)"
+                        value={form.dashboardBanner} aspect="1280/511"
                         onChange={(url) => saveImageField("dashboardBanner", url)}
                       />
                       <ImageUploadField
