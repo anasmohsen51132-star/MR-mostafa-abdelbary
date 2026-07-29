@@ -5,7 +5,7 @@ import { SITE_URL, SITE_NAME } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "إنشاء حساب جديد",
-  description: `أنشئ حسابك المجاني في ${SITE_NAME} وابدأ رحلتك في تعلّم اللغة العربية.`,
+  description: `أنشئ حسابك المجاني في ${SITE_NAME} وابدأ رحلتك في تعلّم الكيمياء.`,
   alternates: {
     canonical: `${SITE_URL}/register`,
   },
