@@ -51,7 +51,7 @@ async function main() {
 
   const lecture = await prisma.lecture.upsert({
     where: { id: "demo-lecture-1" },
-    create: { id: "demo-lecture-1", title: "المقدمة: ما هي اللغة العربية؟", order: 1 },
+    create: { id: "demo-lecture-1", title: "المقدمة: ما هي الكيمياء؟", order: 1 },
     update: {},
   });
 
