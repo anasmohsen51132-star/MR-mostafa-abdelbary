@@ -60,13 +60,14 @@ export function Sidebar({
       >
         {/* Atom logo mark */}
         <div
-          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-base"
+          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
           style={{
             background: "linear-gradient(135deg,#00D4FF,#00FF88)",
             boxShadow: "0 4px 14px rgba(0,212,255,0.35)",
           }}
         >
-          ⚛
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon-192" alt="شعار المنصة" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
         </div>
         <div className="min-w-0">
           <div
