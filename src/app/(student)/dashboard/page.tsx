@@ -257,7 +257,17 @@ export default function StudentDashboard() {
               src={bannerUrl}
               alt="بانر المنصة"
               className="w-full object-cover"
-              style={{ maxHeight: 220, display: "block" }}
+              style={{
+                // Scale height in proportion to width (matches the banner's
+                // real 21:9-ish design ratio) instead of a fixed pixel cap —
+                // a fixed maxHeight made the crop ratio depend on screen
+                // width, cutting the artwork differently on phone vs desktop.
+                aspectRatio: "1280 / 511",
+                // Still cap it on very wide/ultra-wide desktop monitors so
+                // the banner doesn't grow oversized.
+                maxHeight: 320,
+                display: "block",
+              }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
           </motion.div>
