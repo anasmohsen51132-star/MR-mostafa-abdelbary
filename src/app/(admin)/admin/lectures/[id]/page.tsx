@@ -1,13 +1,12 @@
 "use client";
 // src/app/(admin)/admin/lectures/[id]/page.tsx
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { m as motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { fetchWithAuth } from "@/hooks/useAuth";
 import { useToast } from "@/store/uiStore";
-import { useFileUpload } from "@/hooks/useFileUpload";
 import { extractYouTubeId } from "@/lib/utils";
 import { QUIZ_REQUIREMENT_LABELS } from "@/types";
 import type { Video, PDF, Quiz, Homework, Course, QuizRequirement } from "@/types";
@@ -15,8 +14,8 @@ import type { Video, PDF, Quiz, Homework, Course, QuizRequirement } from "@/type
 type ActiveTab = "videos" | "pdfs" | "quizzes" | "homework" | "settings";
 
 const REQUIREMENT_OPTIONS: { value: QuizRequirement; label: string; desc: string; color: string }[] = [
-  { value: "NONE",      label: "بدون اختبار",      desc: "الدرس مفتوح دائماً للطلاب",               color: "#2D9E6B" },
-  { value: "OPTIONAL",  label: "اختبار اختياري",   desc: "يمكن مشاهدة الدرس بدون اجتياز الاختبار", color: "#C9A84C" },
+  { value: "NONE",      label: "بدون اختبار",      desc: "الدرس مفتوح دائماً للطلاب",               color: "#00FF88" },
+  { value: "OPTIONAL",  label: "اختبار اختياري",   desc: "يمكن مشاهدة الدرس بدون اجتياز الاختبار", color: "#00D4FF" },
   { value: "MUST_PASS", label: "اختبار إجباري",    desc: "يجب اجتياز الاختبار لفتح المحتوى",       color: "#DC2626" },
 ];
 
@@ -29,24 +28,32 @@ export default function LectureEditPage() {
   const [videoUrl,   setVideoUrl]   = useState("");
   const [pdfTitle,   setPdfTitle]   = useState("");
   const [pdfUrl,     setPdfUrl]     = useState("");
+  const [pdfUploading, setPdfUploading] = useState(false);
+  const pdfFileInputRef = useRef<HTMLInputElement>(null);
 
-  // TASK 05: was a hand-rolled fetch+FormData+useState('pdfUploading')
-  // implementation with no client-side type/size validation (relied
-  // entirely on the server rejecting oversized/wrong-type files after a
-  // full round trip) and no drag & drop. Now shares the same
-  // useFileUpload() hook as the image uploaders, which also fixes the
-  // "reselect the exact same file" input bug and adds real progress.
-  const {
-    inputRef: pdfFileInputRef, accept: pdfAccept, maxLabel: pdfMaxLabel,
-    isUploading: pdfUploading, progress: pdfProgress, dragOver: pdfDragOver,
-    dragProps: pdfDragProps, trigger: triggerPdfPicker, handleInputChange: handlePdfInputChange,
-  } = useFileUpload({
-    kind: "pdf",
-    onSuccess: (result, file) => {
-      setPdfUrl(result.url);
+  // Same /api/upload + FormData pattern already used for image uploads
+  // elsewhere in this app (quiz-builder, ImageUploadField). Fills pdfUrl
+  // with the resulting storage URL — the only kind of URL /api/pdfs will
+  // actually accept — so admins have a real way to add a PDF, instead of
+  // needing to already have a Vercel Blob link to paste in manually.
+  async function handlePdfFileSelect(file: File | undefined) {
+    if (!file) return;
+    setPdfUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("type", "pdf");
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error ?? "فشل رفع الملف");
+      setPdfUrl(json.data.url as string);
       if (!pdfTitle.trim()) setPdfTitle(file.name.replace(/\.pdf$/i, ""));
-    },
-  });
+    } catch (e: any) {
+      toast.error(e?.message ?? "فشل رفع الملف");
+    } finally {
+      setPdfUploading(false);
+    }
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-lecture", id],
@@ -111,15 +118,15 @@ export default function LectureEditPage() {
   );
   if (!lecture) return (
     <div className="text-center py-20" style={{ direction: "rtl" }}>
-      <p style={{ fontFamily: "Cairo,sans-serif", color: "#7A6E5A" }}>المحاضرة غير موجودة</p>
-      <Link href="/admin/lectures" style={{ color: "#C9A84C", fontFamily: "Cairo,sans-serif", textDecoration: "none" }}>← عودة</Link>
+      <p style={{ fontFamily: "Cairo,sans-serif", color: "#52607A" }}>المحاضرة غير موجودة</p>
+      <Link href="/admin/lectures" style={{ color: "#00D4FF", fontFamily: "Cairo,sans-serif", textDecoration: "none" }}>← عودة</Link>
     </div>
   );
 
   const fieldInput: React.CSSProperties = {
     flex: 1, padding: "10px 13px", borderRadius: 10,
-    border: "1.5px solid rgba(201,168,76,0.25)", background: "#FAFAF8",
-    color: "#1A1208", fontFamily: "Cairo,sans-serif", fontSize: 13,
+    border: "1.5px solid rgba(0,212,255,0.25)", background: "#FAFAF8",
+    color: "#0A0F1E", fontFamily: "Cairo,sans-serif", fontSize: 13,
     outline: "none", direction: "rtl", transition: "border-color 0.2s",
   };
 
@@ -128,9 +135,9 @@ export default function LectureEditPage() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <Link href="/admin/lectures" style={{ color: "#C9A84C", fontFamily: "Cairo,sans-serif", fontSize: 13, textDecoration: "none" }}>← المحاضرات</Link>
+          <Link href="/admin/lectures" style={{ color: "#00D4FF", fontFamily: "Cairo,sans-serif", fontSize: 13, textDecoration: "none" }}>← المحاضرات</Link>
         </div>
-        <h1 style={{ fontFamily: "Amiri,serif", color: "#1A1208", fontSize: 28, marginBottom: 4 }}>{lecture.title}</h1>
+        <h1 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 28, marginBottom: 4 }}>{lecture.title}</h1>
 
         {/* Quiz requirement badge */}
         <div className="flex flex-wrap gap-2 mt-2">
@@ -144,7 +151,7 @@ export default function LectureEditPage() {
             );
           })()}
           {lecture.courses?.map(({ course }: { course: Course }) => (
-            <span key={course.id} style={{ padding:"3px 10px", borderRadius:8, fontSize:12, background:"rgba(26,107,71,0.08)", color:"#1A6B47", border:"1px solid rgba(26,107,71,0.2)", fontFamily:"Cairo,sans-serif" }}>
+            <span key={course.id} style={{ padding:"3px 10px", borderRadius:8, fontSize:12, background:"rgba(0,255,136,0.08)", color:"#111E38", border:"1px solid rgba(0,255,136,0.2)", fontFamily:"Cairo,sans-serif" }}>
               {course.icon} {course.title}
             </span>
           ))}
@@ -156,9 +163,9 @@ export default function LectureEditPage() {
         {TABS.map((t) => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ padding:"8px 18px", borderRadius:12, border:"1.5px solid",
-              borderColor: tab===t.id ? "#C9A84C" : "rgba(201,168,76,0.25)",
-              background:  tab===t.id ? "rgba(201,168,76,0.12)" : "#fff",
-              color:       tab===t.id ? "#8B6914" : "#7A6E5A",
+              borderColor: tab===t.id ? "#00D4FF" : "rgba(0,212,255,0.25)",
+              background:  tab===t.id ? "rgba(0,212,255,0.12)" : "#fff",
+              color:       tab===t.id ? "#0099CC" : "#52607A",
               fontFamily:"Cairo,sans-serif", fontSize:13,
               fontWeight: tab===t.id ? 700 : 400, cursor:"pointer", transition:"all 0.15s" }}>
             {t.icon} {t.label}
@@ -172,14 +179,14 @@ export default function LectureEditPage() {
           {/* ═══ VIDEOS ═══ */}
           {tab === "videos" && (
             <div className="space-y-5">
-              <div className="rounded-2xl p-6" style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.15)", boxShadow:"0 2px 12px rgba(26,18,8,0.04)" }}>
-                <h3 style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:17, marginBottom:14 }}>إضافة فيديو يوتيوب</h3>
+              <div className="rounded-2xl p-6" style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.15)", boxShadow:"0 2px 12px rgba(10,15,30,0.04)" }}>
+                <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:17, marginBottom:14 }}>إضافة فيديو يوتيوب</h3>
                 <div className="flex gap-3 flex-wrap mb-3">
-                  <input value={videoTitle} onChange={(e) => setVideoTitle(e.target.value)} placeholder="عنوان الفيديو" style={fieldInput} onFocus={(e) => (e.target.style.borderColor="rgba(201,168,76,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(201,168,76,0.25)")} />
-                  <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="رابط يوتيوب" style={{ ...fieldInput, direction:"ltr" }} onFocus={(e) => (e.target.style.borderColor="rgba(201,168,76,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(201,168,76,0.25)")} />
+                  <input value={videoTitle} onChange={(e) => setVideoTitle(e.target.value)} placeholder="عنوان الفيديو" style={fieldInput} onFocus={(e) => (e.target.style.borderColor="rgba(0,212,255,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(0,212,255,0.25)")} />
+                  <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="رابط يوتيوب" style={{ ...fieldInput, direction:"ltr" }} onFocus={(e) => (e.target.style.borderColor="rgba(0,212,255,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(0,212,255,0.25)")} />
                   <button onClick={() => { if (!videoTitle.trim()) { toast.error("أدخل عنوان الفيديو"); return; } if (!extractYouTubeId(videoUrl)) { toast.error("رابط يوتيوب غير صحيح"); return; } addVideo.mutate(); }}
                     disabled={addVideo.isPending}
-                    style={{ padding:"10px 22px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#C9A84C,#8B6914)", color:"#1A1208", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", whiteSpace:"nowrap" }}>
+                    style={{ padding:"10px 22px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#00D4FF,#00FF88)", color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", whiteSpace:"nowrap" }}>
                     {addVideo.isPending ? "⏳..." : "＋ إضافة"}
                   </button>
                 </div>
@@ -189,13 +196,13 @@ export default function LectureEditPage() {
                   {lecture.videos?.map((v: Video, i: number) => (
                     <motion.div key={v.id} initial={{ opacity:0, x:10 }} animate={{ opacity:1, x:0 }} transition={{ delay:i*0.05 }}
                       className="flex items-center gap-4 p-4 rounded-2xl"
-                      style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.12)" }}>
+                      style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.12)" }}>
                       <img src={`https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg`}
                         alt={v.title} className="w-20 h-14 rounded-xl object-cover flex-shrink-0"
                         onError={(e) => { (e.target as HTMLImageElement).style.display="none"; }} />
                       <div className="flex-1 min-w-0">
-                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#1A1208", fontSize:14, fontWeight:600, marginBottom:2 }}>{v.title}</p>
-                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:11 }}>🔒 الرابط محمي</p>
+                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:14, fontWeight:600, marginBottom:2 }}>{v.title}</p>
+                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:11 }}>🔒 الرابط محمي</p>
                       </div>
                       <button onClick={() => deleteVideo.mutate(v.id)}
                         style={{ padding:"5px 12px", borderRadius:8, border:"1px solid rgba(239,68,68,0.25)", color:"#DC2626", background:"none", fontFamily:"Cairo,sans-serif", fontSize:12, cursor:"pointer" }}>
@@ -211,63 +218,44 @@ export default function LectureEditPage() {
           {/* ═══ PDFs ═══ */}
           {tab === "pdfs" && (
             <div className="space-y-5">
-              <div className="rounded-2xl p-6" style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.15)", boxShadow:"0 2px 12px rgba(26,18,8,0.04)" }}>
-                <h3 style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:17, marginBottom:14 }}>إضافة ملف PDF</h3>
+              <div className="rounded-2xl p-6" style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.15)", boxShadow:"0 2px 12px rgba(10,15,30,0.04)" }}>
+                <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:17, marginBottom:14 }}>إضافة ملف PDF</h3>
                 <div className="flex gap-3 flex-wrap items-center">
-                  <input value={pdfTitle} onChange={(e) => setPdfTitle(e.target.value)} placeholder="عنوان الملف" style={fieldInput} onFocus={(e) => (e.target.style.borderColor="rgba(201,168,76,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(201,168,76,0.25)")} />
-                  <input value={pdfUrl} onChange={(e) => setPdfUrl(e.target.value)} placeholder="أو الصق رابط ملف مرفوع مسبقًا" style={{ ...fieldInput, direction:"ltr" }} onFocus={(e) => (e.target.style.borderColor="rgba(201,168,76,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(201,168,76,0.25)")} />
+                  <input value={pdfTitle} onChange={(e) => setPdfTitle(e.target.value)} placeholder="عنوان الملف" style={fieldInput} onFocus={(e) => (e.target.style.borderColor="rgba(0,212,255,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(0,212,255,0.25)")} />
+                  <input value={pdfUrl} onChange={(e) => setPdfUrl(e.target.value)} placeholder="أو الصق رابط ملف مرفوع مسبقًا" style={{ ...fieldInput, direction:"ltr" }} onFocus={(e) => (e.target.style.borderColor="rgba(0,212,255,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(0,212,255,0.25)")} />
                   <input
                     ref={pdfFileInputRef}
                     type="file"
-                    accept={pdfAccept}
+                    accept="application/pdf"
                     style={{ display: "none" }}
-                    aria-hidden="true"
-                    tabIndex={-1}
-                    onChange={handlePdfInputChange}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      handlePdfFileSelect(file);
+                    }}
                   />
-                  {/* Doubles as a drag & drop target — dropping a PDF anywhere
-                      on this button starts the same upload as clicking it. */}
                   <button
                     type="button"
-                    onClick={triggerPdfPicker}
+                    onClick={() => pdfFileInputRef.current?.click()}
                     disabled={pdfUploading}
-                    aria-label={`رفع ملف PDF — حتى ${pdfMaxLabel}`}
-                    aria-busy={pdfUploading}
-                    {...pdfDragProps}
-                    style={{
-                      padding:"10px 18px", borderRadius:10,
-                      border: `1.5px dashed ${pdfDragOver ? "var(--cyan)" : "rgba(201,168,76,0.35)"}`,
-                      background: pdfDragOver ? "rgba(0,212,255,0.08)" : "transparent",
-                      color: pdfDragOver ? "var(--cyan-dark)" : "#7A6E5A",
-                      fontFamily:"Cairo,sans-serif", fontSize:13,
-                      cursor: pdfUploading ? "not-allowed" : "pointer",
-                      whiteSpace:"nowrap",
-                      transition: "border-color var(--duration-base) var(--ease-standard), background var(--duration-base) var(--ease-standard)",
-                    }}>
-                    {pdfUploading
-                      ? `⏳ جارِ الرفع${pdfProgress > 0 ? ` ${pdfProgress}%` : "..."}`
-                      : `📤 رفع ملف PDF (أو اسحبه هنا) — حتى ${pdfMaxLabel}`}
+                    style={{ padding:"10px 18px", borderRadius:10, border:"1px solid rgba(0,212,255,0.35)", background:"transparent", color:"#52607A", fontFamily:"Cairo,sans-serif", fontSize:13, cursor:"pointer", whiteSpace:"nowrap" }}>
+                    {pdfUploading ? "⏳ جارِ الرفع..." : "📤 رفع ملف PDF"}
                   </button>
                   <button onClick={() => { if (!pdfTitle.trim() || !pdfUrl.trim()) { toast.error("أدخل عنوان ورابط الملف"); return; } addPDF.mutate(); }}
                     disabled={addPDF.isPending}
-                    style={{ padding:"10px 22px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#C9A84C,#8B6914)", color:"#1A1208", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", whiteSpace:"nowrap" }}>
+                    style={{ padding:"10px 22px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#00D4FF,#00FF88)", color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", whiteSpace:"nowrap" }}>
                     {addPDF.isPending ? "⏳..." : "＋ إضافة"}
                   </button>
                 </div>
-                {pdfUploading && pdfProgress > 0 && (
-                  <div style={{ width: "100%", maxWidth: 320, height: 4, borderRadius: 2, background: "rgba(0,212,255,0.15)", overflow: "hidden", marginTop: 10 }}>
-                    <div style={{ width: `${pdfProgress}%`, height: "100%", background: "var(--cyan)", transition: "width 0.15s linear" }} />
-                  </div>
-                )}
               </div>
               {(lecture.pdfs?.length ?? 0) === 0 ? <EmptyState icon="📄" label="لا توجد ملفات بعد" /> : (
                 <div className="space-y-3">
                   {lecture.pdfs?.map((p: PDF) => (
-                    <div key={p.id} className="flex items-center gap-4 p-4 rounded-2xl" style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.12)" }}>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background:"rgba(201,168,76,0.1)" }}>📄</div>
-                      <div className="flex-1">
-                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#1A1208", fontSize:14, fontWeight:600 }}>{p.title}</p>
-                        <a href={p.fileUrl} target="_blank" rel="noopener noreferrer" style={{ fontFamily:"Cairo,sans-serif", color:"#C9A84C", fontSize:11, textDecoration:"none" }}>فتح الرابط ↗</a>
+                    <div key={p.id} className="flex items-center gap-4 p-4 rounded-2xl" style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.12)" }}>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background:"rgba(0,212,255,0.1)" }}>📄</div>
+                      <div className="flex-1 min-w-0">
+                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:14, fontWeight:600 }}>{p.title}</p>
+                        <a href={p.fileUrl} target="_blank" rel="noopener noreferrer" style={{ fontFamily:"Cairo,sans-serif", color:"#00D4FF", fontSize:11, textDecoration:"none" }}>فتح الرابط ↗</a>
                       </div>
                       <button onClick={() => deletePDF.mutate(p.id)} style={{ padding:"5px 12px", borderRadius:8, border:"1px solid rgba(239,68,68,0.25)", color:"#DC2626", background:"none", fontFamily:"Cairo,sans-serif", fontSize:12, cursor:"pointer" }}>حذف</button>
                     </div>
@@ -281,20 +269,20 @@ export default function LectureEditPage() {
           {tab === "quizzes" && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:20 }}>الاختبارات</h3>
+                <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:20 }}>الاختبارات</h3>
                 <Link href={`/admin/quiz-builder?lectureId=${id}&type=quiz`}
-                  style={{ padding:"9px 22px", borderRadius:12, background:"linear-gradient(135deg,#C9A84C,#8B6914)", color:"#1A1208", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:13, textDecoration:"none" }}>
+                  style={{ padding:"9px 22px", borderRadius:12, background:"linear-gradient(135deg,#00D4FF,#00FF88)", color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:13, textDecoration:"none" }}>
                   ＋ اختبار جديد
                 </Link>
               </div>
               {(lecture.quizzes?.length ?? 0) === 0 ? <EmptyState icon="📝" label="لا توجد اختبارات — أضف اختباراً جديداً" /> : (
                 <div className="space-y-3">
                   {lecture.quizzes?.map((q: Quiz) => (
-                    <div key={q.id} className="flex items-center gap-4 p-5 rounded-2xl" style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.12)" }}>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background:"rgba(201,168,76,0.1)" }}>📝</div>
-                      <div className="flex-1">
-                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#1A1208", fontSize:14, fontWeight:600 }}>{q.title}</p>
-                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:12 }}>
+                    <div key={q.id} className="flex items-center gap-4 p-5 rounded-2xl" style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.12)" }}>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background:"rgba(0,212,255,0.1)" }}>📝</div>
+                      <div className="flex-1 min-w-0">
+                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:14, fontWeight:600 }}>{q.title}</p>
+                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:12 }}>
                           {q.questions?.length ?? q._count?.questions ?? 0} سؤال
                           {q.timeLimit ? ` • ${q.timeLimit} دقيقة` : ""}
                         </p>
@@ -311,20 +299,20 @@ export default function LectureEditPage() {
           {tab === "homework" && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:20 }}>الواجبات</h3>
+                <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:20 }}>الواجبات</h3>
                 <Link href={`/admin/quiz-builder?lectureId=${id}&type=homework`}
-                  style={{ padding:"9px 22px", borderRadius:12, background:"linear-gradient(135deg,#C9A84C,#8B6914)", color:"#1A1208", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:13, textDecoration:"none" }}>
+                  style={{ padding:"9px 22px", borderRadius:12, background:"linear-gradient(135deg,#00D4FF,#00FF88)", color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:13, textDecoration:"none" }}>
                   ＋ واجب جديد
                 </Link>
               </div>
               {(lecture.homework?.length ?? 0) === 0 ? <EmptyState icon="📋" label="لا توجد واجبات" /> : (
                 <div className="space-y-3">
                   {lecture.homework?.map((hw: Homework) => (
-                    <div key={hw.id} className="flex items-center gap-4 p-5 rounded-2xl" style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.12)" }}>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background:"rgba(201,168,76,0.1)" }}>📋</div>
-                      <div className="flex-1">
-                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#1A1208", fontSize:14, fontWeight:600 }}>{hw.title}</p>
-                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:12 }}>{hw.questions?.length ?? hw._count?.questions ?? 0} سؤال</p>
+                    <div key={hw.id} className="flex items-center gap-4 p-5 rounded-2xl" style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.12)" }}>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background:"rgba(0,212,255,0.1)" }}>📋</div>
+                      <div className="flex-1 min-w-0">
+                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:14, fontWeight:600 }}>{hw.title}</p>
+                        <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:12 }}>{hw.questions?.length ?? hw._count?.questions ?? 0} سؤال</p>
                       </div>
                       <button onClick={() => deleteHomework.mutate(hw.id)} style={{ padding:"5px 12px", borderRadius:8, border:"1px solid rgba(239,68,68,0.25)", color:"#DC2626", background:"none", fontFamily:"Cairo,sans-serif", fontSize:12, cursor:"pointer" }}>حذف</button>
                     </div>
@@ -381,34 +369,34 @@ function LectureSettings({
 
   const fieldInput: React.CSSProperties = {
     width:"100%", padding:"12px 14px", borderRadius:12,
-    border:"1.5px solid rgba(201,168,76,0.25)", background:"#FAFAF8",
-    color:"#1A1208", fontFamily:"Cairo,sans-serif", fontSize:14,
+    border:"1.5px solid rgba(0,212,255,0.25)", background:"#FAFAF8",
+    color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontSize:14,
     outline:"none", direction:"rtl", transition:"border-color 0.2s",
   };
 
   return (
     <div className="space-y-6 max-w-2xl">
       {/* Text info */}
-      <div className="rounded-2xl p-6" style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.15)", boxShadow:"0 2px 12px rgba(26,18,8,0.04)" }}>
-        <h3 style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:18, marginBottom:16 }}>معلومات المحاضرة</h3>
+      <div className="rounded-2xl p-6" style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.15)", boxShadow:"0 2px 12px rgba(10,15,30,0.04)" }}>
+        <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:18, marginBottom:16 }}>معلومات المحاضرة</h3>
         <div style={{ marginBottom:14 }}>
-          <label style={{ fontFamily:"Cairo,sans-serif", color:"#4A3F2A", fontSize:13, fontWeight:600, marginBottom:5, display:"block" }}>العنوان</label>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} style={fieldInput} onFocus={(e) => (e.target.style.borderColor="rgba(201,168,76,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(201,168,76,0.25)")} />
+          <label style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:13, fontWeight:600, marginBottom:5, display:"block" }}>العنوان</label>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} style={fieldInput} onFocus={(e) => (e.target.style.borderColor="rgba(0,212,255,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(0,212,255,0.25)")} />
         </div>
         <div style={{ marginBottom:16 }}>
-          <label style={{ fontFamily:"Cairo,sans-serif", color:"#4A3F2A", fontSize:13, fontWeight:600, marginBottom:5, display:"block" }}>الوصف</label>
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} style={{ ...fieldInput, resize:"vertical" }} onFocus={(e) => (e.target.style.borderColor="rgba(201,168,76,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(201,168,76,0.25)")} />
+          <label style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:13, fontWeight:600, marginBottom:5, display:"block" }}>الوصف</label>
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} style={{ ...fieldInput, resize:"vertical" }} onFocus={(e) => (e.target.style.borderColor="rgba(0,212,255,0.6)")} onBlur={(e) => (e.target.style.borderColor="rgba(0,212,255,0.25)")} />
         </div>
         <button onClick={() => saveText.mutate()} disabled={saveText.isPending}
-          style={{ padding:"11px 28px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#C9A84C,#8B6914)", color:"#1A1208", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:14, cursor:"pointer" }}>
+          style={{ padding:"11px 28px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#00D4FF,#00FF88)", color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:14, cursor:"pointer" }}>
           {saveText.isPending ? "⏳..." : "💾 حفظ النص"}
         </button>
       </div>
 
       {/* Quiz requirement */}
-      <div className="rounded-2xl p-6" style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.15)", boxShadow:"0 2px 12px rgba(26,18,8,0.04)" }}>
-        <h3 style={{ fontFamily:"Amiri,serif", color:"#1A1208", fontSize:18, marginBottom:6 }}>🔐 إعداد الاختبار الإجباري</h3>
-        <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:13, marginBottom:16 }}>
+      <div className="rounded-2xl p-6" style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.15)", boxShadow:"0 2px 12px rgba(10,15,30,0.04)" }}>
+        <h3 style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:18, marginBottom:6 }}>🔐 إعداد الاختبار الإجباري</h3>
+        <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:13, marginBottom:16 }}>
           حدد ما إذا كان يجب على الطالب اجتياز الاختبار قبل مشاهدة محتوى هذه المحاضرة.
         </p>
 
@@ -417,17 +405,17 @@ function LectureSettings({
             <motion.button key={opt.value} type="button" whileHover={{ scale:1.01 }} whileTap={{ scale:0.99 }}
               onClick={() => setQuizReq(opt.value)}
               className="w-full flex items-start gap-4 p-4 rounded-xl text-right"
-              style={{ border:"1.5px solid", borderColor: quizReq===opt.value ? opt.color : "rgba(201,168,76,0.2)",
+              style={{ border:"1.5px solid", borderColor: quizReq===opt.value ? opt.color : "rgba(0,212,255,0.2)",
                 background: quizReq===opt.value ? `${opt.color}0f` : "transparent", cursor:"pointer", transition:"all 0.15s" }}>
-              <div style={{ width:22, height:22, borderRadius:"50%", border:`2px solid ${quizReq===opt.value ? opt.color : "rgba(201,168,76,0.3)"}`,
+              <div style={{ width:22, height:22, borderRadius:"50%", border:`2px solid ${quizReq===opt.value ? opt.color : "rgba(0,212,255,0.3)"}`,
                 background: quizReq===opt.value ? opt.color : "transparent",
                 display:"flex", alignItems:"center", justifyContent:"center",
                 color:"#fff", fontSize:12, flexShrink:0, marginTop:2, transition:"all 0.15s" }}>
                 {quizReq===opt.value ? "✓" : ""}
               </div>
               <div>
-                <p style={{ fontFamily:"Cairo,sans-serif", color:"#1A1208", fontSize:14, fontWeight:700 }}>{opt.label}</p>
-                <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:12, marginTop:2 }}>{opt.desc}</p>
+                <p style={{ fontFamily:"Cairo,sans-serif", color:"#0A0F1E", fontSize:14, fontWeight:700 }}>{opt.label}</p>
+                <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:12, marginTop:2 }}>{opt.desc}</p>
               </div>
             </motion.button>
           ))}
@@ -435,16 +423,16 @@ function LectureSettings({
 
         {quizReq === "MUST_PASS" && (
           <motion.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:"auto" }} style={{ marginBottom:16 }}>
-            <label style={{ fontFamily:"Cairo,sans-serif", color:"#4A3F2A", fontSize:13, fontWeight:600, marginBottom:5, display:"block" }}>
+            <label style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:13, fontWeight:600, marginBottom:5, display:"block" }}>
               درجة النجاح المطلوبة (%)
             </label>
             <div className="flex items-center gap-4">
               <input type="number" min={1} max={100} value={passScore} onChange={(e) => setPassScore(Number(e.target.value))}
                 style={{ ...fieldInput, width:120, direction:"ltr" }}
-                onFocus={(e) => (e.target.style.borderColor="rgba(201,168,76,0.6)")}
-                onBlur={(e) => (e.target.style.borderColor="rgba(201,168,76,0.25)")} />
-              <span style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:14 }}>%</span>
-              <span style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:13 }}>
+                onFocus={(e) => (e.target.style.borderColor="rgba(0,212,255,0.6)")}
+                onBlur={(e) => (e.target.style.borderColor="rgba(0,212,255,0.25)")} />
+              <span style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:14 }}>%</span>
+              <span style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:13 }}>
                 الطالب يحتاج ≥ {passScore}% للنجاح
               </span>
             </div>
@@ -453,8 +441,8 @@ function LectureSettings({
 
         <button onClick={() => onSave({ quizRequirement: quizReq, quizPassScore: passScore })} disabled={isSaving}
           style={{ padding:"11px 28px", borderRadius:12, border:"none",
-            background: isSaving ? "rgba(201,168,76,0.3)" : "linear-gradient(135deg,#C9A84C,#8B6914)",
-            color:"#1A1208", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:14, cursor:"pointer" }}>
+            background: isSaving ? "rgba(0,212,255,0.3)" : "linear-gradient(135deg,#00D4FF,#00FF88)",
+            color:"#0A0F1E", fontFamily:"Cairo,sans-serif", fontWeight:700, fontSize:14, cursor:"pointer" }}>
           {isSaving ? "⏳ جارٍ الحفظ..." : "💾 حفظ إعداد الاختبار"}
         </button>
       </div>
@@ -464,9 +452,9 @@ function LectureSettings({
 
 function EmptyState({ icon, label }: { icon: string; label: string }) {
   return (
-    <div className="text-center py-14 rounded-2xl" style={{ background:"#fff", border:"1px solid rgba(201,168,76,0.12)" }}>
+    <div className="text-center py-14 rounded-2xl" style={{ background:"#fff", border:"1px solid rgba(0,212,255,0.12)" }}>
       <div style={{ fontSize:44, marginBottom:10 }}>{icon}</div>
-      <p style={{ fontFamily:"Cairo,sans-serif", color:"#7A6E5A", fontSize:14 }}>{label}</p>
+      <p style={{ fontFamily:"Cairo,sans-serif", color:"#52607A", fontSize:14 }}>{label}</p>
     </div>
   );
 }
