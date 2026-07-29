@@ -133,7 +133,7 @@ export function HeroSection({ settings }: Props) {
             style={{ background: "linear-gradient(135deg,#00D4FF,#00FF88)" }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon-192" alt="شعار المنصة" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
+            <img src="/logo-icon.png" alt="شعار المنصة" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
           </div>
           <div className="min-w-0">
             <span

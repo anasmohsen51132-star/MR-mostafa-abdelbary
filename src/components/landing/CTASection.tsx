@@ -69,7 +69,7 @@ export function CTASection({ settings }: Props = {}) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/icon-192"
+                src="/logo-icon.png"
                 alt="شعار المنصة"
                 style={{ width: "clamp(36px,8vw,52px)", height: "clamp(36px,8vw,52px)", borderRadius: 12 }}
               />
