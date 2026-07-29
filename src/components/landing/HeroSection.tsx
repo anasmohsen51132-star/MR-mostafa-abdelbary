@@ -26,6 +26,17 @@ const fadeUp = {
   }),
 };
 
+// Used only for the headline: it starts tiny and slightly above its resting
+// spot (right where the reaction flash sits) and grows/settles into place,
+// so it reads as "born from" the reaction instead of just sliding up.
+const emergeFromReaction = {
+  hidden: { opacity: 0, scale: 0.35, y: -18 },
+  show: (delay = 0) => ({
+    opacity: 1, scale: 1, y: 0,
+    transition: { type: "spring", stiffness: 260, damping: 15, delay },
+  }),
+};
+
 // Atom SVG decorative component
 function AtomDecor({ size = 120, opacity = 0.12, color = "#00D4FF" }: { size?: number; opacity?: number; color?: string }) {
   return (
@@ -205,7 +216,7 @@ export function HeroSection({ settings }: Props) {
             longer reads from settings.heroTitle, so a stale "اتقن اللغة
             العربية" value saved in the CMS can never show up here again. */}
         <motion.h1
-          initial="hidden" animate="show" custom={1.85} variants={fadeUp}
+          initial="hidden" animate="show" custom={2.1} variants={emergeFromReaction}
           style={{
             fontFamily: "Cairo,sans-serif",
             fontWeight: 900,
@@ -229,7 +240,7 @@ export function HeroSection({ settings }: Props) {
 
         {/* Sub heading — also fixed, same reason as above */}
         <motion.h2
-          initial="hidden" animate="show" custom={2} variants={fadeUp}
+          initial="hidden" animate="show" custom={2.25} variants={emergeFromReaction}
           style={{
             fontFamily: "Cairo,sans-serif",
             color: "rgba(122,232,255,0.6)",
@@ -245,7 +256,7 @@ export function HeroSection({ settings }: Props) {
         <motion.div
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ duration: 0.7, delay: 2.15 }}
+          transition={{ duration: 0.7, delay: 2.5 }}
           className="flex items-center justify-center gap-3 mb-8"
         >
           <div style={{ height: 1, width: 60, background: "linear-gradient(to right,transparent,rgba(0,212,255,0.5))" }} />
@@ -263,7 +274,7 @@ export function HeroSection({ settings }: Props) {
 
         {/* Description */}
         <motion.p
-          initial="hidden" animate="show" custom={2.3} variants={fadeUp}
+          initial="hidden" animate="show" custom={2.65} variants={fadeUp}
           style={{
             color: "rgba(255,255,255,0.55)",
             fontFamily: "Cairo,sans-serif",
@@ -278,7 +289,7 @@ export function HeroSection({ settings }: Props) {
 
         {/* CTA Buttons — stack on mobile, row on tablet+ */}
         <motion.div
-          initial="hidden" animate="show" custom={2.45} variants={fadeUp}
+          initial="hidden" animate="show" custom={2.8} variants={fadeUp}
           className="flex flex-col sm:flex-row justify-center"
           style={{ gap: "clamp(10px,2vw,16px)" }}
         >
@@ -334,7 +345,7 @@ export function HeroSection({ settings }: Props) {
 
         {/* Stats bar — 2×2 on mobile, row on sm+ */}
         <motion.div
-          initial="hidden" animate="show" custom={2.6} variants={fadeUp}
+          initial="hidden" animate="show" custom={2.95} variants={fadeUp}
           className="grid grid-cols-2 sm:grid-cols-4 mt-14 mx-auto"
           style={{ maxWidth: 560, gap: "clamp(12px,3vw,24px)" }}
         >
@@ -348,7 +359,7 @@ export function HeroSection({ settings }: Props) {
               }}
               initial={{ opacity: 0, scale: 0.6 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 260, damping: 14, delay: 2.75 + i * 0.1 }}
+              transition={{ type: "spring", stiffness: 260, damping: 14, delay: 3.1 + i * 0.1 }}
               whileHover={{ scale: 1.08, y: -4 }}
             >
               <div style={{
