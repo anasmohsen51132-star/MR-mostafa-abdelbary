@@ -101,9 +101,11 @@ export function AuthPageShell({ title, subtitle, maxWidth = 460, children }: Aut
               marginBottom: 14,
               fontSize: 22,
               boxShadow: "0 6px 20px rgba(0,212,255,0.35)",
+              overflow: "hidden",
             }}
           >
-            ⚛
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon-192" alt="شعار المنصة" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
           </div>
 
           <h1
