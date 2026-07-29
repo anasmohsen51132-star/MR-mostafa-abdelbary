@@ -71,9 +71,10 @@ export function WelcomeAnimation({ name, onDone }: Props) {
               initial={{ opacity: 0, scale: 0.3 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.1, type: "spring", stiffness: 260, damping: 14 }}
-              style={{ fontSize: 56, marginBottom: 12 }}
+              style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}
             >
-              ⚛️
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icon-192" alt="شعار المنصة" style={{ width: 56, height: 56, borderRadius: 14 }} />
             </motion.div>
 
             {/* Welcome */}
