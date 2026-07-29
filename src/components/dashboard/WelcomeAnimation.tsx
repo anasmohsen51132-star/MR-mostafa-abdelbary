@@ -74,7 +74,7 @@ export function WelcomeAnimation({ name, onDone }: Props) {
               style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icon-192" alt="شعار المنصة" style={{ width: 56, height: 56, borderRadius: 14 }} />
+              <img src="/logo-icon.png" alt="شعار المنصة" style={{ width: 56, height: 56, borderRadius: 14 }} />
             </motion.div>
 
             {/* Welcome */}
