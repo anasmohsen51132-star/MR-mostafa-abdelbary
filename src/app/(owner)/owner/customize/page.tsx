@@ -238,7 +238,7 @@ export default function CustomizePage() {
                 {activeSection === "hero" && (
                   <div>
                     <h2 style={sectionTitleStyle}>🏠 إعدادات الصفحة الرئيسية</h2>
-                    <Field label="العنوان الرئيسي"     field="heroTitle"    placeholder="اتقن اللغة العربية" />
+                    <Field label="العنوان الرئيسي"     field="heroTitle"    placeholder="اتقن الكيمياء" />
                     <Field label="العنوان الفرعي"       field="heroSubtitle" placeholder="مع نخبة من أفضل الأساتذة" />
                     <Field label="وصف الصفحة الرئيسية" field="heroDesc"     placeholder="انضم إلى آلاف الطلاب..." multiline />
                     <Field label="نص تذييل الصفحة"      field="footerText"   placeholder="© ٢٠٢٤ اكاديمية..." />
@@ -285,7 +285,7 @@ export default function CustomizePage() {
                   <div>
                     <h2 style={sectionTitleStyle}>👨‍🏫 معلومات الأستاذ</h2>
                     <Field label="اسم الأستاذ"     field="teacherName"  placeholder="مستر مصطفى" />
-                    <Field label="لقب / تخصص"       field="teacherTitle" placeholder="خبير تدريس اللغة العربية" />
+                    <Field label="لقب / تخصص"       field="teacherTitle" placeholder="خبير تدريس الكيمياء" />
                     <Field label="نبذة عن الأستاذ"  field="teacherBio"   placeholder="معلم متميز بخبرة..." multiline />
                   </div>
                 )}
@@ -295,7 +295,7 @@ export default function CustomizePage() {
                   <div>
                     <h2 style={sectionTitleStyle}>🏷️ هوية المنصة</h2>
                     <Field label="اسم المنصة" field="platformName"    placeholder="اكاديمية مستر مصطفى" />
-                    <Field label="شعار / وصف" field="platformTagline" placeholder="لتدريس اللغة العربية" />
+                    <Field label="شعار / وصف" field="platformTagline" placeholder="لتدريس الكيمياء" />
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-2">
                       <ImageUploadField
@@ -398,7 +398,7 @@ export default function CustomizePage() {
                     <h2 style={sectionTitleStyle}>🔎 محركات البحث والمشاركة</h2>
                     <Field label="عنوان المتصفح (Meta Title)" field="metaTitle" placeholder="اكاديمية مستر مصطفى" />
                     <Field label="وصف الصفحة (Meta Description)" field="metaDescription" placeholder="وصف قصير يظهر في نتائج البحث" multiline />
-                    <Field label="كلمات مفتاحية (مفصولة بفاصلة)" field="metaKeywords" placeholder="اللغة العربية, ثانوية عامة, ..." />
+                    <Field label="كلمات مفتاحية (مفصولة بفاصلة)" field="metaKeywords" placeholder="الكيمياء, ثانوية عامة, ..." />
 
                     <div className="mt-2">
                       <ImageUploadField
