@@ -119,7 +119,7 @@ export default function CourseDetailPage() {
                       >
                         {idx + 1}
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <h3 style={{ fontFamily: "Cairo,sans-serif", color: "#0A0F1E", fontSize: 15, fontWeight: 700, marginBottom: 3 }}>
                           {cl.lecture.title}
                         </h3>
