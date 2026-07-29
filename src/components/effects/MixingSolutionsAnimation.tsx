@@ -17,6 +17,8 @@ const RISE_DELAY = 0.45;   // liquid starts rising once streams land
 const RISE_DUR = 1.15;     // liquid rise + color-shift finishes ~1.6s
 const FLASH_DELAY = 1.55;  // reaction flash / sparkle burst
 const FLASH_DUR = 0.55;
+const FLASK_FADE_START = 2.1; // flasks start dissolving right after the flash
+const FLASK_FADE_END = 2.6;   // …fully gone by here, clearing the way for the headline
 const IDLE_DELAY = 2.05;   // ambient loop kicks in once the reaction has settled
 
 export function MixingSolutionsAnimation({ maxWidth = 300, className = "" }: Props) {
@@ -56,20 +58,30 @@ export function MixingSolutionsAnimation({ maxWidth = 300, className = "" }: Pro
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* ── Left flask (cyan solution) — tilts inward once to pour ── */}
+        {/* ── Left flask (cyan solution) — tilts inward once to pour, then dissolves away once spent ── */}
         <motion.g
-          style={{ transformOrigin: "38px 70px" }}
-          animate={{ rotate: [0, 0, -42, -42, 0] }}
-          transition={{ duration: POUR_DUR, ease: "easeInOut", times: [0, 0.16, 0.4, 0.68, 1] }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: [1, 1, 0] }}
+          transition={{
+            duration: FLASK_FADE_END,
+            ease: "easeInOut",
+            times: [0, FLASK_FADE_START / FLASK_FADE_END, 1],
+          }}
         >
-          <path
-            d="M27 15 L27 53 L7 94 Q4 103 16 103 L60 103 Q72 103 69 94 L49 53 L49 15 Z"
-            fill="rgba(0,212,255,0.08)"
-            stroke="#00D4FF"
-            strokeWidth="2.5"
-          />
-          <rect x="22" y="7" width="32" height="9" rx="2" fill="rgba(0,212,255,0.16)" stroke="#00D4FF" strokeWidth="1.5" />
-          <path d="M17 80 L48 80 L60 101 Q62 103 58 103 L17 103 Q11 103 13 101 Z" fill="#00D4FF" opacity="0.55" />
+          <motion.g
+            style={{ transformOrigin: "38px 70px" }}
+            animate={{ rotate: [0, 0, -42, -42, 0] }}
+            transition={{ duration: POUR_DUR, ease: "easeInOut", times: [0, 0.16, 0.4, 0.68, 1] }}
+          >
+            <path
+              d="M27 15 L27 53 L7 94 Q4 103 16 103 L60 103 Q72 103 69 94 L49 53 L49 15 Z"
+              fill="rgba(0,212,255,0.08)"
+              stroke="#00D4FF"
+              strokeWidth="2.5"
+            />
+            <rect x="22" y="7" width="32" height="9" rx="2" fill="rgba(0,212,255,0.16)" stroke="#00D4FF" strokeWidth="1.5" />
+            <path d="M17 80 L48 80 L60 101 Q62 103 58 103 L17 103 Q11 103 13 101 Z" fill="#00D4FF" opacity="0.55" />
+          </motion.g>
         </motion.g>
 
         {/* stream + droplets poured from the left flask */}
@@ -90,20 +102,30 @@ export function MixingSolutionsAnimation({ maxWidth = 300, className = "" }: Pro
           />
         ))}
 
-        {/* ── Right flask (green solution) — tilts inward once to pour ── */}
+        {/* ── Right flask (green solution) — tilts inward once to pour, then dissolves away once spent ── */}
         <motion.g
-          style={{ transformOrigin: "182px 70px" }}
-          animate={{ rotate: [0, 0, 42, 42, 0] }}
-          transition={{ duration: POUR_DUR, ease: "easeInOut", times: [0, 0.16, 0.4, 0.68, 1] }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: [1, 1, 0] }}
+          transition={{
+            duration: FLASK_FADE_END,
+            ease: "easeInOut",
+            times: [0, FLASK_FADE_START / FLASK_FADE_END, 1],
+          }}
         >
-          <path
-            d="M193 15 L193 53 L213 94 Q216 103 204 103 L160 103 Q148 103 151 94 L171 53 L171 15 Z"
-            fill="rgba(0,255,136,0.08)"
-            stroke="#00FF88"
-            strokeWidth="2.5"
-          />
-          <rect x="166" y="7" width="32" height="9" rx="2" fill="rgba(0,255,136,0.16)" stroke="#00FF88" strokeWidth="1.5" />
-          <path d="M172 80 L203 80 L207 101 Q209 103 203 103 L162 103 Q158 103 160 101 Z" fill="#00FF88" opacity="0.55" />
+          <motion.g
+            style={{ transformOrigin: "182px 70px" }}
+            animate={{ rotate: [0, 0, 42, 42, 0] }}
+            transition={{ duration: POUR_DUR, ease: "easeInOut", times: [0, 0.16, 0.4, 0.68, 1] }}
+          >
+            <path
+              d="M193 15 L193 53 L213 94 Q216 103 204 103 L160 103 Q148 103 151 94 L171 53 L171 15 Z"
+              fill="rgba(0,255,136,0.08)"
+              stroke="#00FF88"
+              strokeWidth="2.5"
+            />
+            <rect x="166" y="7" width="32" height="9" rx="2" fill="rgba(0,255,136,0.16)" stroke="#00FF88" strokeWidth="1.5" />
+            <path d="M172 80 L203 80 L207 101 Q209 103 203 103 L162 103 Q158 103 160 101 Z" fill="#00FF88" opacity="0.55" />
+          </motion.g>
         </motion.g>
 
         {/* stream + droplets poured from the right flask */}
