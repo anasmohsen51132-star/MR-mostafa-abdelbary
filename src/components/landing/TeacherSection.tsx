@@ -15,7 +15,7 @@ const STATS_DEFAULT = [
 ];
 
 // Orbiting electron rings around teacher avatar
-function AtomAvatar({ letter }: { letter: string }) {
+function AtomAvatar({ photoSrc }: { photoSrc: string }) {
   return (
     <div className="relative flex items-center justify-center" style={{ width: 200, height: 200 }}>
       {/* Outer orbit ring 1 */}
@@ -50,16 +50,20 @@ function AtomAvatar({ letter }: { letter: string }) {
 
       {/* Core avatar */}
       <div
-        className="relative z-10 w-36 h-36 rounded-full flex items-center justify-center"
+        className="relative z-10 w-36 h-36 rounded-full overflow-hidden"
         style={{
           background: "linear-gradient(135deg,rgba(0,212,255,0.25),rgba(0,255,136,0.2))",
           border: "2.5px solid rgba(0,212,255,0.5)",
           boxShadow: "0 0 30px rgba(0,212,255,0.2), inset 0 0 20px rgba(0,212,255,0.1)",
         }}
       >
-        <span style={{ fontFamily: "Cairo,sans-serif", color: "#7AE8FF", fontSize: 64, fontWeight: 900 }}>
-          {letter}
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={photoSrc}
+          alt="صورة المدرس"
+          className="w-full h-full object-cover"
+          style={{ objectPosition: "center top" }}
+        />
       </div>
     </div>
   );
@@ -104,7 +108,7 @@ export function TeacherSection({ settings }: Props) {
             transition={{ type: "spring", stiffness: 200, damping: 18 }}
             className="flex-shrink-0 flex flex-col items-center"
           >
-            <AtomAvatar letter="م" />
+            <AtomAvatar photoSrc="/teacher-mostafa.jpeg" />
 
             {/* Name card */}
             <motion.div

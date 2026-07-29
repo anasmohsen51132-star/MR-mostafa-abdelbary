@@ -65,9 +65,14 @@ export function CTASection({ settings }: Props = {}) {
               initial={{ opacity: 0, scale: 0.3 }}
               animate={inView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.6, delay: 0.1, type: "spring", stiffness: 260, damping: 14 }}
-              style={{ fontSize: "clamp(36px,8vw,52px)", marginBottom: 12 }}
+              style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}
             >
-              ⚛️
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/icon-192"
+                alt="شعار المنصة"
+                style={{ width: "clamp(36px,8vw,52px)", height: "clamp(36px,8vw,52px)", borderRadius: 12 }}
+              />
             </motion.div>
 
             <motion.h2
