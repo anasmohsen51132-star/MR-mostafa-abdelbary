@@ -1,618 +1,80 @@
-/* ============================================================================
-   src/app/globals.css — CHEMISTRY DESIGN SYSTEM
-   Single source of truth for every color, type, spacing, radius, shadow,
-   blur, and motion token used across the app. tailwind.config.ts reads
-   the RGB variables below; components should use Tailwind classes
-   (`bg-cyan`, `text-navy`, `shadow-glow-cyan`, …) or `var(--token)`
-   rather than hard-coded hex values.
-
-   NOTE ON AMIRI: this file previously loaded "Amiri" (a classical Arabic
-   calligraphy/literary typeface) alongside Cairo and Tajawal. It has been
-   removed from the font import below, so it is no longer an active
-   webfont anywhere in the app — any remaining inline
-   `fontFamily: "Amiri, serif"` reference in a page/component will now
-   silently fall back to the browser's generic serif font instead of
-   loading the old branded typeface. Those inline references still exist
-   in ~45 page/component files (see the design-system audit) and should
-   be swapped to the Cairo/Tajawal type scale below in a follow-up,
-   page-level task — this file only controls what's *available* to load,
-   not what each page *asks for*.
-   ============================================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Cairo:wght@300;400;600;700;900&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* ============================================================
-   DESIGN TOKENS — Chemistry Premium Theme
-   All values are defined ONCE here. Everything else (Tailwind
-   config, component styles) should reference these variables
-   rather than re-declaring color literals.
-   ============================================================ */
-:root {
-  /* ---------------------------------------------------------
-     1) COLOR PRIMITIVES
-     "-rgb" variables are space-separated R G B triplets (no
-     rgb() wrapper, no commas) so Tailwind's `rgb(var(--x-rgb) /
-     <alpha-value>)` opacity-modifier pattern works everywhere.
-     --------------------------------------------------------- */
-
-  /* Deep Science Navy — primary dark surface */
-  --chem-navy-rgb:        10 15 30;      /* #0A0F1E */
-  --chem-navy-mid-rgb:    13 21 40;      /* #0D1528 */
-  --chem-navy-light-rgb:  17 30 56;      /* #111E38 */
-  --chem-blue-rgb:        26 58 107;     /* #1A3A6B */
-  --chem-blue-light-rgb:  30 77 140;     /* #1E4D8C */
-
-  --chem-navy:       rgb(var(--chem-navy-rgb));
-  --chem-navy-mid:   rgb(var(--chem-navy-mid-rgb));
-  --chem-navy-light: rgb(var(--chem-navy-light-rgb));
-  --chem-blue:       rgb(var(--chem-blue-rgb));
-  --chem-blue-light: rgb(var(--chem-blue-light-rgb));
-
-  /* Electric Cyan — primary accent */
-  --cyan-rgb:        0 212 255;          /* #00D4FF */
-  --cyan-light-rgb:  122 232 255;        /* #7AE8FF */
-  --cyan-dark-rgb:   0 153 204;          /* #0099CC */
-
-  --cyan:            rgb(var(--cyan-rgb));
-  --cyan-light:      rgb(var(--cyan-light-rgb));
-  --cyan-dark:       rgb(var(--cyan-dark-rgb));
-  --cyan-glow:       rgba(var(--cyan-rgb), 0.35);
-
-  /* Laboratory Green — secondary accent */
-  --lab-green-rgb:       0 255 136;      /* #00FF88 */
-  --lab-green-dark-rgb:  0 204 106;      /* #00CC6A */
-
-  --lab-green:       rgb(var(--lab-green-rgb));
-  --lab-green-dark:  rgb(var(--lab-green-dark-rgb));
-  --lab-green-glow:  rgba(var(--lab-green-rgb), 0.25);
-
-  /* Atomic Orange — warm highlight / warning */
-  --atom-orange-rgb:        255 107 53;  /* #FF6B35 */
-  --atom-orange-light-rgb:  255 143 96;  /* #FF8F60 */
-
-  --atom-orange:       rgb(var(--atom-orange-rgb));
-  --atom-orange-light: rgb(var(--atom-orange-light-rgb));
-
-  /* Danger / destructive actions (kept consistent with the red already
-     used across delete/error buttons throughout the app) */
-  --danger-rgb:  220 38 38;              /* #DC2626 */
-  --danger:      rgb(var(--danger-rgb));
-
-  /* Neutral surfaces & text */
-  --surface-rgb:       240 244 255;      /* #F0F4FF */
-  --surface-dark-rgb:  232 237 248;      /* #E8EDF8 */
-  --white-soft-rgb:    248 250 255;      /* #F8FAFF */
-  --ink-rgb:           10 15 30;         /* #0A0F1E */
-  --ink-muted-rgb:     45 58 90;         /* #2D3A5A */
-  --ink-light-rgb:     108 122 156;      /* #6C7A9C */
-
-  --surface:       rgb(var(--surface-rgb));
-  --surface-dark:  rgb(var(--surface-dark-rgb));
-  --white-soft:    rgb(var(--white-soft-rgb));
-  --ink:           rgb(var(--ink-rgb));
-  --ink-muted:     rgb(var(--ink-muted-rgb));
-  --ink-light:     rgb(var(--ink-light-rgb));
-
-  /* ---------------------------------------------------------
-     2) SEMANTIC TOKENS  ("--ds-*" = Design System)
-     What each color *means*, not just what it looks like — use
-     these in components in preference to raw palette names.
-
-     NAMING NOTE: these are deliberately prefixed "--ds-" rather
-     than "--color-". src/components/theme/ThemeStyle.tsx already
-     injects a SEPARATE, owner-editable set of variables named
-     --color-primary / --color-secondary / --color-accent /
-     --color-background / --color-surface / --color-text /
-     --color-button / --color-hover / --color-success /
-     --color-warning / --color-error (sourced from the DB, see
-     src/lib/site-settings.ts + the SiteSettings Prisma model).
-     Using "--color-*" here would silently collide with — and, in
-     document order, potentially be overridden by — that existing
-     runtime system. The two systems are related but distinct:
-       --ds-*    = this design system's static code-level tokens
-       --color-* = the OWNER's live, per-deployment brand override,
-                   layered on top via the Customize dashboard
-     KNOWN OPEN ISSUE (out of scope for this task — do not fix
-     here): the Prisma @default(...) values backing --color-primary/
-     --color-accent/--color-background/--color-text/--color-button/
-     --color-hover for an install where the owner has never opened
-     Customize are STILL the old gold/emerald hex values
-     (#C9A84C / #1A6B47 / #F5F1E8 / #1A1208 / #8B6914). Because
-     ThemeStyle renders after this stylesheet, those DB-sourced
-     values can win the cascade for any component that reads
-     --color-* instead of --ds-*/--cyan/--navy/etc. Fixing this
-     requires a Prisma schema + data change, which this task is
-     explicitly not permitted to touch — flagged for a dedicated,
-     separately-approved follow-up task.
-     --------------------------------------------------------- */
-  --ds-bg:            var(--surface);
-  --ds-bg-elevated:   var(--white-soft);
-  --ds-bg-inverse:    var(--chem-navy);
-  --ds-border:        rgba(var(--cyan-rgb), 0.15);
-  --ds-border-strong: rgba(var(--cyan-rgb), 0.3);
-  --ds-text:          var(--ink);
-  --ds-text-muted:    var(--ink-muted);
-  --ds-text-light:    var(--ink-light);
-  --ds-text-inverse:  var(--white-soft);
-  --ds-accent:        var(--cyan);
-  --ds-accent-alt:    var(--lab-green);
-  --ds-success:       var(--lab-green);
-  --ds-warning:       var(--atom-orange);
-  --ds-danger:        var(--danger);
-  --ds-info:          var(--cyan);
-  --ds-focus-ring:    var(--cyan);
-
-  /* ---------------------------------------------------------
-     3) RADIUS
-     --------------------------------------------------------- */
-  --radius-sm:   8px;
-  --radius-md:   12px;
-  --radius-lg:   16px;
-  --radius-xl:   24px;
-  --radius-2xl:  32px;
-  --radius-full: 9999px;
-
-  /* ---------------------------------------------------------
-     4) SHADOWS / GLASS
-     --------------------------------------------------------- */
-  --shadow-card:      0 1px 2px rgba(10,15,30,0.04), 0 8px 24px rgba(var(--cyan-rgb),0.08);
-  --shadow-elevated:  0 20px 60px rgba(10,15,30,0.18), 0 2px 6px rgba(10,15,30,0.06);
-  --shadow-glow-cyan: 0 4px 16px rgba(var(--cyan-rgb),0.35);
-  --shadow-glow-green: 0 4px 16px rgba(var(--lab-green-rgb),0.3);
-  --blur-glass:       16px;
-  --blur-glass-lg:    20px;
-
-  /* ---------------------------------------------------------
-     5) SPACING PHILOSOPHY
-     Tailwind's default 4px-based spacing scale is the base grid
-     for everything (p-1 = 4px … p-16 = 64px). These are the few
-     *component-level* spacing decisions worth naming so every
-     card/section/dialog agrees on the same rhythm.
-     --------------------------------------------------------- */
-  --space-card-p:      20px;
-  --space-section-py:  clamp(64px, 8vw, 112px);
-  --space-dialog-p:    24px;
-  --space-input-y:     10px;
-  --space-input-x:     14px;
-
-  /* ---------------------------------------------------------
-     6) MOTION
-     --------------------------------------------------------- */
-  --duration-fast: 150ms;
-  --duration-base: 250ms;
-  --duration-slow: 400ms;
-  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-spring:   cubic-bezier(0.22, 1, 0.36, 1);
-
-  /* ---------------------------------------------------------
-     7) INTERACTIVE STATE OPACITY
-     --------------------------------------------------------- */
-  --opacity-hover:    0.92;
-  --opacity-pressed:  0.85;
-  --opacity-disabled: 0.45;
-
-  /* ---------------------------------------------------------
-     8) DEPRECATED ALIASES
-     Kept ONLY so components still referencing the old
-     "gold" / "emerald" / "cream" / "parchment" CSS variable
-     names (e.g. inline `style={{ color: 'var(--gold)' }}`)
-     keep compiling and now render Chemistry Design System
-     colors instead of the old Arabic-academy palette. Do not
-     use these in new code — use the primitives/semantic tokens
-     above. Remove once no file references them (grep for
-     `var(--gold` / `var(--emerald` / `var(--cream` / `var(--parchment`).
-     --------------------------------------------------------- */
-  --gold:            var(--cyan);
-  --gold-light:      var(--cyan-light);
-  --gold-dark:       var(--cyan-dark);
-  --emerald:         var(--chem-blue);
-  --emerald-light:   var(--chem-blue-light);
-  --emerald-dark:    var(--chem-navy);
-  --cream:           var(--surface);
-  --parchment:       var(--surface-dark);
-}
-
-/* ============================================================
-   DARK THEME — TASK 06
-   ============================================================
-   Only the STRUCTURAL tokens are overridden here (surfaces, text,
-   borders, shadows) — brand/accent hues (--cyan*, --lab-green*,
-   --atom-orange*, --chem-navy*, --chem-blue*, --danger) intentionally
-   stay the same in both themes, same as most premium dark-mode design
-   systems (Stripe, Linear, GitHub): the brand identity doesn't change,
-   only what it's drawn on top of.
-
-   Because every Tailwind color token added in the earlier design-system
-   task (bg-surface, text-ink, bg-cream, shadow-card, the deprecated
-   bg-gold/text-emerald aliases, etc.) reads from these SAME CSS
-   variables, any component already using those classes — or the
-   --ds-*/--surface/--ink variables directly — re-themes automatically
-   with ZERO changes to that component. This is what lets the toggle
-   affect StatCard, Toast, HealthBadge, ImageUploadField, and every
-   dashboard card using bg-cream/text-ink-muted, without touching any of
-   those files again here. Components that use raw hard-coded hex values
-   instead of tokens (see the audit's "remaining hardcoded colors" list)
-   will NOT respond to this — that's expected, and tracked separately.
-
-   Toggled via `data-theme="dark"` on <html> (set by the pre-hydration
-   script in src/lib/theme-script.ts + src/components/theme/ThemeProvider.tsx),
-   not a media query alone, so an explicit user choice can override the OS
-   preference and persist via localStorage.
-   ============================================================ */
-[data-theme="dark"] {
-  /* Deep-navy surfaces reuse the existing "chem-navy" scale rather than
-     inventing a parallel one — this is the same navy already used by the
-     always-dark landing Hero/Sidebar chrome, so dark mode reads as a
-     natural extension of the existing brand rather than a new palette. */
-  --surface-rgb:       17 30 56;     /* #111E38 — page background */
-  --surface-dark-rgb:  13 21 40;     /* #0D1528 — slightly deeper */
-  --white-soft-rgb:    22 33 61;     /* #16213D — elevated card surface */
-
-  /* Near-white text, tuned for AA contrast against the navy surfaces above. */
-  --ink-rgb:           244 248 255;  /* #F4F8FF — primary text */
-  --ink-muted-rgb:     184 196 224;  /* #B8C4E0 — secondary text */
-  --ink-light-rgb:     134 149 184;  /* #8695B8 — tertiary/caption text */
-
-  --ds-border:        rgba(var(--cyan-rgb), 0.22);
-  --ds-border-strong: rgba(var(--cyan-rgb), 0.4);
-  --ds-bg-inverse:    var(--white-soft); /* inverse of dark = light */
-
-  /* Dark-mode shadows: a light-mode rgba(navy, x) shadow is invisible on
-     an already-navy background, so these use black + a subtle cyan rim
-     instead, for the same sense of elevation. */
-  --shadow-card:      0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35), 0 0 0 1px rgba(var(--cyan-rgb),0.05);
-  --shadow-elevated:  0 24px 64px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
-}
-
-/* ============================================================
-   THEME TRANSITION
-   Briefly applied to <html> by ThemeProvider (and auto-removed
-   ~320ms later) so a theme switch animates smoothly instead of
-   repainting instantly. Scoped to a temporary class + !important
-   deliberately: it needs to override any component's own more
-   specific transition rule for that one brief window, without
-   requiring every component to be edited individually.
-   ============================================================ */
-.theme-transition,
-.theme-transition * {
-  transition:
-    background-color var(--duration-slow) var(--ease-standard),
-    border-color var(--duration-slow) var(--ease-standard),
-    color var(--duration-slow) var(--ease-standard),
-    box-shadow var(--duration-slow) var(--ease-standard) !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .theme-transition,
-  .theme-transition * {
-    transition: none !important;
-  }
-}
-
-/* ============================================================
-   HIDE NEXT.JS DEV OVERLAYS
-   ============================================================ */
-[data-nextjs-toast],
-[data-nextjs-dialog],
-[data-nextjs-dialog-overlay],
-#__next-build-watcher,
-nextjs-portal,
-body > nextjs-portal,
-[data-next-mark],
-.__next-build-indicator,
-.nextjs-toast-errors-parent,
-.nextjs-container-errors-header {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* ============================================================
-   BASE RESET & TYPOGRAPHY
-   ============================================================ */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  overflow-x: hidden;
-}
-
-body {
-  font-family: 'Cairo', 'Tajawal', sans-serif;
-  background: var(--surface);
-  color: var(--ink);
-  direction: rtl;
-  min-height: 100dvh;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: pan-y;
-}
-
-h1, h2, h3, h4, h5 {
-  font-family: 'Cairo', 'Tajawal', sans-serif;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-/* ============================================================
-   MOBILE-FIRST LAYOUT FIXES
-   ============================================================ */
-img, video, iframe {
-  max-width: 100%;
-  height: auto;
-}
-
-table {
-  width: 100%;
-  overflow-x: auto;
-  display: block;
-}
-.table-fixed { display: table; }
-
-p, span, h1, h2, h3, h4, label, td, th {
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-input, textarea, select {
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* ============================================================
-   MOBILE PORTRAIT SPECIFICS (< 640px)
-   ============================================================ */
-@media (max-width: 640px) {
-  h1 { font-size: clamp(22px, 7vw, 32px); }
-  h2 { font-size: clamp(18px, 5.5vw, 26px); }
-
-  .md\:mr-64 { margin-right: 0 !important; }
-
-  main > div {
-    padding-left: 14px !important;
-    padding-right: 14px !important;
-  }
-
-  .xl\:grid-cols-6,
-  .lg\:grid-cols-3 {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-
-  .flex.gap-3.flex-wrap > input,
-  .flex.gap-3.flex-wrap > button {
-    width: 100% !important;
-    min-width: unset !important;
-  }
-
-  .rounded-3xl.p-7 {
-    padding: 20px !important;
-    margin: 8px !important;
-  }
-
-  .overflow-x-auto {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  td span[style*="monospace"] {
-    font-size: 12px !important;
-    letter-spacing: 0.03em !important;
-  }
-
-  .space-y-6 > div { padding: 16px !important; }
-
-  [style*="aspectRatio"] { width: 100% !important; }
-
-  main { padding-bottom: 24px !important; }
-}
-
-/* ============================================================
-   SCROLLBAR — Cyan Chemistry Theme
-   ============================================================ */
-::-webkit-scrollbar       { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--surface-dark); }
-::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--cyan-dark); }
-@media (max-width: 768px) {
-  ::-webkit-scrollbar { width: 0; height: 0; }
-}
-
-/* ============================================================
-   ANIMATIONS
-   ============================================================ */
-@keyframes fadeUp     { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-@keyframes fadeIn     { from { opacity:0; }                             to { opacity:1; } }
-@keyframes float      { 0%,100%{transform:translateY(0px) rotate(0deg);} 33%{transform:translateY(-12px) rotate(3deg);} 66%{transform:translateY(-6px) rotate(-2deg);} }
-@keyframes shimmer    { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
-@keyframes spin-slow  { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-@keyframes pulse-glow { 0%,100%{box-shadow:0 0 20px rgba(0,212,255,0.3);} 50%{box-shadow:0 0 40px rgba(0,212,255,0.7);} }
-@keyframes gradientShift { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
-@keyframes scaleIn    { from{opacity:0;transform:scale(0.92);} to{opacity:1;transform:scale(1);} }
-@keyframes orbit      { from{transform:rotate(0deg) translateX(28px) rotate(0deg);} to{transform:rotate(360deg) translateX(28px) rotate(-360deg);} }
-@keyframes electronOrbit { 0%{transform:rotate(0deg) translateX(40px);} 100%{transform:rotate(360deg) translateX(40px);} }
-@keyframes atomPulse  { 0%,100%{transform:scale(1); opacity:0.8;} 50%{transform:scale(1.2); opacity:1;} }
-@keyframes chemFloat  { 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-18px) rotate(5deg);} }
-@keyframes neonFlicker { 0%,100%{opacity:1;} 92%{opacity:1;} 93%{opacity:0.7;} 95%{opacity:1;} 97%{opacity:0.8;} 98%{opacity:1;} }
-
-.animate-fade-up    { animation: fadeUp 0.6s ease forwards; }
-.animate-fade-in    { animation: fadeIn 0.4s ease forwards; }
-.animate-scale-in   { animation: scaleIn 0.3s ease forwards; }
-.animate-float      { animation: float 4s ease-in-out infinite; }
-.animate-shimmer    { animation: shimmer 2s linear infinite; }
-.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-.animate-spin-slow  { animation: spin-slow 20s linear infinite; }
-.animate-orbit      { animation: orbit 4s linear infinite; }
-.animate-chem-float { animation: chemFloat 5s ease-in-out infinite; }
-
-/* ============================================================
-   GLASSMORPHISM — Chemistry Dark Mode
-   ============================================================ */
-.glass {
-  background: rgba(255,255,255,0.07);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0,212,255,0.15);
-}
-.glass-dark {
-  background: rgba(10,15,30,0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0,212,255,0.2);
-}
-
-/* ============================================================
-   DESIGN SYSTEM UTILITY CLASSES (additive / opt-in)
-   Not referenced by any existing page yet — safe to introduce.
-   Future page-level tasks can adopt these instead of ad hoc
-   inline styles for common patterns.
-   ============================================================ */
-
-/* Reusable elevated card surface using the unified shadow tokens */
-.ds-card {
-  background: var(--ds-bg-elevated);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  padding: var(--space-card-p);
-  transition: transform var(--duration-base) var(--ease-spring),
-              box-shadow var(--duration-base) var(--ease-standard);
-}
-.ds-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-elevated);
-}
-
-/* Small status pill (success/warning/danger/info) built on the
-   semantic tokens, matching the pattern already used by
-   HealthBadge.tsx so both can eventually share one implementation */
-.ds-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border-radius: var(--radius-full);
-  font-family: 'Cairo', sans-serif;
-  font-weight: 700;
-  font-size: 0.6875rem;
-  padding: 4px 12px;
-}
-.ds-badge--success { background: color-mix(in srgb, var(--ds-success) 12%, transparent); color: var(--lab-green-dark); }
-.ds-badge--warning  { background: color-mix(in srgb, var(--ds-warning) 14%, transparent); color: var(--atom-orange); }
-.ds-badge--danger   { background: color-mix(in srgb, var(--ds-danger) 12%, transparent); color: var(--danger); }
-.ds-badge--info     { background: color-mix(in srgb, var(--ds-info) 10%, transparent); color: var(--cyan-dark); }
-
-/* Disabled-state helper matching --opacity-disabled */
-.ds-disabled {
-  opacity: var(--opacity-disabled);
-  pointer-events: none;
-  cursor: not-allowed;
-}
-
-/* ============================================================
-   CHEMISTRY MOLECULE PATTERN (replaces arabesque)
-   ============================================================ */
-.pattern-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Ccircle cx='30' cy='30' r='3' fill='%2300D4FF' fill-opacity='0.08'/%3E%3Ccircle cx='10' cy='10' r='2' fill='%2300D4FF' fill-opacity='0.06'/%3E%3Ccircle cx='50' cy='50' r='2' fill='%2300D4FF' fill-opacity='0.06'/%3E%3Cline x1='10' y1='10' x2='30' y2='30' stroke='%2300D4FF' stroke-opacity='0.04' stroke-width='1'/%3E%3Cline x1='30' y1='30' x2='50' y2='50' stroke='%2300D4FF' stroke-opacity='0.04' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
-}
-
-/* ============================================================
-   VIDEO PROTECTION
-   ============================================================ */
-.video-protected-wrapper {
-  position: relative;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-/* ============================================================
-   PRINT STYLES — code cards
-   ============================================================ */
-@media print {
-  body > *                            { display: none !important; }
-  #print-sheet-root,
-  #codes-print-grid                   { display: grid !important; }
-  .no-print                           { display: none !important; }
-  .code-card-print                    { break-inside: avoid; page-break-inside: avoid; }
-  body  { background: white; direction: rtl; }
-  @page { margin: 10mm; size: A4 portrait; }
-
-  #codes-print-grid { gap: 10mm !important; }
-  .code-card-print {
-    border: 1.5px dashed #444 !important;
-    outline: 1px solid transparent;
-    position: relative;
-  }
-}
-.print-only { display: none; }
-
-/* ============================================================
-   RTL UTILITIES
-   ============================================================ */
-.rtl { direction: rtl; text-align: right; }
-.ltr { direction: ltr; text-align: left; }
-
-/* ============================================================
-   FOCUS STYLES
-   ============================================================ */
-*:focus-visible {
-  outline: 2px solid var(--ds-focus-ring);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* ============================================================
-   SELECTION COLOR
-   ============================================================ */
-::selection {
-  background: rgba(0,212,255,0.25);
-  color: var(--ink);
-}
-
-/* ============================================================
-   LOADING SKELETON — Cyan shimmer
-   ============================================================ */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(0,212,255,0.05) 25%,
-    rgba(0,212,255,0.12) 50%,
-    rgba(0,212,255,0.05) 75%
+"use client";
+// src/app/global-error.tsx
+// Root-level error boundary. This catches errors thrown by the root
+// layout itself (src/app/layout.tsx) — a case regular error.tsx files
+// can't handle, since they render *inside* the root layout.
+// Because it replaces the root layout when triggered, it must render
+// its own <html> and <body> tags.
+import { useEffect } from "react";
+
+export default function GlobalError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    console.error("[root error boundary]", error);
+  }, [error]);
+
+  return (
+    <html lang="ar" dir="rtl">
+      <body style={{ margin: 0 }}>
+        <div
+          style={{
+            background: "#F8FAFF",
+            direction: "rtl",
+            padding: 24,
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 16,
+              padding: "40px 32px",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+              textAlign: "center",
+              maxWidth: 420,
+            }}
+          >
+            <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
+            <h1
+              style={{
+                fontFamily: "Cairo,sans-serif",
+                color: "#111E38",
+                fontSize: 22,
+                fontWeight: 700,
+                marginBottom: 8,
+              }}
+            >
+              حدث خطأ غير متوقع
+            </h1>
+            <p style={{ color: "#52607A", marginBottom: 24, lineHeight: 1.6 }}>
+              نعتذر عن هذا الخلل. حاول مرة أخرى، وإذا تكررت المشكلة تواصل مع الإدارة.
+            </p>
+            <button
+              onClick={reset}
+              style={{
+                background: "#111E38",
+                color: "#fff",
+                border: "none",
+                borderRadius: 10,
+                padding: "10px 28px",
+                fontWeight: 600,
+                cursor: "pointer",
+                fontSize: 15,
+              }}
+            >
+              إعادة المحاولة
+            </button>
+          </div>
+        </div>
+      </body>
+    </html>
   );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: 8px;
 }
-
-/* ============================================================
-   TOUCH BUTTON IMPROVEMENTS
-   ============================================================ */
-button, a, [role="button"] {
-  min-height: 44px;
-  touch-action: manipulation;
-}
-button.small-btn { min-height: unset; }
-
-/* ============================================================
-   MOBILE SIDEBAR OVERLAY
-   ============================================================ */
-@media (max-width: 767px) {
-  .fixed.z-50 { z-index: 9999 !important; }
-  .fixed.z-40 { z-index: 9998 !important; }
-}
-
-/* ============================================================
-   LINE CLAMP UTILITY
-   ============================================================ */
-.line-clamp-1 { overflow:hidden; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; }
-.line-clamp-2 { overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
-.line-clamp-3 { overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
