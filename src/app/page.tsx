@@ -2,6 +2,7 @@
 // Pure Server Component — no client-only imports at top level
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { TeacherSection } from "@/components/landing/TeacherSection";
@@ -126,16 +127,38 @@ export default async function LandingPage() {
           </p>
           <p
             className="text-xs"
-            style={{ color: "rgba(201,168,76,0.35)", fontFamily: "Cairo, sans-serif", marginTop: 8 }}
+            style={{
+              color: "rgba(59,130,246,0.55)",
+              fontFamily: "Cairo, sans-serif",
+              marginTop: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+            }}
           >
             Developed by{" "}
             <a
-              href="https://wa.me/201092828464"
+              href="https://wa.me/201287206328"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: "#C9A84C", textDecoration: "none", fontWeight: 600 }}
+              style={{
+                color: "#3B82F6",
+                textDecoration: "none",
+                fontWeight: 600,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+              }}
             >
-              Anas
+              <Image
+                src="/3a-logo.jpeg"
+                alt="3A Digital Technology"
+                width={16}
+                height={16}
+                style={{ borderRadius: 3 }}
+              />
+              3A
             </a>
           </p>
         </footer>
