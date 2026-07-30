@@ -10,7 +10,7 @@
 import { m as motion } from "framer-motion";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { authBackground, authAccentGradient, authColors } from "./authTheme";
+import { authBackground, authColors } from "./authTheme";
 
 interface AuthPageShellProps {
   title: string;
@@ -97,15 +97,13 @@ export function AuthPageShell({ title, subtitle, maxWidth = 460, children }: Aut
               width: 46,
               height: 46,
               borderRadius: 14,
-              background: authAccentGradient,
               marginBottom: 14,
               fontSize: 22,
-              boxShadow: "0 6px 20px rgba(0,212,255,0.35)",
               overflow: "hidden",
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="شعار المنصة" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
+            <img src="/logo-icon.png" alt="شعار المنصة" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </div>
 
           <h1
