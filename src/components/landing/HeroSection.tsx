@@ -3,7 +3,7 @@
 import { m as motion } from "framer-motion";
 import Link from "next/link";
 import type { SiteSettings } from "@/types";
-import { MixingSolutionsAnimation } from "@/components/effects/MixingSolutionsAnimation";
+import { MoleculeToGlassAnimation } from "@/components/effects/MoleculeToGlassAnimation";
 import { FloatingChemistryBackground } from "@/components/effects/FloatingChemistryBackground";
 import { TwinklingStars } from "@/components/effects/TwinklingStars";
 
@@ -193,7 +193,7 @@ export function HeroSection({ settings }: Props) {
           transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.05 }}
           className="mb-2"
         >
-          <MixingSolutionsAnimation maxWidth={300} />
+          <MoleculeToGlassAnimation maxWidth={300} />
         </motion.div>
 
         {/* Platform badge */}
