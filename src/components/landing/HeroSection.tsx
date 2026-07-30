@@ -130,10 +130,9 @@ export function HeroSection({ settings }: Props) {
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
-            style={{ background: "linear-gradient(135deg,#00D4FF,#00FF88)" }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="شعار المنصة" style={{ width: "70%", height: "70%", objectFit: "contain" }} />
+            <img src="/logo-icon.png" alt="شعار المنصة" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </div>
           <div className="min-w-0">
             <span
