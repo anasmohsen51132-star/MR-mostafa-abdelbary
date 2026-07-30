@@ -193,7 +193,7 @@ export function HeroSection({ settings }: Props) {
           transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.05 }}
           className="mb-2"
         >
-          <MoleculeToGlassAnimation maxWidth={300} />
+          <MoleculeToGlassAnimation maxWidth={260} />
         </motion.div>
 
         {/* Platform badge */}
