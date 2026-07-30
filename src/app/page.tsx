@@ -125,42 +125,53 @@ export default async function LandingPage() {
           >
             {settings?.footerText ?? "© ٢٠٢٤ اكاديمية مستر مصطفى — جميع الحقوق محفوظة"}
           </p>
-          <p
-            className="text-xs"
+          <div
             style={{
-              color: "rgba(59,130,246,0.55)",
-              fontFamily: "Cairo, sans-serif",
-              marginTop: 8,
+              marginTop: 10,
               display: "flex",
-              alignItems: "center",
               justifyContent: "center",
-              gap: 6,
             }}
           >
-            Developed by{" "}
-            <a
-              href="https://wa.me/201287206328"
-              target="_blank"
-              rel="noopener noreferrer"
+            <p
+              className="text-xs"
+              dir="ltr"
               style={{
-                color: "#3B82F6",
-                textDecoration: "none",
-                fontWeight: 600,
+                color: "#93C5FD",
+                fontFamily: "Cairo, sans-serif",
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 4,
+                gap: 6,
+                background: "rgba(59,130,246,0.12)",
+                border: "1px solid rgba(59,130,246,0.25)",
+                borderRadius: 999,
+                padding: "4px 12px",
               }}
             >
-              <Image
-                src="/3a-logo.jpeg"
-                alt="3A Digital Technology"
-                width={16}
-                height={16}
-                style={{ borderRadius: 3 }}
-              />
-              3A
-            </a>
-          </p>
+              Developed by
+              <a
+                href="https://wa.me/201287206328"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: "#60A5FA",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                <Image
+                  src="/3a-logo.jpeg"
+                  alt="3A Digital Technology"
+                  width={16}
+                  height={16}
+                  style={{ borderRadius: 3 }}
+                />
+                3A
+              </a>
+            </p>
+          </div>
         </footer>
       </main>
     </>
