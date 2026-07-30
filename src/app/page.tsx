@@ -117,11 +117,14 @@ export default async function LandingPage() {
         <CTASection settings={settings} />
         <footer
           className="py-8 text-center"
-          style={{ background: "#0D3D27", borderTop: "1px solid rgba(201,168,76,0.15)" }}
+          style={{
+            background: "linear-gradient(135deg,#0A0F1E 0%,#0D1528 60%,#111E38 100%)",
+            borderTop: "1px solid rgba(59,130,246,0.15)",
+          }}
         >
           <p
             className="text-sm"
-            style={{ color: "rgba(201,168,76,0.55)", fontFamily: "Amiri, serif" }}
+            style={{ color: "rgba(148,180,255,0.6)", fontFamily: "Amiri, serif" }}
           >
             {settings?.footerText ?? "© ٢٠٢٤ اكاديمية مستر مصطفى — جميع الحقوق محفوظة"}
           </p>
