@@ -132,45 +132,36 @@ export default async function LandingPage() {
               justifyContent: "center",
             }}
           >
-            <p
-              className="text-xs"
+            <a
+              href="https://wa.me/201287206328"
+              target="_blank"
+              rel="noopener noreferrer"
               dir="ltr"
+              className="text-xs"
               style={{
-                color: "#93C5FD",
+                color: "#DBEAFE",
                 fontFamily: "Cairo, sans-serif",
+                textDecoration: "none",
+                fontWeight: 600,
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
-                background: "rgba(59,130,246,0.12)",
-                border: "1px solid rgba(59,130,246,0.25)",
+                background: "#1E3A8A",
+                border: "1px solid #3B82F6",
                 borderRadius: 999,
                 padding: "4px 12px",
               }}
             >
               Developed by
-              <a
-                href="https://wa.me/201287206328"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  color: "#60A5FA",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                }}
-              >
-                <Image
-                  src="/3a-logo.jpeg"
-                  alt="3A Digital Technology"
-                  width={16}
-                  height={16}
-                  style={{ borderRadius: 3 }}
-                />
-                3A
-              </a>
-            </p>
+              <Image
+                src="/3a-logo.jpeg"
+                alt="3A Digital Technology"
+                width={16}
+                height={16}
+                style={{ borderRadius: 3 }}
+              />
+              3A
+            </a>
           </div>
         </footer>
       </main>
