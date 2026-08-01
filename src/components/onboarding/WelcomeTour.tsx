@@ -6,9 +6,19 @@
 // first time they land inside the student area. Walks them through every
 // student page — Dashboard, Courses, Redeem code, My Courses, Profile — and
 // their permissions as a student, driven entirely by the "التالي" button:
-// each step spotlights the matching sidebar item and navigates the real app
-// to that page in the background, so what the student sees behind the tour
-// card is the actual page being described.
+// each step spotlights the matching sidebar item (desktop) and navigates the
+// real app to that page in the background, so what the student sees behind
+// the tour card is the actual page being described.
+//
+// Layout adapts to three device classes:
+//   - Mobile   (<640px)  — native-feeling bottom sheet, sticky action bar.
+//   - Tablet   (640–1023) — centered modal, illustration stacked above text.
+//   - Desktop  (≥1024px) — two-column modal + a live spotlight ring drawn
+//                           around the matching item in the real sidebar.
+// A small "mini nav" strip (mirroring the real sidebar's 5 items) is shown
+// on every device so the student always knows where they are, even where a
+// live spotlight isn't possible (mobile/tablet, where the sidebar is a
+// hidden drawer).
 //
 // Persistence is intentionally client-only (localStorage) — no schema
 // change needed. If a DB-backed "onboarding completed" flag is ever wanted
@@ -22,8 +32,7 @@ import { springBouncy } from "@/lib/motion-presets";
 interface TourStep {
   id: string;
   route?: string;
-  targetId?: string; // matches data-tour-id on the sidebar item
-  icon: string;
+  targetId?: string; // matches data-tour-id on the sidebar item + mini-nav
   title: string;
   description: string;
   bullets?: string[];
@@ -33,17 +42,15 @@ interface TourStep {
 const STEPS: TourStep[] = [
   {
     id: "welcome",
-    icon: "⚗️",
     title: "أهلاً بيك في أكاديمية مستر مصطفى عبد الباري",
     description:
       "هناخدك في جولة سريعة على المنصة عشان تتعرف على كل صفحة وإزاي تستخدمها كطالب. تقدر تتخطى الجولة في أي وقت.",
-    cta: "ابدأ الجولة 🚀",
+    cta: "ابدأ الجولة",
   },
   {
     id: "dashboard",
     route: "/dashboard",
     targetId: "dashboard",
-    icon: "🏠",
     title: "لوحة التحكم",
     description:
       "دي صفحتك الرئيسية. هتلاقي فيها نظرة عامة على تقدمك، آخر محاضرة كنت بتذاكر فيها عشان تكمل منها على طول، وإحصائيات بسيطة عن نشاطك.",
@@ -52,7 +59,6 @@ const STEPS: TourStep[] = [
     id: "courses",
     route: "/courses",
     targetId: "courses",
-    icon: "📚",
     title: "الكورسات",
     description:
       "هنا بتلاقي كل الكورسات المتاحة على المنصة، تقدر تتصفحها وتشوف تفاصيلها حتى لو لسه مش مشترك فيها، عشان تعرف تختار الكورس المناسب لصفك الدراسي.",
@@ -61,7 +67,6 @@ const STEPS: TourStep[] = [
     id: "redeem",
     route: "/redeem",
     targetId: "redeem",
-    icon: "🎟️",
     title: "استخدام كود الاشتراك",
     description:
       "دي أهم صفحة عشان تفتح الكورسات. الكود بتاخده من المستر مباشرةً (كارت أو ورقة فيها كود)، وبتكتبه هنا لفتح الكورس المرتبط بيه.",
@@ -75,7 +80,6 @@ const STEPS: TourStep[] = [
     id: "my-courses",
     route: "/my-courses",
     targetId: "my-courses",
-    icon: "🎓",
     title: "كورساتي",
     description:
       "دي الكورسات اللي انت مشترك فيها فعليًا بعد ما فعّلت الكود. من هنا بتدخل على المحاضرات، تكمل من حيث ما وقفت، وتحل الواجبات والاختبارات.",
@@ -84,7 +88,6 @@ const STEPS: TourStep[] = [
     id: "profile",
     route: "/profile",
     targetId: "profile",
-    icon: "👤",
     title: "الملف الشخصي",
     description:
       "هنا بياناتك الشخصية: اسمك، رقم الهاتف اللي بتسجل بيه دخولك، وصفك الدراسي. تقدر تراجعها في أي وقت.",
@@ -92,7 +95,7 @@ const STEPS: TourStep[] = [
   {
     id: "permissions",
     route: "/dashboard",
-    icon: "🔐",
+    targetId: "dashboard",
     title: "صلاحياتك كطالب",
     description: "عشان تكون الصورة واضحة، ده اللي تقدر تعمله على المنصة:",
     bullets: [
@@ -104,12 +107,22 @@ const STEPS: TourStep[] = [
   },
   {
     id: "finish",
-    icon: "🚀",
+    targetId: "dashboard",
     title: "جاهز تبدأ!",
     description:
       "كده عرفت تتحرك في المنصة براحتك. لو محتاج تراجع أي حاجة، الصفحات كلها موجودة دايمًا في القائمة الجانبية. بالتوفيق في رحلتك مع الكيمياء!",
-    cta: "ابدأ رحلتي 🧪",
+    cta: "ابدأ رحلتي",
   },
+];
+
+// Fixed order — mirrors the real sidebar (src/app/(student)/layout.tsx),
+// independent of the order the tour visits pages in.
+const MINI_NAV = [
+  { id: "dashboard", icon: "🏠", label: "لوحة التحكم" },
+  { id: "courses", icon: "📚", label: "الكورسات" },
+  { id: "my-courses", icon: "🎓", label: "كورساتي" },
+  { id: "redeem", icon: "🎟️", label: "كود الاشتراك" },
+  { id: "profile", icon: "👤", label: "ملفي" },
 ];
 
 const STORAGE_PREFIX = "mustafa_onboarding_done_";
@@ -125,11 +138,258 @@ interface Props {
   userId: string;
 }
 
+/* ------------------------------------------------------------------ */
+/* Per-step illustration — flat, on-brand vector scenes so every step  */
+/* is *shown*, not just described in text.                             */
+/* ------------------------------------------------------------------ */
+function StepArt({ id }: { id: string }) {
+  const cyan = "#00D4FF";
+  const green = "#00FF88";
+  const orange = "#FF6B35";
+
+  return (
+    <svg viewBox="0 0 200 140" width="100%" height="100%" style={{ overflow: "visible" }}>
+      <defs>
+        <radialGradient id={`glow-${id}`} cx="50%" cy="45%" r="60%">
+          <stop offset="0%" stopColor={cyan} stopOpacity="0.22" />
+          <stop offset="100%" stopColor={cyan} stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <circle cx="100" cy="66" r="66" fill={`url(#glow-${id})`} />
+
+      {id === "welcome" && (
+        <g>
+          <motion.g
+            style={{ transformOrigin: "100px 38px" }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+          >
+            <ellipse cx="100" cy="38" rx="34" ry="13" fill="none" stroke={cyan} strokeOpacity="0.35" strokeWidth="1.5" />
+            <circle cx="134" cy="38" r="3.2" fill={cyan} />
+          </motion.g>
+          <motion.g
+            style={{ transformOrigin: "100px 38px" }}
+            animate={{ rotate: -360 }}
+            transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+          >
+            <ellipse cx="100" cy="38" rx="20" ry="34" fill="none" stroke={green} strokeOpacity="0.3" strokeWidth="1.5" />
+            <circle cx="100" cy="4" r="2.6" fill={green} />
+          </motion.g>
+          {/* flask */}
+          <path
+            d="M88 46 L88 68 L64 110 Q60 118 70 118 L130 118 Q140 118 136 110 L112 68 L112 46 Z"
+            fill="rgba(0,212,255,0.06)"
+            stroke={cyan}
+            strokeWidth="2.5"
+            strokeLinejoin="round"
+          />
+          <path d="M72 106 Q100 96 128 106 L133 113 Q136 118 130 118 L70 118 Q64 118 67 113 Z" fill={green} fillOpacity="0.55" />
+          <line x1="82" y1="46" x2="118" y2="46" stroke={cyan} strokeWidth="2.5" strokeLinecap="round" />
+          {[0, 1, 2].map((i) => (
+            <motion.circle
+              key={i}
+              cx={92 + i * 8}
+              r="2.4"
+              fill={i % 2 ? cyan : green}
+              initial={{ cy: 112, opacity: 0 }}
+              animate={{ cy: [112, 86], opacity: [0, 1, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.45, ease: "easeOut" }}
+            />
+          ))}
+        </g>
+      )}
+
+      {id === "dashboard" && (
+        <g>
+          <rect x="26" y="18" width="148" height="96" rx="12" fill="rgba(0,212,255,0.05)" stroke={cyan} strokeOpacity="0.4" strokeWidth="1.5" />
+          <circle cx="38" cy="30" r="2.4" fill={orange} />
+          <circle cx="46" cy="30" r="2.4" fill="#FFD166" />
+          <circle cx="54" cy="30" r="2.4" fill={green} />
+          <line x1="26" y1="40" x2="174" y2="40" stroke={cyan} strokeOpacity="0.15" strokeWidth="1" />
+          {/* bars */}
+          {[0, 1, 2].map((i) => (
+            <motion.rect
+              key={i}
+              x={40 + i * 16}
+              width="10"
+              rx="3"
+              fill={i === 2 ? green : cyan}
+              fillOpacity={i === 2 ? 0.9 : 0.55}
+              initial={{ height: 0, y: 100 }}
+              animate={{ height: 14 + i * 12, y: 100 - (14 + i * 12) }}
+              transition={{ duration: 0.7, delay: 0.15 + i * 0.12, ease: "easeOut" }}
+            />
+          ))}
+          {/* progress ring */}
+          <g transform="translate(140,66)">
+            <circle r="18" fill="none" stroke={cyan} strokeOpacity="0.15" strokeWidth="6" />
+            <motion.circle
+              r="18"
+              fill="none"
+              stroke={green}
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeDasharray="113"
+              initial={{ strokeDashoffset: 113 }}
+              animate={{ strokeDashoffset: 34 }}
+              transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+              transform="rotate(-90)"
+            />
+            <polygon points="-4,-6 -4,6 6,0" fill={cyan} />
+          </g>
+        </g>
+      )}
+
+      {id === "courses" && (
+        <g>
+          {[0, 1, 2].map((i) => (
+            <motion.g
+              key={i}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.12, type: "spring", stiffness: 260, damping: 18 }}
+            >
+              <rect x={40 + i * 24} y={34 + (2 - i) * 6} width="44" height="60" rx="8"
+                fill="rgba(0,212,255,0.05)" stroke={cyan} strokeOpacity="0.35" strokeWidth="1.5" />
+              <rect x={40 + i * 24} y={34 + (2 - i) * 6} width="44" height="9" rx="8"
+                fill={[cyan, green, orange][i]} fillOpacity="0.6" />
+            </motion.g>
+          ))}
+          <g transform="translate(150,36)">
+            <circle r="12" fill="rgba(10,15,30,0.5)" stroke={green} strokeWidth="2.5" />
+            <line x1="9" y1="9" x2="18" y2="18" stroke={green} strokeWidth="2.5" strokeLinecap="round" />
+          </g>
+        </g>
+      )}
+
+      {id === "redeem" && (
+        <g>
+          <path
+            d="M34 42 a8 8 0 000 16 v20 a8 8 0 000 16 h132 a8 8 0 000-16 v-20 a8 8 0 000-16 Z"
+            fill="rgba(0,212,255,0.05)" stroke={cyan} strokeOpacity="0.4" strokeWidth="1.5"
+          />
+          {[0, 1, 2, 3].map((i) => (
+            <rect key={i} x={54 + i * 24} y="60" width="16" height="20" rx="4"
+              fill="none" stroke={cyan} strokeOpacity="0.55" strokeWidth="1.5" strokeDasharray="3 2" />
+          ))}
+          <motion.g
+            initial={{ rotate: -18, y: -3 }}
+            animate={{ rotate: [-18, 4, -18] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            style={{ transformOrigin: "156px 96px" }}
+          >
+            <circle cx="156" cy="96" r="13" fill="rgba(10,15,30,0.6)" stroke={green} strokeWidth="2" />
+            <path d="M150 92 v-6 a6 6 0 0112 0" fill="none" stroke={green} strokeWidth="2.2" strokeLinecap="round" />
+            <rect x="150" y="92" width="12" height="9" rx="2.5" fill={green} fillOpacity="0.7" />
+          </motion.g>
+          <motion.text
+            x="178" y="82" fontSize="14" fill={green}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: [0, 1, 0], scale: [0.5, 1.1, 1.1] }}
+            transition={{ duration: 1.8, repeat: Infinity }}
+          >✦</motion.text>
+        </g>
+      )}
+
+      {id === "my-courses" && (
+        <g>
+          <path d="M100 30 L156 50 L100 70 L44 50 Z" fill={cyan} fillOpacity="0.5" stroke={cyan} strokeWidth="1.5" strokeLinejoin="round" />
+          <line x1="100" y1="70" x2="100" y2="86" stroke={cyan} strokeOpacity="0.5" strokeWidth="1.5" />
+          <circle cx="100" cy="86" r="2.6" fill={green} />
+          <rect x="52" y="78" width="96" height="40" rx="10" fill="rgba(0,212,255,0.05)" stroke={cyan} strokeOpacity="0.35" strokeWidth="1.5" />
+          <polygon points="92,90 92,106 106,98" fill={green} />
+          <rect x="60" y="112" width="80" height="4" rx="2" fill={cyan} fillOpacity="0.15" />
+          <motion.rect
+            x="60" y="112" height="4" rx="2" fill={green}
+            initial={{ width: 0 }} animate={{ width: 50 }} transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+          />
+        </g>
+      )}
+
+      {id === "profile" && (
+        <g>
+          <circle cx="70" cy="60" r="26" fill="rgba(0,212,255,0.06)" stroke={cyan} strokeOpacity="0.4" strokeWidth="1.5" />
+          <circle cx="70" cy="52" r="9" fill={cyan} fillOpacity="0.55" />
+          <path d="M52 78 a18 15 0 0136 0" fill={cyan} fillOpacity="0.4" />
+          <g transform="translate(86,80)">
+            <circle r="11" fill="#0A0F1E" stroke={green} strokeWidth="2" />
+            <path d="M-4 0 l3 3 l5 -6" fill="none" stroke={green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </g>
+          {[0, 1, 2].map((i) => (
+            <motion.rect
+              key={i}
+              x="112" y={40 + i * 16} height="7" rx="3.5"
+              fill={cyan} fillOpacity={0.4 - i * 0.08}
+              initial={{ width: 0 }} animate={{ width: 52 - i * 12 }}
+              transition={{ delay: 0.15 + i * 0.1, duration: 0.5 }}
+            />
+          ))}
+        </g>
+      )}
+
+      {id === "permissions" && (
+        <g>
+          <path
+            d="M100 22 L146 36 V70 C146 96 126 112 100 120 C74 112 54 96 54 70 V36 Z"
+            fill="rgba(0,212,255,0.06)" stroke={cyan} strokeOpacity="0.45" strokeWidth="2"
+          />
+          {["تصفح", "تفعيل", "حلول"].map((_, i) => (
+            <motion.g
+              key={i}
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.15 + i * 0.15 }}
+            >
+              <circle cx="76" cy={54 + i * 18} r="6" fill="none" stroke={green} strokeWidth="1.8" />
+              <path d={`M73 ${54 + i * 18} l2 2.5 l4 -5`} fill="none" stroke={green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              <rect x="90" y={51 + i * 18} width="34" height="6" rx="3" fill={cyan} fillOpacity="0.3" />
+            </motion.g>
+          ))}
+        </g>
+      )}
+
+      {id === "finish" && (
+        <g>
+          {[...Array(6)].map((_, i) => (
+            <motion.text
+              key={i}
+              x={30 + (i * 27) % 150}
+              y={20 + ((i * 41) % 70)}
+              fontSize="10"
+              fill={i % 2 ? green : cyan}
+              initial={{ opacity: 0, y: 0 }}
+              animate={{ opacity: [0, 1, 0], y: -10 }}
+              transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.25 }}
+            >✦</motion.text>
+          ))}
+          <path
+            d="M88 118 L88 96 Q88 70 112 70 Q112 96 112 118 Z"
+            fill="rgba(0,212,255,0.06)" stroke={cyan} strokeWidth="2" strokeLinejoin="round"
+          />
+          <path d="M92 114 Q100 108 108 114 L110 118 Q100 122 90 118 Z" fill={green} fillOpacity="0.55" />
+          <motion.g
+            initial={{ y: 0 }}
+            animate={{ y: [-2, -60] }}
+            transition={{ duration: 1.4, repeat: Infinity, repeatDelay: 0.6, ease: "easeIn" }}
+          >
+            <path d="M100 30 Q112 44 108 62 L92 62 Q88 44 100 30 Z" fill={cyan} stroke={cyan} strokeWidth="1" />
+            <circle cx="100" cy="46" r="4" fill="#0A0F1E" />
+            <polygon points="92,62 88,74 96,66" fill={orange} />
+            <polygon points="108,62 112,74 104,66" fill={orange} />
+            <polygon points="96,62 100,76 104,62" fill={green} />
+          </motion.g>
+        </g>
+      )}
+    </svg>
+  );
+}
+
 export function WelcomeTour({ userId }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const [active, setActive] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
+  const [dir, setDir] = useState(1);
   const [rect, setRect] = useState<Rect | null>(null);
   const checkedRef = useRef(false);
 
@@ -196,9 +456,13 @@ export function WelcomeTour({ userId }: Props) {
       finish();
       return;
     }
+    setDir(1);
     setStepIndex((i) => i + 1);
   };
-  const goBack = () => setStepIndex((i) => Math.max(0, i - 1));
+  const goBack = () => {
+    setDir(-1);
+    setStepIndex((i) => Math.max(0, i - 1));
+  };
 
   if (!active) return null;
 
@@ -219,7 +483,21 @@ export function WelcomeTour({ userId }: Props) {
         {/* Backdrop */}
         <div
           className="absolute inset-0"
-          style={{ background: "rgba(6,10,20,0.82)", backdropFilter: "blur(3px)" }}
+          style={{ background: "rgba(6,10,20,0.84)", backdropFilter: "blur(3px)" }}
+        />
+
+        {/* Drifting ambient glows */}
+        <motion.div
+          className="absolute w-72 h-72 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle,rgba(0,212,255,0.10),transparent 70%)", top: "8%", right: "6%" }}
+          animate={{ x: [0, -20, 0], y: [0, 16, 0] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute w-64 h-64 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle,rgba(0,255,136,0.08),transparent 70%)", bottom: "6%", left: "8%" }}
+          animate={{ x: [0, 18, 0], y: [0, -14, 0] }}
+          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
         />
 
         {/* Rising bubble particles — subtle flask feel */}
@@ -241,19 +519,19 @@ export function WelcomeTour({ userId }: Props) {
                   background: i % 2 === 0 ? "rgba(0,212,255,0.35)" : "rgba(0,255,136,0.3)",
                   boxShadow: i % 2 === 0 ? "0 0 8px rgba(0,212,255,0.5)" : "0 0 8px rgba(0,255,136,0.45)",
                 }}
-                animate={{ y: [0, -(window.innerHeight + 40)], opacity: [0, 1, 1, 0] }}
+                animate={{ y: [0, -(typeof window !== "undefined" ? window.innerHeight + 40 : 800)], opacity: [0, 1, 1, 0] }}
                 transition={{ duration, delay, repeat: Infinity, ease: "linear" }}
               />
             );
           })}
         </div>
 
-        {/* Spotlight ring on the active sidebar item */}
+        {/* Spotlight ring on the active sidebar item — desktop only */}
         <AnimatePresence>
           {rect && (
             <motion.div
               key="spotlight"
-              className="absolute rounded-2xl pointer-events-none"
+              className="absolute rounded-2xl pointer-events-none hidden lg:block"
               style={{
                 border: "2px solid #00D4FF",
                 boxShadow: "0 0 0 4px rgba(0,212,255,0.15), 0 0 26px rgba(0,212,255,0.55)",
@@ -272,79 +550,87 @@ export function WelcomeTour({ userId }: Props) {
           )}
         </AnimatePresence>
 
-        {/* Card container */}
-        <div
-          className="absolute inset-0 flex items-center justify-center px-4"
-          style={{ paddingInlineEnd: "clamp(16px, 4vw, 300px)" }}
-        >
-          <AnimatePresence mode="wait">
+        {/* Card container — bottom sheet on mobile, centered modal from sm+ */}
+        <div className="absolute inset-0 flex items-end sm:items-center justify-center px-0 sm:px-4">
+          <div className="hidden lg:block" style={{ width: "clamp(0px,4vw,280px)" }} />
+          <AnimatePresence mode="wait" custom={dir}>
             <motion.div
               key={step.id}
-              initial={{ opacity: 0, y: 24, scale: 0.94 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -16, scale: 0.96 }}
+              custom={dir}
+              initial={{ opacity: 0, x: dir > 0 ? 36 : -36, y: 12, scale: 0.97 }}
+              animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              exit={{ opacity: 0, x: dir > 0 ? -36 : 36, scale: 0.97 }}
               transition={springBouncy}
-              className="relative w-full max-w-md rounded-3xl overflow-hidden"
+              className="relative w-full sm:max-w-md lg:max-w-3xl max-h-[92dvh] sm:max-h-[85vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl flex flex-col lg:flex-row"
               style={{
                 background: "linear-gradient(160deg,#0D1528 0%,#0A0F1E 100%)",
                 border: "1px solid rgba(0,212,255,0.25)",
                 boxShadow: "0 24px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,212,255,0.08)",
               }}
             >
-              {/* Decorative molecule (top-left corner) */}
-              <svg
-                width="90"
-                height="90"
-                viewBox="0 0 90 90"
-                className="absolute -top-4 -left-4 pointer-events-none"
-                style={{ opacity: 0.5 }}
-              >
-                <line x1="20" y1="20" x2="55" y2="45" stroke="#00D4FF" strokeOpacity="0.3" strokeWidth="1.5" />
-                <line x1="55" y1="45" x2="30" y2="70" stroke="#00FF88" strokeOpacity="0.25" strokeWidth="1.5" />
-                <circle cx="20" cy="20" r="5" fill="#00D4FF" fillOpacity="0.4" />
-                <circle cx="55" cy="45" r="7" fill="#00D4FF" fillOpacity="0.55" />
-                <circle cx="30" cy="70" r="4" fill="#00FF88" fillOpacity="0.4" />
-              </svg>
+              {/* Mobile grabber handle */}
+              <div className="sm:hidden flex justify-center pt-2.5 pb-1 flex-shrink-0">
+                <div className="w-10 h-1.5 rounded-full" style={{ background: "rgba(122,232,255,0.25)" }} />
+              </div>
 
               {/* Skip */}
               <button
                 onClick={finish}
-                className="absolute top-4 left-4 text-xs px-2.5 py-1.5 rounded-full z-10"
+                className="absolute top-3 sm:top-4 left-3 sm:left-4 text-xs px-2.5 py-1.5 rounded-full z-10"
                 style={{
-                  color: "rgba(122,232,255,0.55)",
+                  color: "rgba(122,232,255,0.6)",
                   fontFamily: "Cairo,sans-serif",
-                  background: "rgba(0,212,255,0.06)",
-                  border: "1px solid rgba(0,212,255,0.15)",
+                  background: "rgba(0,212,255,0.07)",
+                  border: "1px solid rgba(0,212,255,0.16)",
                   cursor: "pointer",
                 }}
               >
                 تخطي الجولة ✕
               </button>
 
-              <div className="relative px-7 pt-16 pb-7">
-                {/* Step counter */}
-                <div
-                  className="text-[11px] font-semibold tracking-widest uppercase mb-3"
-                  style={{ color: "rgba(0,212,255,0.5)", fontFamily: "Cairo,sans-serif" }}
-                >
-                  الخطوة {stepIndex + 1} من {STEPS.length}
+              {/* Illustration panel */}
+              <div className="flex-shrink-0 order-1 lg:order-2 flex items-center justify-center px-6 pt-3 lg:pt-8 lg:px-8">
+                <div className="w-40 h-28 sm:w-48 sm:h-32 lg:w-56 lg:h-40">
+                  <StepArt id={step.id} />
                 </div>
+              </div>
 
-                {/* Icon */}
-                <motion.div
-                  initial={{ scale: 0.5, opacity: 0, rotate: -12 }}
-                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.05 }}
-                  style={{ fontSize: 46, marginBottom: 14, lineHeight: 1 }}
-                >
-                  {step.icon}
-                </motion.div>
+              {/* Text + actions panel */}
+              <div className="relative flex-1 order-2 lg:order-1 px-6 sm:px-7 pt-2 lg:pt-9 pb-6 sm:pb-7 lg:min-w-0">
+                {/* Mini nav strip — always visible, mirrors the real sidebar */}
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-5 overflow-x-auto">
+                  {MINI_NAV.map((n) => {
+                    const isActive = step.targetId === n.id;
+                    return (
+                      <div
+                        key={n.id}
+                        className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-full flex-shrink-0 transition-all"
+                        style={{
+                          background: isActive ? "rgba(0,212,255,0.14)" : "rgba(255,255,255,0.03)",
+                          border: isActive ? "1px solid rgba(0,212,255,0.5)" : "1px solid rgba(255,255,255,0.06)",
+                        }}
+                      >
+                        <span style={{ fontSize: 12, filter: isActive ? "none" : "grayscale(0.4) opacity(0.55)" }}>{n.icon}</span>
+                        <span
+                          className="hidden sm:inline text-[10.5px] whitespace-nowrap"
+                          style={{
+                            fontFamily: "Cairo,sans-serif",
+                            color: isActive ? "#7AE8FF" : "rgba(122,232,255,0.4)",
+                            fontWeight: isActive ? 700 : 500,
+                          }}
+                        >
+                          {n.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
 
                 <h2
                   style={{
                     fontFamily: "Cairo,sans-serif",
                     color: "#FFFFFF",
-                    fontSize: 22,
+                    fontSize: 21,
                     fontWeight: 800,
                     marginBottom: 10,
                   }}
@@ -356,8 +642,8 @@ export function WelcomeTour({ userId }: Props) {
                   style={{
                     fontFamily: "Cairo,sans-serif",
                     color: "rgba(230,240,255,0.75)",
-                    fontSize: 14.5,
-                    lineHeight: 1.9,
+                    fontSize: 14,
+                    lineHeight: 1.85,
                     marginBottom: step.bullets ? 14 : 22,
                   }}
                 >
@@ -387,19 +673,25 @@ export function WelcomeTour({ userId }: Props) {
                   </ul>
                 )}
 
-                {/* Progress dots */}
-                <div className="flex items-center gap-1.5 mb-6">
+                {/* Segmented progress bar */}
+                <div className="flex items-center gap-1 mb-1.5">
                   {STEPS.map((s, i) => (
-                    <div
-                      key={s.id}
-                      className="rounded-full transition-all"
-                      style={{
-                        height: 5,
-                        width: i === stepIndex ? 20 : 5,
-                        background: i === stepIndex ? "#00D4FF" : "rgba(0,212,255,0.2)",
-                      }}
-                    />
+                    <div key={s.id} className="flex-1 rounded-full overflow-hidden" style={{ height: 4, background: "rgba(0,212,255,0.15)" }}>
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ background: "linear-gradient(90deg,#00D4FF,#00FF88)" }}
+                        initial={false}
+                        animate={{ width: i <= stepIndex ? "100%" : "0%" }}
+                        transition={{ duration: 0.35 }}
+                      />
+                    </div>
                   ))}
+                </div>
+                <div
+                  className="text-[11px] mb-5"
+                  style={{ color: "rgba(122,232,255,0.45)", fontFamily: "Cairo,sans-serif" }}
+                >
+                  الخطوة {stepIndex + 1} من {STEPS.length}
                 </div>
 
                 {/* Actions */}
@@ -407,7 +699,7 @@ export function WelcomeTour({ userId }: Props) {
                   {!isFirst && (
                     <button
                       onClick={goBack}
-                      className="px-4 py-3 rounded-2xl text-sm font-semibold"
+                      className="px-4 py-3 rounded-2xl text-sm font-semibold flex-shrink-0"
                       style={{
                         fontFamily: "Cairo,sans-serif",
                         color: "rgba(122,232,255,0.7)",
@@ -438,6 +730,7 @@ export function WelcomeTour({ userId }: Props) {
               </div>
             </motion.div>
           </AnimatePresence>
+          <div className="hidden lg:block" style={{ width: "clamp(0px,4vw,280px)" }} />
         </div>
       </motion.div>
     </AnimatePresence>
