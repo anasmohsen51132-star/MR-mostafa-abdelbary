@@ -26,7 +26,7 @@
 // this is the single place to swap the read/write for an API call.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { m as motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { springBouncy } from "@/lib/motion-presets";
 
 interface TourStep {
@@ -464,6 +464,37 @@ export function WelcomeTour({ userId }: Props) {
     setStepIndex((i) => Math.max(0, i - 1));
   };
 
+  // Keyboard shortcuts — Enter advances, Escape skips. Works on any device
+  // with a keyboard (desktop, tablets with a paired keyboard, etc).
+  useEffect(() => {
+    if (!active) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        goNext();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        finish();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, stepIndex]);
+
+  // Swipe / drag navigation — lets the card itself be dragged left-right to
+  // move between steps, matching the native feel of onboarding flows on
+  // touch devices (and works just as well with a trackpad or mouse).
+  const handleDragEnd = (_e: unknown, info: PanInfo) => {
+    const SWIPE_DISTANCE = 60;
+    const SWIPE_VELOCITY = 400;
+    if (info.offset.x < -SWIPE_DISTANCE || info.velocity.x < -SWIPE_VELOCITY) {
+      goNext();
+    } else if ((info.offset.x > SWIPE_DISTANCE || info.velocity.x > SWIPE_VELOCITY) && stepIndex > 0) {
+      goBack();
+    }
+  };
+
   if (!active) return null;
 
   const isFirst = stepIndex === 0;
@@ -557,30 +588,69 @@ export function WelcomeTour({ userId }: Props) {
             <motion.div
               key={step.id}
               custom={dir}
+              drag="x"
+              dragElastic={0.12}
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={handleDragEnd}
               initial={{ opacity: 0, x: dir > 0 ? 36 : -36, y: 12, scale: 0.97 }}
               animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
               exit={{ opacity: 0, x: dir > 0 ? -36 : 36, scale: 0.97 }}
               transition={springBouncy}
-              className="relative w-full sm:max-w-md lg:max-w-3xl max-h-[92dvh] sm:max-h-[85vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl flex flex-col lg:flex-row"
+              className="relative w-full sm:max-w-md lg:max-w-3xl max-h-[92dvh] sm:max-h-[85vh] rounded-t-3xl sm:rounded-3xl flex flex-col overflow-hidden touch-pan-y"
               style={{
                 background: "linear-gradient(160deg,#0D1528 0%,#0A0F1E 100%)",
                 border: "1px solid rgba(0,212,255,0.25)",
                 boxShadow: "0 24px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,212,255,0.08)",
               }}
             >
-              {/* Mobile grabber handle */}
-              <div className="sm:hidden flex justify-center pt-2.5 pb-1 flex-shrink-0">
-                <div className="w-10 h-1.5 rounded-full" style={{ background: "rgba(122,232,255,0.25)" }} />
-              </div>
+              {/* Shimmering top accent */}
+              <motion.div
+                className="h-[3px] w-full flex-shrink-0"
+                style={{ background: "linear-gradient(90deg,#00D4FF,#00FF88,#00D4FF)", backgroundSize: "200% 100%" }}
+                animate={{ backgroundPosition: ["0% 0%", "200% 0%"] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              />
 
-              {/* Skip */}
+              {/* Confetti burst — plays once when the finish step mounts */}
+              {step.id === "finish" && (
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                  {Array.from({ length: 16 }).map((_, i) => {
+                    const angle = (i / 16) * Math.PI * 2;
+                    const dist = 90 + (i % 4) * 26;
+                    const colors = ["#00D4FF", "#00FF88", "#FF6B35", "#FFD166"];
+                    return (
+                      <motion.div
+                        key={i}
+                        className="absolute rounded-full"
+                        style={{
+                          top: "38%",
+                          left: "50%",
+                          width: 5 + (i % 3) * 2,
+                          height: 5 + (i % 3) * 2,
+                          background: colors[i % colors.length],
+                        }}
+                        initial={{ x: 0, y: 0, opacity: 1, scale: 0.6 }}
+                        animate={{
+                          x: Math.cos(angle) * dist,
+                          y: Math.sin(angle) * dist - 20,
+                          opacity: 0,
+                          scale: 1,
+                        }}
+                        transition={{ duration: 1.3, delay: 0.15, ease: "easeOut" }}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Pinned skip button — stays put even while content below scrolls */}
               <button
                 onClick={finish}
-                className="absolute top-3 sm:top-4 left-3 sm:left-4 text-xs px-2.5 py-1.5 rounded-full z-10"
+                className="absolute top-4 sm:top-5 left-3 sm:left-4 text-xs px-2.5 py-1.5 rounded-full z-10"
                 style={{
                   color: "rgba(122,232,255,0.6)",
                   fontFamily: "Cairo,sans-serif",
-                  background: "rgba(0,212,255,0.07)",
+                  background: "rgba(10,15,30,0.55)",
                   border: "1px solid rgba(0,212,255,0.16)",
                   cursor: "pointer",
                 }}
@@ -588,92 +658,119 @@ export function WelcomeTour({ userId }: Props) {
                 تخطي الجولة ✕
               </button>
 
-              {/* Illustration panel */}
-              <div className="flex-shrink-0 order-1 lg:order-2 flex items-center justify-center px-6 pt-3 lg:pt-8 lg:px-8">
-                <div className="w-40 h-28 sm:w-48 sm:h-32 lg:w-56 lg:h-40">
-                  <StepArt id={step.id} />
+              {/* Scrollable content */}
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                {/* Mobile grabber handle */}
+                <div className="sm:hidden flex justify-center pt-2.5 pb-1">
+                  <div className="w-10 h-1.5 rounded-full" style={{ background: "rgba(122,232,255,0.25)" }} />
+                </div>
+
+                <div className="flex flex-col lg:flex-row">
+                  {/* Illustration panel — set inside its own "screen" with a faint lab grid */}
+                  <div className="flex-shrink-0 order-1 lg:order-2 flex items-center justify-center px-6 pt-4 lg:pt-9 lg:px-8">
+                    <div
+                      className="w-44 h-32 sm:w-52 sm:h-36 lg:w-60 lg:h-44 rounded-2xl flex items-center justify-center p-3"
+                      style={{
+                        border: "1px solid rgba(0,212,255,0.14)",
+                        backgroundImage:
+                          "radial-gradient(circle at 30% 20%, rgba(0,212,255,0.09), rgba(0,255,136,0.03) 60%, transparent 80%), radial-gradient(rgba(0,212,255,0.16) 1px, transparent 1px)",
+                        backgroundSize: "auto, 14px 14px",
+                      }}
+                    >
+                      <StepArt id={step.id} />
+                    </div>
+                  </div>
+
+                  {/* Text panel */}
+                  <div className="relative flex-1 order-2 lg:order-1 px-6 sm:px-7 pt-3 lg:pt-9 pb-5 lg:min-w-0">
+                    {/* Mini nav strip — always visible, mirrors the real sidebar */}
+                    <div className="flex items-center gap-1.5 sm:gap-2 mb-5 overflow-x-auto">
+                      {MINI_NAV.map((n) => {
+                        const isActive = step.targetId === n.id;
+                        return (
+                          <div
+                            key={n.id}
+                            className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-full flex-shrink-0 transition-all"
+                            style={{
+                              background: isActive ? "rgba(0,212,255,0.14)" : "rgba(255,255,255,0.03)",
+                              border: isActive ? "1px solid rgba(0,212,255,0.5)" : "1px solid rgba(255,255,255,0.06)",
+                            }}
+                          >
+                            <span style={{ fontSize: 12, filter: isActive ? "none" : "grayscale(0.4) opacity(0.55)" }}>{n.icon}</span>
+                            <span
+                              className="hidden sm:inline text-[10.5px] whitespace-nowrap"
+                              style={{
+                                fontFamily: "Cairo,sans-serif",
+                                color: isActive ? "#7AE8FF" : "rgba(122,232,255,0.4)",
+                                fontWeight: isActive ? 700 : 500,
+                              }}
+                            >
+                              {n.label}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <h2
+                      style={{
+                        fontFamily: "Cairo,sans-serif",
+                        color: "#FFFFFF",
+                        fontSize: 21,
+                        fontWeight: 800,
+                        marginBottom: 10,
+                      }}
+                    >
+                      {step.title}
+                    </h2>
+
+                    <p
+                      style={{
+                        fontFamily: "Cairo,sans-serif",
+                        color: "rgba(230,240,255,0.75)",
+                        fontSize: 14,
+                        lineHeight: 1.85,
+                        marginBottom: step.bullets ? 14 : 6,
+                      }}
+                    >
+                      {step.description}
+                    </p>
+
+                    {step.bullets && (
+                      <ul className="space-y-2">
+                        {step.bullets.map((b, i) => (
+                          <motion.li
+                            key={i}
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.1 + i * 0.08 }}
+                            className="flex items-start gap-2"
+                            style={{
+                              fontFamily: "Cairo,sans-serif",
+                              color: "rgba(230,240,255,0.75)",
+                              fontSize: 13.5,
+                              lineHeight: 1.7,
+                            }}
+                          >
+                            <span style={{ color: "#00FF88", flexShrink: 0, marginTop: 1 }}>✓</span>
+                            <span>{b}</span>
+                          </motion.li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Text + actions panel */}
-              <div className="relative flex-1 order-2 lg:order-1 px-6 sm:px-7 pt-2 lg:pt-9 pb-6 sm:pb-7 lg:min-w-0">
-                {/* Mini nav strip — always visible, mirrors the real sidebar */}
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-5 overflow-x-auto">
-                  {MINI_NAV.map((n) => {
-                    const isActive = step.targetId === n.id;
-                    return (
-                      <div
-                        key={n.id}
-                        className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-full flex-shrink-0 transition-all"
-                        style={{
-                          background: isActive ? "rgba(0,212,255,0.14)" : "rgba(255,255,255,0.03)",
-                          border: isActive ? "1px solid rgba(0,212,255,0.5)" : "1px solid rgba(255,255,255,0.06)",
-                        }}
-                      >
-                        <span style={{ fontSize: 12, filter: isActive ? "none" : "grayscale(0.4) opacity(0.55)" }}>{n.icon}</span>
-                        <span
-                          className="hidden sm:inline text-[10.5px] whitespace-nowrap"
-                          style={{
-                            fontFamily: "Cairo,sans-serif",
-                            color: isActive ? "#7AE8FF" : "rgba(122,232,255,0.4)",
-                            fontWeight: isActive ? 700 : 500,
-                          }}
-                        >
-                          {n.label}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <h2
-                  style={{
-                    fontFamily: "Cairo,sans-serif",
-                    color: "#FFFFFF",
-                    fontSize: 21,
-                    fontWeight: 800,
-                    marginBottom: 10,
-                  }}
-                >
-                  {step.title}
-                </h2>
-
-                <p
-                  style={{
-                    fontFamily: "Cairo,sans-serif",
-                    color: "rgba(230,240,255,0.75)",
-                    fontSize: 14,
-                    lineHeight: 1.85,
-                    marginBottom: step.bullets ? 14 : 22,
-                  }}
-                >
-                  {step.description}
-                </p>
-
-                {step.bullets && (
-                  <ul className="mb-6 space-y-2">
-                    {step.bullets.map((b, i) => (
-                      <motion.li
-                        key={i}
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 + i * 0.08 }}
-                        className="flex items-start gap-2"
-                        style={{
-                          fontFamily: "Cairo,sans-serif",
-                          color: "rgba(230,240,255,0.75)",
-                          fontSize: 13.5,
-                          lineHeight: 1.7,
-                        }}
-                      >
-                        <span style={{ color: "#00FF88", flexShrink: 0, marginTop: 1 }}>✓</span>
-                        <span>{b}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                )}
-
-                {/* Segmented progress bar */}
+              {/* Sticky footer — progress + actions always reachable, never scrolled out of view */}
+              <div
+                className="flex-shrink-0 px-6 sm:px-7 pt-4 pb-5 sm:pb-6"
+                style={{
+                  borderTop: "1px solid rgba(0,212,255,0.1)",
+                  background: "rgba(6,10,20,0.5)",
+                  paddingBottom: "max(1.1rem, env(safe-area-inset-bottom))",
+                }}
+              >
                 <div className="flex items-center gap-1 mb-1.5">
                   {STEPS.map((s, i) => (
                     <div key={s.id} className="flex-1 rounded-full overflow-hidden" style={{ height: 4, background: "rgba(0,212,255,0.15)" }}>
@@ -688,13 +785,12 @@ export function WelcomeTour({ userId }: Props) {
                   ))}
                 </div>
                 <div
-                  className="text-[11px] mb-5"
+                  className="text-[11px] mb-4"
                   style={{ color: "rgba(122,232,255,0.45)", fontFamily: "Cairo,sans-serif" }}
                 >
                   الخطوة {stepIndex + 1} من {STEPS.length}
                 </div>
 
-                {/* Actions */}
                 <div className="flex items-center gap-3">
                   {!isFirst && (
                     <button
@@ -715,12 +811,19 @@ export function WelcomeTour({ userId }: Props) {
                     onClick={goNext}
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.97 }}
+                    animate={{
+                      boxShadow: [
+                        "0 6px 20px rgba(0,212,255,0.35)",
+                        "0 6px 28px rgba(0,212,255,0.55)",
+                        "0 6px 20px rgba(0,212,255,0.35)",
+                      ],
+                    }}
+                    transition={{ boxShadow: { duration: 2.2, repeat: Infinity, ease: "easeInOut" } }}
                     className="flex-1 py-3 rounded-2xl text-sm font-bold"
                     style={{
                       fontFamily: "Cairo,sans-serif",
                       color: "#0A0F1E",
                       background: "linear-gradient(135deg,#00D4FF,#00FF88)",
-                      boxShadow: "0 6px 20px rgba(0,212,255,0.35)",
                       cursor: "pointer",
                     }}
                   >
