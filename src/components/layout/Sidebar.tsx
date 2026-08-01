@@ -126,6 +126,7 @@ export function Sidebar({
                   key={item.id}
                   href={item.href}
                   onClick={onClose}
+                  data-tour-id={item.id}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 text-sm transition-all duration-200 relative group rounded-xl mb-0.5",
                   )}
