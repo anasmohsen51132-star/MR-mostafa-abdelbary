@@ -463,6 +463,11 @@ export function WelcomeTour({ userId }: Props) {
     setDir(-1);
     setStepIndex((i) => Math.max(0, i - 1));
   };
+  const goToStep = (idx: number) => {
+    if (idx === stepIndex || idx < 0 || idx >= STEPS.length) return;
+    setDir(idx > stepIndex ? 1 : -1);
+    setStepIndex(idx);
+  };
 
   // Keyboard shortcuts — Enter advances, Escape skips. Works on any device
   // with a keyboard (desktop, tablets with a paired keyboard, etc).
@@ -511,11 +516,48 @@ export function WelcomeTour({ userId }: Props) {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0"
-          style={{ background: "rgba(6,10,20,0.84)", backdropFilter: "blur(3px)" }}
-        />
+        {/* Backdrop — when a real target is spotlighted on desktop, this is
+            built from four panels that tile around the hole so the actual
+            sidebar item shows through fully lit and legible. Everywhere
+            else (mobile/tablet, or steps with no target) it's one flat
+            dimmed layer. */}
+        {rect ? (
+          <>
+            <motion.div
+              className="fixed pointer-events-auto hidden lg:block"
+              style={{ background: "rgba(6,10,20,0.86)", backdropFilter: "blur(3px)", top: 0, left: 0, right: 0 }}
+              initial={false}
+              animate={{ height: Math.max(rect.top - 8, 0) }}
+              transition={springBouncy}
+            />
+            <motion.div
+              className="fixed pointer-events-auto hidden lg:block"
+              style={{ background: "rgba(6,10,20,0.86)", backdropFilter: "blur(3px)", left: 0, right: 0, bottom: 0 }}
+              initial={false}
+              animate={{ top: rect.top + rect.height + 8 }}
+              transition={springBouncy}
+            />
+            <motion.div
+              className="fixed pointer-events-auto hidden lg:block"
+              style={{ background: "rgba(6,10,20,0.86)", backdropFilter: "blur(3px)", left: 0 }}
+              initial={false}
+              animate={{ top: rect.top - 8, height: rect.height + 16, width: Math.max(rect.left - 8, 0) }}
+              transition={springBouncy}
+            />
+            <motion.div
+              className="fixed pointer-events-auto hidden lg:block"
+              style={{ background: "rgba(6,10,20,0.86)", backdropFilter: "blur(3px)", right: 0 }}
+              initial={false}
+              animate={{ top: rect.top - 8, height: rect.height + 16, left: rect.left + rect.width + 8 }}
+              transition={springBouncy}
+            />
+            {/* Same four panels again, undimmed, purely to block clicks below lg — the
+                cutout is a desktop-only affordance, so mobile/tablet still get a full block */}
+            <div className="fixed inset-0 lg:hidden" style={{ background: "rgba(6,10,20,0.84)", backdropFilter: "blur(3px)" }} />
+          </>
+        ) : (
+          <div className="fixed inset-0" style={{ background: "rgba(6,10,20,0.84)", backdropFilter: "blur(3px)" }} />
+        )}
 
         {/* Drifting ambient glows */}
         <motion.div
@@ -557,16 +599,15 @@ export function WelcomeTour({ userId }: Props) {
           })}
         </div>
 
-        {/* Spotlight ring on the active sidebar item — desktop only */}
+        {/* Spotlight ring on the active sidebar item — desktop only.
+            The hole itself is created by the panels above; this ring is
+            just the glowing outline + a one-off "landing" ping so the eye
+            is drawn straight to the real, clickable nav item. */}
         <AnimatePresence>
           {rect && (
             <motion.div
-              key="spotlight"
-              className="absolute rounded-2xl pointer-events-none hidden lg:block"
-              style={{
-                border: "2px solid #00D4FF",
-                boxShadow: "0 0 0 4px rgba(0,212,255,0.15), 0 0 26px rgba(0,212,255,0.55)",
-              }}
+              key={`spotlight-${step.id}`}
+              className="fixed rounded-2xl pointer-events-none hidden lg:block"
               initial={false}
               animate={{
                 top: rect.top - 6,
@@ -574,12 +615,34 @@ export function WelcomeTour({ userId }: Props) {
                 width: rect.width + 12,
                 height: rect.height + 12,
                 opacity: 1,
+                boxShadow: [
+                  "0 0 0 4px rgba(0,212,255,0.15), 0 0 26px rgba(0,212,255,0.55)",
+                  "0 0 0 6px rgba(0,212,255,0.22), 0 0 34px rgba(0,212,255,0.7)",
+                  "0 0 0 4px rgba(0,212,255,0.15), 0 0 26px rgba(0,212,255,0.55)",
+                ],
               }}
               exit={{ opacity: 0 }}
-              transition={springBouncy}
-            />
+              transition={{
+                top: springBouncy,
+                left: springBouncy,
+                width: springBouncy,
+                height: springBouncy,
+                boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+              }}
+              style={{ border: "2px solid #00D4FF" }}
+            >
+              <motion.span
+                key={`ping-${step.id}`}
+                className="absolute inset-0 rounded-2xl"
+                style={{ border: "2px solid #00FF88" }}
+                initial={{ opacity: 0.8, scale: 1 }}
+                animate={{ opacity: 0, scale: 1.35 }}
+                transition={{ duration: 0.9, ease: "easeOut" }}
+              />
+            </motion.div>
           )}
         </AnimatePresence>
+
 
         {/* Card container — bottom sheet on mobile, centered modal from sm+ */}
         <div className="absolute inset-0 flex items-end sm:items-center justify-center px-0 sm:px-4">
@@ -687,13 +750,18 @@ export function WelcomeTour({ userId }: Props) {
                     <div className="flex items-center gap-1.5 sm:gap-2 mb-5 overflow-x-auto">
                       {MINI_NAV.map((n) => {
                         const isActive = step.targetId === n.id;
+                        const targetIdx = STEPS.findIndex((s) => s.id === n.id);
                         return (
-                          <div
+                          <motion.button
                             key={n.id}
-                            className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-full flex-shrink-0 transition-all"
+                            onClick={() => goToStep(targetIdx)}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-full flex-shrink-0"
                             style={{
                               background: isActive ? "rgba(0,212,255,0.14)" : "rgba(255,255,255,0.03)",
                               border: isActive ? "1px solid rgba(0,212,255,0.5)" : "1px solid rgba(255,255,255,0.06)",
+                              cursor: "pointer",
                             }}
                           >
                             <span style={{ fontSize: 12, filter: isActive ? "none" : "grayscale(0.4) opacity(0.55)" }}>{n.icon}</span>
@@ -707,7 +775,7 @@ export function WelcomeTour({ userId }: Props) {
                             >
                               {n.label}
                             </span>
-                          </div>
+                          </motion.button>
                         );
                       })}
                     </div>
@@ -773,7 +841,13 @@ export function WelcomeTour({ userId }: Props) {
               >
                 <div className="flex items-center gap-1 mb-1.5">
                   {STEPS.map((s, i) => (
-                    <div key={s.id} className="flex-1 rounded-full overflow-hidden" style={{ height: 4, background: "rgba(0,212,255,0.15)" }}>
+                    <button
+                      key={s.id}
+                      onClick={() => goToStep(i)}
+                      className="flex-1 rounded-full overflow-hidden"
+                      style={{ height: 4, background: "rgba(0,212,255,0.15)", cursor: "pointer" }}
+                      aria-label={s.title}
+                    >
                       <motion.div
                         className="h-full rounded-full"
                         style={{ background: "linear-gradient(90deg,#00D4FF,#00FF88)" }}
@@ -781,7 +855,7 @@ export function WelcomeTour({ userId }: Props) {
                         animate={{ width: i <= stepIndex ? "100%" : "0%" }}
                         transition={{ duration: 0.35 }}
                       />
-                    </div>
+                    </button>
                   ))}
                 </div>
                 <div
